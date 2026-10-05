@@ -4,7 +4,7 @@ The 0.1 preview implements the core workflows listed in README. It does not prom
 
 ## Before calling the product production-ready
 
-- Complete installer creation and verify installation and server connection on physical Windows, Mac, Linux and Android devices.
+- Verify installation and server connection on physical Windows, Mac, Linux and Android devices; producing installer files alone does not verify those flows.
 - Verify PWA installation on a physical iPhone, cookies across installed/browser contexts and background/resume behavior.
 - Measure server idle/load memory, database growth, concurrent users and backup restoration; report hardware and workload alongside results.
 - A formal security review, administrative setup provisioning, upload quotas and operational monitoring.
