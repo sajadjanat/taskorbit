@@ -1,5 +1,11 @@
 # TaskOrbit wordmark
 
+Current version: `taskorbit-wordmark-v4-balanced.png`, with comfortable spacing and slight k/r overlap behind Mercury. Built-in imagegen prompt: keep the sunlit Mercury wordmark unchanged and bring Task/rbit inward only enough for roughly 2–3% planet-diameter overlap; preserve letter readability and comfortable spacing. The earlier tightly overlapped trial was rejected and is not used.
+
+The app icon `taskorbit-icon.png` uses the same sunlit Mercury on charcoal. Built-in imagegen prompt: derive a square icon from the approved planet, retaining crater texture and warm upper-left solar backlight, no text or rings, centered sphere at roughly 66% diameter with safe margins. The previous blue icon is preserved as `taskorbit-icon-v1-blue.png`.
+
+UI palette: light stone `#f6f4f0`, dark charcoal `#171615`, warm dark amber `#7d4b0b` on light surfaces and solar gold `#e9b75f` on dark surfaces. Semantic task status colors remain distinguishable. Earlier versions follow below.
+
 Current version: `taskorbit-wordmark-v3-sunlight.png`. Warm white-gold sunlight emerges from behind Mercury's upper-left limb, with a soft amber halo and rays to suggest its proximity to the Sun. Previous versions remain preserved.
 
 Sunlight edit prompt (built-in imagegen, 2026-10-05): add intense but restrained white-gold solar backlighting behind Mercury's upper-left limb, amber halo and soft radial rays fading into black, warm surface highlights and a dark right side; preserve the cratered planet, lettering, position and composition; no rings, accretion disk, extra planet or visible Sun sphere; do not wash out the letters.

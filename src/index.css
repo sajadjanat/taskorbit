@@ -25,30 +25,30 @@
   --radius-xl: 12px;
 }
 :root {
-  --background: #f8fafc;
-  --foreground: #1e293b;
+  --background: #f6f4f0;
+  --foreground: #292524;
   --card: #fff;
-  --primary: #1d4ed8;
+  --primary: #7d4b0b;
   --primary-foreground: #fff;
-  --secondary: #eff4fa;
-  --muted: #52647b;
-  --border: #e2e8f0;
-  --sidebar: #f1f5f9;
+  --secondary: #ede9e2;
+  --muted: #686159;
+  --border: #ddd6cc;
+  --sidebar: #eeeae4;
   --radius: 8px;
   color-scheme: light;
   font-family: "Vazirmatn", sans-serif;
   font-synthesis: none;
 }
 .dark {
-  --background: #101824;
-  --foreground: #e2e8f0;
-  --card: #172232;
-  --primary: #60a5fa;
-  --primary-foreground: #0f172a;
-  --secondary: #223146;
-  --muted: #a0aec0;
-  --border: #2b3b4f;
-  --sidebar: #141e2b;
+  --background: #171615;
+  --foreground: #f0eae0;
+  --card: #22201e;
+  --primary: #e9b75f;
+  --primary-foreground: #241b10;
+  --secondary: #302c27;
+  --muted: #b6aea3;
+  --border: #40392f;
+  --sidebar: #1c1a18;
   color-scheme: dark;
 }
 * {
@@ -117,8 +117,10 @@ input[type="color"] {
   letter-spacing: -0.9px;
 }
 .brand img {
-  width: 39px;
-  height: 39px;
+  width: 100%;
+  max-width: 250px;
+  height: auto;
+  border-radius: 6px;
   object-fit: contain;
 }
 .brand-orbit {
@@ -435,8 +437,8 @@ input[type="color"] {
   flex-shrink: 0;
 }
 .dot-doing {
-  border-color: #3b82f6;
-  background: #3b82f6;
+  border-color: var(--primary);
+  background: var(--primary);
 }
 .dot-review {
   border-color: #a855f7;
@@ -468,9 +470,9 @@ input[type="color"] {
 }
 .status-doing,
 .status-active {
-  color: #2563eb;
-  background: #3b82f610;
-  border-color: #3b82f633;
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
+  border-color: color-mix(in srgb, var(--primary) 25%, transparent);
 }
 .status-done,
 .status-completed {
@@ -725,7 +727,7 @@ input[type="color"] {
   color: #e11d48;
 }
 .priority-medium {
-  color: #3b82f6;
+  color: var(--primary);
 }
 .meta-end {
   display: flex;
@@ -1165,7 +1167,7 @@ tbody tr:hover {
 .orbit-path {
   width: 250px;
   height: 145px;
-  border: 1.5px dashed #3b82f655;
+  border: 1.5px dashed color-mix(in srgb, var(--primary) 35%, transparent);
   border-radius: 50%;
   transform: rotate(-25deg);
   position: absolute;
@@ -1178,7 +1180,7 @@ tbody tr:hover {
   height: 90px;
   border-radius: 26px;
   background: var(--primary);
-  color: #fff;
+  color: var(--primary-foreground);
   display: grid;
   place-items: center;
   transform: rotate(-8deg);
@@ -1483,7 +1485,7 @@ tbody tr:hover {
 }
 .dark .status-doing,
 .dark .status-active {
-  color: #93c5fd;
+  color: var(--primary);
 }
 .dark .status-done,
 .dark .status-completed {
@@ -1500,7 +1502,7 @@ tbody tr:hover {
   color: #92400e;
 }
 .priority-medium {
-  color: #1d4ed8;
+  color: var(--primary);
 }
 .priority-urgent {
   color: #be123c;
@@ -1515,10 +1517,10 @@ tbody tr:hover {
 }
 .status-doing,
 .status-active {
-  color: #1d4ed8;
+  color: var(--primary);
 }
 .dark .priority-medium {
-  color: #93c5fd;
+  color: var(--primary);
 }
 .dark .priority-high {
   color: #fcd34d;

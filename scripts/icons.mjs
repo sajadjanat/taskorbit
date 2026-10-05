@@ -31,7 +31,7 @@ copyFileSync("public/icon-192.png", "public/icon.png");
 const png = readFileSync("assets/brand/taskorbit-icon.png").toString("base64");
 writeFileSync(
   "work/pwa-icons/mask.svg",
-  `<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512"><rect width="512" height="512" fill="#101824"/><image x="90" y="90" width="332" height="332" href="data:image/png;base64,${png}"/></svg>`,
+  `<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512"><rect width="512" height="512" fill="#171615"/><image x="90" y="90" width="332" height="332" href="data:image/png;base64,${png}"/></svg>`,
 );
 run(["icon", "work/pwa-icons/mask.svg", "-o", "work/mask-icons", "-p", "512"]);
 copyFileSync("work/mask-icons/512x512.png", "public/maskable-512.png");

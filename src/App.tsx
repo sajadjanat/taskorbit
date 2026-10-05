@@ -184,15 +184,12 @@ function Logo() {
   return (
     <div className="brand">
       <img
-        src="/icon.png"
-        alt=""
+        src="/wordmark.png"
+        alt="TaskOrbit"
         onError={(e) => {
           e.currentTarget.src = "/icon.svg";
         }}
       />
-      <span>
-        Task<span className="brand-orbit">Orbit</span>
-      </span>
     </div>
   );
 }
@@ -958,7 +955,7 @@ export default function App() {
                   name: "",
                   identifier: "",
                   description: "",
-                  color: "#2563eb",
+                  color: "#7d4b0b",
                   archived: false,
                 })
               }
@@ -1178,7 +1175,7 @@ export default function App() {
                       name: "",
                       identifier: "",
                       description: "",
-                      color: "#2563eb",
+                      color: "#7d4b0b",
                     })
                   }
                 >

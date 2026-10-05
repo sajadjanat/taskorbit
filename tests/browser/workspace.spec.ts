@@ -44,11 +44,9 @@ test("setup, project, sprint, work item, comment, language and persistence", asy
   await dialog.getByRole("button", { name: "Save", exact: true }).click();
   await expect(dialog).not.toBeVisible();
   if (mobile)
-    await page
-      .locator(".mobile-backdrop")
-      .click({
-        position: { x: (page.viewportSize()?.width || 390) - 12, y: 12 },
-      });
+    await page.locator(".mobile-backdrop").click({
+      position: { x: (page.viewportSize()?.width || 390) - 12, y: 12 },
+    });
   await nav("Sprints");
   await page.getByRole("button", { name: "New sprint", exact: true }).click();
   await dialog.getByLabel("Name", { exact: true }).fill("Sprint 01");
@@ -124,6 +122,22 @@ test("setup, project, sprint, work item, comment, language and persistence", asy
     path: `work/screenshots/${testInfo.project.name}-fa.png`,
     fullPage: true,
   });
+  await page.getByRole("button", { name: "تیره", exact: true }).click();
+  await expect(page.locator("html")).toHaveClass(/dark/);
+  const darkScan = await new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa"])
+    .analyze();
+  expect(
+    darkScan.violations.filter(
+      (v) => v.impact === "critical" || v.impact === "serious",
+    ),
+  ).toEqual([]);
+  await page.screenshot({
+    path: `work/screenshots/${testInfo.project.name}-fa-dark.png`,
+    fullPage: true,
+  });
+  await page.getByRole("button", { name: "روشن", exact: true }).click();
+  await expect(page.locator("html")).not.toHaveClass(/dark/);
   const manifest = await (await request.get("/manifest.webmanifest")).json();
   expect(manifest.display).toBe("standalone");
   expect((await request.get("/apple-touch-icon.png")).status()).toBe(200);
