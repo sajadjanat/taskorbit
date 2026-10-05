@@ -1,1 +1,1 @@
-{"$schema":"../gen/schemas/desktop-schema.json","identifier":"local-connection","description":"Only the bundled connection screen receives native IPC. Remote servers get no native capabilities.","windows":["main"],"permissions":["core:default"]}
+{"$schema":"../gen/schemas/desktop-schema.json","identifier":"local-connection","description":"Only the bundled connection screen receives native IPC. Remote servers get no native capabilities.","windows":["main"],"permissions":["core:default","updater:default"],"platforms":["windows","macOS","linux"]}

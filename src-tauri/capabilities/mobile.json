@@ -1,0 +1,1 @@
+{"$schema":"../gen/schemas/mobile-schema.json","identifier":"mobile-connection","description":"Bundled mobile connection screen only; no remote capabilities.","windows":["main"],"permissions":["core:default"],"platforms":["android","iOS"]}

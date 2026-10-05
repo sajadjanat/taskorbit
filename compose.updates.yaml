@@ -1,0 +1,33 @@
+services:
+  taskorbit:
+    image: ${TASKORBIT_IMAGE:-ghcr.io/sajadjanat/taskorbit:stable}
+    labels:
+      io.taskorbit.role: server
+      io.taskorbit.instance: ${TASKORBIT_INSTANCE:-default}
+    environment:
+      UPDATE_AGENT_URL: http://updater:4311
+      UPDATE_TOKEN_PATH: /updates/control-token
+      UPDATE_STATE_PATH: /updates/state.json
+    volumes:
+      - taskorbit-updates:/updates:ro
+  updater:
+    image: ${TASKORBIT_IMAGE:-ghcr.io/sajadjanat/taskorbit:stable}
+    restart: unless-stopped
+    user: "0:0"
+    command: [node, server/update-agent.mjs]
+    environment:
+      TASKORBIT_INSTANCE: ${TASKORBIT_INSTANCE:-default}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - taskorbit-data:/data
+      - taskorbit-updates:/updates
+    healthcheck:
+      disable: true
+    mem_limit: 256m
+    cpus: 0.5
+    security_opt:
+      - no-new-privileges:true
+    cap_drop: [ALL]
+    cap_add: [CHOWN, FOWNER, DAC_OVERRIDE]
+volumes:
+  taskorbit-updates:

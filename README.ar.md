@@ -4,7 +4,7 @@
 
 [English](README.md) · [فارسی](README.fa.md) · العربية · [简体中文](README.zh-CN.md)
 
-إدارة خفيفة للمشاريع والسبرنتات ومهام الفريق على خادمك الخاص. TaskOrbit تطبيق مستقل بترخيص MIT مستوحى من سير العمل في [Plane](https://github.com/sajadjanat/plane-persian)، ولا يتضمن شيفرة Plane. الإصدار الحالي تجريبي ولا يوفر جميع ميزات Plane.
+إدارة خفيفة للمشاريع والسبرنتات ومهام الفريق على خادمك الخاص. TaskOrbit تطبيق مستقل بترخيص MIT لإدارة مشاريع الفرق. الإصدار الحالي تجريبي؛ توضح الأقسام التالية الميزات المتاحة والعمل المتبقي.
 
 ## الميزات المتاحة
 
@@ -39,7 +39,7 @@ docker compose up -d --build
 docker compose -f compose.image.yaml up -d
 ```
 
-الصورة `ghcr.io/sajadjanat/taskorbit:v0.1.2` متاحة لـ Linux amd64 وarm64. تحفظ الحسابات والمرفقات وSQLite في `taskorbit-data`. الأمر `docker compose down -v` يحذف وحدة التخزين والبيانات.
+الصورة `ghcr.io/sajadjanat/taskorbit:v0.1.3` متاحة لـ Linux amd64 وarm64. تحفظ الحسابات والمرفقات وSQLite في `taskorbit-data`. الأمر `docker compose down -v` يحذف وحدة التخزين والبيانات.
 
 ## خادم عام مع HTTPS: حاويتان
 
@@ -54,6 +54,11 @@ docker compose -f compose.yaml -f compose.https.yaml up -d --build
 ```
 
 الحاوية الثانية هي Caddy لتوفير شهادات TLS وتمرير الطلبات إلى TaskOrbit. للصورة الجاهزة استبدل `compose.yaml` بـ `compose.image.yaml`. يمكنك استخدام وكيلك العكسي الموجود وحاوية التطبيق فقط، مع `APP_ORIGIN=https://tasks.example.com` و`NODE_ENV=production`. يجب أن يطابق origin عنوان المتصفح. يرتبط التطبيق افتراضياً بعنوان loopback على مضيف Docker. لا تعرض الإعداد الأولي للعامة قبل استعداد المالك لإنشاء المدير.
+
+## التحديثات
+
+يمكن للمشرف العام التحقق من الإصدارات في لوحة الإدارة. لتفعيل تحديث الخادم بنقرة واحدة مع نسخة احتياطية واستعادة تلقائية عند الفشل، اسحب الصور ثم شغّل `docker compose -f compose.image.yaml -f compose.updates.yaml up -d`. تضاف حاوية تحديث: حاويتان إجمالاً أو ثلاث مع Caddy. يتضمن سطح المكتب منذ 0.1.3 تحديثات موقعة عبر شاشة الاتصال وقائمة **Updates / Server connection**. يتيح Android تنزيل APK الموقّع ويتطلب موافقة المستخدم للتثبيت. يقدم الويب وPWA على iPhone إعادة التحميل بعد تحديث الخادم. الإصدارات الأقدم تحتاج تثبيت 0.1.3 يدويًا مرة واحدة. راجع [دليل التحديث](docs/UPDATES.md).
+
 
 ## التثبيت على الأجهزة
 
@@ -100,7 +105,7 @@ npm run test:e2e
 
 ## الإصدار والنطاق
 
-يشغّل الوسم `v0.1.2` الاختبارات وبناء الحزم الأصلية والصورة متعددة المعماريات ومسودة إصدار تجريبي. ينشر الإصدار بعد نجاح جميع المنصات. راجع [ملاحظات الإصدار](docs/RELEASE-NOTES.md) و[نتائج التحقق](docs/VERIFICATION.md) و[خارطة الطريق](docs/ROADMAP.md).
+يشغّل الوسم `v0.1.3` الاختبارات وبناء الحزم الأصلية والصورة متعددة المعماريات ومسودة إصدار. ينشر الإصدار بعد نجاح جميع المنصات. راجع [ملاحظات الإصدار](docs/RELEASE-NOTES.md) و[نتائج التحقق](docs/VERIFICATION.md) و[خارطة الطريق](docs/ROADMAP.md).
 
 التقنيات: React وTypeScript وVite وTailwind ومكونات shadcn/ui الفعلية وExpress وSQLite المدمجة في Node وTauri 2. الخط Vazirmatn بترخيص OFL. تعتمد الهوية على عطارد وإضاءة شمسية دافئة وألوان حجرية/فحمية وذهبية؛ [تفاصيل الهوية](assets/brand/WORDMARK.md).
 

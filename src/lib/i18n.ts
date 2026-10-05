@@ -1,5 +1,36 @@
 export const messages = {
   en: {
+    webUpdateReady:
+      "A new web version is ready. Save your work before reloading.",
+    reloadApp: "Reload app",
+    clientUpdates: "Client updates",
+    serverUpdates: "Server updates",
+    installedVersion: "Installed version",
+    newVersion: "New version",
+    checkUpdates: "Check for updates",
+    installUpdate: "Install update",
+    downloadApk: "Download signed APK",
+    updateUnavailable:
+      "Could not reach the update service. Check connectivity and try again.",
+    clientUpdateHint:
+      "Desktop updates are signature-verified. Android downloads a signed APK for installation through your device.",
+    serverUpdateHint:
+      "The new image is downloaded first. Editing pauses briefly for a database backup and restart. If health verification fails, the previous version and database are restored.",
+    upgrading: "Upgrade in progress; reconnecting…",
+    updateRolledBack:
+      "The upgrade failed and the previous version was restored.",
+    updateRecovery:
+      "Upgrade failed. If automatic recovery was unsuccessful, ask the server operator to use the retained backup.",
+    upToDate: "You are up to date.",
+    downloading: "Downloading",
+    enableUpgradeService:
+      "Enable the Docker upgrade service for one-click server updates.",
+    updateGuide: "Upgrade guide",
+    updatePhase_downloading: "Downloading image",
+    updatePhase_backing_up: "Backing up database",
+    updatePhase_installing: "Installing",
+    updatePhase_checking_health: "Verifying server health",
+    updatePhase_rolling_back: "Restoring previous version",
     overview: "Overview",
     tasks: "Work items",
     sprints: "Sprints",
@@ -157,6 +188,36 @@ export const messages = {
       "An instance administrator creates accounts; a workspace administrator adds existing accounts to the team.",
   },
   fa: {
+    webUpdateReady:
+      "نسخهٔ جدید وب آماده است. پیش از بارگذاری مجدد، تغییرات خود را ذخیره کنید.",
+    reloadApp: "بارگذاری نسخهٔ جدید",
+    clientUpdates: "به‌روزرسانی کلاینت",
+    serverUpdates: "به‌روزرسانی سرور",
+    installedVersion: "نسخه نصب‌شده",
+    newVersion: "نسخه جدید",
+    checkUpdates: "بررسی به‌روزرسانی",
+    installUpdate: "نصب به‌روزرسانی",
+    downloadApk: "دریافت APK امضاشده",
+    updateUnavailable:
+      "ارتباط با سرویس به‌روزرسانی برقرار نشد. اتصال را بررسی و دوباره تلاش کنید.",
+    clientUpdateHint:
+      "به‌روزرسانی دسکتاپ با بررسی امضا نصب می‌شود. اندروید APK امضاشده را برای نصب از طریق دستگاه دریافت می‌کند.",
+    serverUpdateHint:
+      "ابتدا ایمیج جدید دانلود می‌شود. ویرایش برای پشتیبان دیتابیس و راه‌اندازی دوباره موقتاً متوقف می‌شود. اگر بررسی سلامت موفق نباشد، نسخه و دیتابیس قبلی بازگردانده می‌شوند.",
+    upgrading: "ارتقا در حال انجام؛ تلاش برای اتصال دوباره…",
+    updateRolledBack: "ارتقا موفق نشد و نسخه قبلی بازگردانده شد.",
+    updateRecovery:
+      "ارتقا موفق نشد. اگر بازیابی خودکار کامل نشد، مسئول سرور از پشتیبان محفوظ استفاده کند.",
+    upToDate: "آخرین نسخه نصب است.",
+    downloading: "در حال دانلود",
+    enableUpgradeService:
+      "برای ارتقای یک‌کلیکی سرور، سرویس ارتقای Docker را فعال کنید.",
+    updateGuide: "راهنمای ارتقا",
+    updatePhase_downloading: "دریافت ایمیج",
+    updatePhase_backing_up: "پشتیبان‌گیری دیتابیس",
+    updatePhase_installing: "نصب",
+    updatePhase_checking_health: "بررسی سلامت سرور",
+    updatePhase_rolling_back: "بازگردانی نسخه قبلی",
     overview: "نمای کلی",
     tasks: "کارها",
     sprints: "اسپرینت‌ها",

@@ -8,4 +8,4 @@
 - Tauri: MIT / Apache-2.0, https://github.com/tauri-apps/tauri
 - SQLite: public domain, https://sqlite.org/copyright.html
 
-Package-manager dependency licenses remain in their distributed packages. The logo is a palette variant generated from the owner's sibling GitOrbit artwork; the source image is recorded in assets/brand/README.md. Plane is used as a feature reference only. No Plane code is distributed.
+Package-manager dependency licenses remain in their distributed packages. The logo was generated from the owner's sibling GitOrbit artwork; the source image is recorded in assets/brand/README.md.

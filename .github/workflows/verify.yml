@@ -22,6 +22,8 @@ jobs:
       - run: npm run test:e2e
       - run: docker compose config --quiet
       - run: docker build -t taskorbit:test .
+      - run: node scripts/test-docker-upgrades.mjs
+      - run: docker compose -f compose.image.yaml -f compose.updates.yaml config --quiet
       - name: Smoke test container
         run: |
           docker run -d --name taskorbit-test -p 4310:4310 taskorbit:test

@@ -10,7 +10,14 @@ import {
   createHash,
 } from "node:crypto";
 import path from "node:path";
+import { readFileSync } from "node:fs";
 import { openDatabase, transaction } from "./db.mjs";
+import {
+  VERSION,
+  releaseChecker,
+  newer,
+  updateAgentClient,
+} from "./updates.mjs";
 
 const id = z.string().uuid(),
   short = z.string().trim().min(1).max(200),
@@ -36,7 +43,7 @@ const projectSchema = z.object({
   color: z
     .string()
     .regex(/^#[a-fA-F0-9]{6}$/)
-    .default("#2563eb"),
+    .default("#7d4b0b"),
   archived: z.boolean().default(false),
 });
 const sprintSchema = z
@@ -88,6 +95,9 @@ export function createApp({
   origin = process.env.APP_ORIGIN || "http://localhost:4310",
   secure = process.env.NODE_ENV === "production",
   serveStatic = true,
+  checkRelease = releaseChecker(),
+  upgradeAgent = updateAgentClient(),
+  maintenancePath = process.env.UPDATE_STATE_PATH,
 } = {}) {
   const db = openDatabase(database),
     app = express();
@@ -110,6 +120,25 @@ export function createApp({
   app.use(express.json({ limit: "256kb" }));
   app.use("/api", (req, res, next) => {
     res.set("Cache-Control", "no-store");
+    if (maintenancePath && !["GET", "HEAD", "OPTIONS"].includes(req.method)) {
+      try {
+        const state = JSON.parse(readFileSync(maintenancePath, "utf8"));
+        if (state.state === "running" || state.phase === "recovery_required")
+          return res
+            .status(503)
+            .json({
+              error:
+                "Server upgrade in progress; editing resumes after health verification",
+            });
+      } catch (e) {
+        if (e.code !== "ENOENT")
+          return res
+            .status(503)
+            .json({
+              error: "Upgrade state unavailable; editing temporarily paused",
+            });
+      }
+    }
     if (
       !["GET", "HEAD", "OPTIONS"].includes(req.method) &&
       req.headers.origin &&
@@ -241,7 +270,7 @@ export function createApp({
 
   app.get("/api/health", (req, res) => {
     db.prepare("SELECT 1").get();
-    res.json({ status: "ok", version: "0.1.2" });
+    res.json({ status: "ok", version: VERSION });
   });
   app.get("/api/setup", (req, res) =>
     res.json({ required: !db.prepare("SELECT 1 FROM users LIMIT 1").get() }),
@@ -309,6 +338,71 @@ export function createApp({
       db.prepare("DELETE FROM sessions WHERE user_id=?").run(req.user.id);
     });
     res.clearCookie("taskorbit_session", { path: "/" }).json({ ok: true });
+  });
+  app.get("/api/admin/updates", admin, async (req, res) => {
+    try {
+      const release = await checkRelease();
+      res.json({
+        current: VERSION,
+        release,
+        available: newer(release.version, VERSION),
+        one_click: upgradeAgent.enabled,
+      });
+    } catch {
+      res
+        .status(503)
+        .json({
+          error: "Cannot check releases; try again when online",
+          current: VERSION,
+          one_click: upgradeAgent.enabled,
+        });
+    }
+  });
+  app.get("/api/admin/updates/status", admin, async (req, res) => {
+    try {
+      res.json(
+        upgradeAgent.enabled
+          ? await upgradeAgent.request("/status")
+          : { state: "disabled" },
+      );
+    } catch {
+      res.status(503).json({ error: "Upgrade service unavailable" });
+    }
+  });
+  app.post("/api/admin/updates", admin, async (req, res) => {
+    try {
+      const { version } = z
+        .object({ version: z.string().regex(/^\d+\.\d+\.\d+$/) })
+        .parse(req.body);
+      const release = await checkRelease();
+      if (version !== release.version || !newer(version, VERSION))
+        return res
+          .status(409)
+          .json({
+            error: "Check the current eligible release before upgrading",
+          });
+      if (!upgradeAgent.enabled)
+        return res
+          .status(409)
+          .json({
+            error:
+              "Enable the Docker upgrade service before using one-click updates",
+          });
+      res
+        .status(202)
+        .json(
+          await upgradeAgent.request("/upgrade", { version, from: VERSION }),
+        );
+    } catch (e) {
+      res
+        .status(e instanceof z.ZodError ? 400 : 503)
+        .json({
+          error:
+            e instanceof z.ZodError
+              ? "Invalid release version"
+              : "Cannot start upgrade; check the release and upgrade service",
+        });
+    }
   });
   app.get("/api/admin/users", admin, (req, res) =>
     res.json(
@@ -814,14 +908,12 @@ export function createApp({
         req.params.pid,
         ...cols.map((k) => (k === "filters" ? JSON.stringify(v[k]) : v[k])),
       );
-      res
-        .status(201)
-        .json({
-          id: rid,
-          project_id: req.params.pid,
-          ...v,
-          ...(resource === "pages" ? { version: 0 } : {}),
-        });
+      res.status(201).json({
+        id: rid,
+        project_id: req.params.pid,
+        ...v,
+        ...(resource === "pages" ? { version: 0 } : {}),
+      });
     });
     app.put(`/api/${resource}/:rid`, (req, res) => {
       const r = db
@@ -898,15 +990,13 @@ export function createApp({
   }
   app.use((error, req, res, next) => {
     if (error instanceof z.ZodError)
-      return res
-        .status(400)
-        .json({
-          error: "Invalid input",
-          issues: error.issues.map((x) => ({
-            path: x.path,
-            message: x.message,
-          })),
-        });
+      return res.status(400).json({
+        error: "Invalid input",
+        issues: error.issues.map((x) => ({
+          path: x.path,
+          message: x.message,
+        })),
+      });
     if (
       error.code?.startsWith("ERR_SQLITE") ||
       error.message?.includes("constraint")

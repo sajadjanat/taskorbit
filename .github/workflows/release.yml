@@ -19,16 +19,19 @@ jobs:
       - run: npm run build
       - run: npx playwright install --with-deps chromium webkit
       - run: npm run test:e2e
+      - run: docker build -t taskorbit:test .
+      - run: node scripts/test-docker-upgrades.mjs
+      - run: docker compose -f compose.image.yaml -f compose.updates.yaml config --quiet
       - name: Package web server
         run: |
           tar -czf /tmp/taskorbit-web-server.tar.gz --exclude=./.git --exclude=./node_modules --exclude=./data --exclude=./work --exclude=./src-tauri/target --exclude=./test-results .
           mv /tmp/taskorbit-web-server.tar.gz ./taskorbit-web-server.tar.gz
-      - name: Create draft prerelease
+      - name: Create draft release
         if: startsWith(github.ref, 'refs/tags/')
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "$GITHUB_REF_NAME" --draft --prerelease --title "TaskOrbit $GITHUB_REF_NAME (preview)" --notes-file docs/RELEASE-NOTES.md
+          gh release create "$GITHUB_REF_NAME" --draft --title "TaskOrbit $GITHUB_REF_NAME" --notes-file docs/RELEASE-NOTES.md
           gh release upload "$GITHUB_REF_NAME" taskorbit-web-server.tar.gz --clobber
       - uses: actions/upload-artifact@v4
         with:
@@ -46,11 +49,11 @@ jobs:
             name: windows-x64
           - os: macos-latest
             target: aarch64-apple-darwin
-            bundles: dmg
+            bundles: app,dmg
             name: macos-arm64
           - os: macos-latest
             target: x86_64-apple-darwin
-            bundles: dmg
+            bundles: app,dmg
             name: macos-x64
           - os: ubuntu-24.04
             target: x86_64-unknown-linux-gnu
@@ -77,6 +80,19 @@ jobs:
       - run: npm run build
       - run: cargo test --lib --locked --manifest-path src-tauri/Cargo.toml
       - run: npx tauri build --target ${{ matrix.target }} --bundles ${{ matrix.bundles }}
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+      - name: Give macOS updater archives unique architecture names
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          bundle="src-tauri/target/${{ matrix.target }}/release/bundle/macos"
+          arch=x64
+          if [[ '${{ matrix.target }}' == aarch64-* ]]; then arch=aarch64; fi
+          version="$(node -p 'require("./package.json").version')"
+          mv "$bundle/TaskOrbit.app.tar.gz" "$bundle/TaskOrbit_${version}_${arch}.app.tar.gz"
+          mv "$bundle/TaskOrbit.app.tar.gz.sig" "$bundle/TaskOrbit_${version}_${arch}.app.tar.gz.sig"
       - uses: actions/upload-artifact@v4
         with:
           name: taskorbit-${{ matrix.name }}
@@ -88,7 +104,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          find src-tauri/target/${{ matrix.target }}/release/bundle -type f \( -name '*.exe' -o -name '*.dmg' -o -name '*.deb' -o -name '*.AppImage' \) -print0 | while IFS= read -r -d '' file; do gh release upload "$GITHUB_REF_NAME" "$file" --clobber; done
+          find src-tauri/target/${{ matrix.target }}/release/bundle -type f \( -name '*.exe' -o -name '*.dmg' -o -name '*.deb' -o -name '*.AppImage' -o -name '*.app.tar.gz' -o -name '*.sig' \) -print0 | while IFS= read -r -d '' file; do gh release upload "$GITHUB_REF_NAME" "$file" --clobber; done
   android:
     needs: verify
     runs-on: ubuntu-24.04
@@ -170,15 +186,31 @@ jobs:
   publish:
     needs: [verify, desktop, android, container]
     if: startsWith(github.ref, 'refs/tags/')
+    permissions:
+      contents: write
+      packages: write
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
       - name: Checksums and publication after all packages succeed
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           mkdir release-files
           gh release download "$GITHUB_REF_NAME" --dir release-files
+          sudo apt-get update && sudo apt-get install -y minisign
+          node scripts/verify-updater-signatures.mjs release-files
+          node scripts/release-manifest.mjs release-files
           (cd release-files && sha256sum * > SHA256SUMS)
-          gh release upload "$GITHUB_REF_NAME" release-files/SHA256SUMS --clobber
-          gh release edit "$GITHUB_REF_NAME" --draft=false --prerelease
+          gh release upload "$GITHUB_REF_NAME" release-files/latest.json release-files/SHA256SUMS --clobber
+          docker buildx imagetools create --tag ghcr.io/sajadjanat/taskorbit:stable "ghcr.io/sajadjanat/taskorbit:$GITHUB_REF_NAME"
+          gh release edit "$GITHUB_REF_NAME" --draft=false --prerelease=false --latest

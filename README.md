@@ -4,7 +4,7 @@
 
 **Languages:** English · [Persian](README.fa.md) · [Arabic](README.ar.md) · [Simplified Chinese](README.zh-CN.md)
 
-TaskOrbit is an independent, MIT-licensed implementation inspired by the project-management workflows of [Plane](https://github.com/sajadjanat/plane-persian). It does not contain Plane source code. The first release is an early preview, not full feature parity with Plane.
+TaskOrbit is an independent, MIT-licensed application for team project management. The current release is an early preview; implemented features and remaining work are documented below.
 
 ## Available in the preview
 
@@ -39,9 +39,14 @@ To use the published multi-architecture image instead of building from source:
 docker compose -f compose.image.yaml up -d
 ```
 
-The public image is `ghcr.io/sajadjanat/taskorbit:v0.1.2` for Linux amd64 and arm64. For HTTPS with this image, combine `compose.image.yaml` with `compose.https.yaml` and set the same `TASKORBIT_DOMAIN` described below.
+The public image is `ghcr.io/sajadjanat/taskorbit:v0.1.3` for Linux amd64 and arm64. For HTTPS with this image, combine `compose.image.yaml` with `compose.https.yaml` and set the same `TASKORBIT_DOMAIN` described below.
 
 SQLite, attachments and account data persist in `taskorbit-data`. Do not use `docker compose down -v` unless you intend to delete them.
+
+## Updates
+
+The instance administrator can check releases in **Admin**. To enable one-click server installation with database backup and automatic rollback, run `docker compose -f compose.image.yaml -f compose.updates.yaml up -d` after pulling the images. This adds one updater container (two total, or three with Caddy). Desktop 0.1.3+ clients have a signed updater on the local connection screen; use the **Updates / Server connection** menu. Android offers the newer signed APK and requires installation approval. Web/iPhone PWA offers reload after your server is upgraded. Versions before 0.1.3 require one manual installation. See the [update guide](docs/UPDATES.md).
+
 
 ## Public server with HTTPS (two containers)
 
@@ -102,7 +107,7 @@ The Compose resource settings cap the application at 512 MB and one CPU; these a
 
 ## Release and scope
 
-Tag `v0.1.2` triggers verification, native packaging, a multi-architecture server image and a draft prerelease. Publication occurs only after all platform jobs succeed. See [release notes](docs/RELEASE-NOTES.md) and [roadmap](docs/ROADMAP.md) for implemented and remaining features.
+Tag `v0.1.3` triggers verification, native packaging, a multi-architecture server image and a draft release. Publication occurs only after all platform jobs succeed. See [release notes](docs/RELEASE-NOTES.md) and [roadmap](docs/ROADMAP.md) for implemented and remaining features.
 
 Stack: React, TypeScript, Vite, Tailwind, genuine shadcn/ui source components, Express, Node's SQLite API and Tauri 2. Font: Vazirmatn (OFL). The Mercury wordmark and app icon use warm solar lighting, with stone/charcoal surfaces and gold accents throughout both UI themes. Brand artwork was generated from the owner's GitOrbit reference; see [brand details](assets/brand/WORDMARK.md).
 

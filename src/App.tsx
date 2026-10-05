@@ -7,6 +7,7 @@ import {
   type ReactNode,
 } from "react";
 import { isTauri, invoke } from "@tauri-apps/api/core";
+import { Updates, WebUpdateNotice } from "./components/updates";
 import {
   LayoutDashboard,
   Layers,
@@ -763,6 +764,7 @@ export default function App() {
           <h1>{t("connection")}</h1>
           <p>{t("serverHint")}</p>
           {errorBanner}
+          <WebUpdateNotice locale={locale} />
           <form
             onSubmit={async (e) => {
               e.preventDefault();
@@ -794,6 +796,7 @@ export default function App() {
             {languageControl}
             {themeControl}
           </div>
+          <Updates locale={locale} native />
         </div>
       </div>
     );
@@ -1855,6 +1858,7 @@ export default function App() {
               )}
               {section === "admin" && !!user.admin && (
                 <>
+                  <Updates locale={locale} />
                   <div className="table-wrap">
                     <table>
                       <thead>
@@ -1918,6 +1922,7 @@ export default function App() {
               )}
               {section === "settings" && (
                 <div className="settings-grid">
+                  {user.admin === 1 && <Updates locale={locale} />}
                   <section className="panel settings-panel">
                     <h2>{t("theme")}</h2>
                     <div className="settings-row">
@@ -1978,7 +1983,7 @@ export default function App() {
           )}
         </div>
         <footer className="app-footer">
-          <span>TaskOrbit 0.1.2</span>
+          <span>TaskOrbit 0.1.3</span>
           <a
             href="https://github.com/sajadjanat/taskorbit"
             target="_blank"
