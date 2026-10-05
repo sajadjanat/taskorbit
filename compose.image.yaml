@@ -1,0 +1,19 @@
+services:
+  taskorbit:
+    image: ghcr.io/sajadjanat/taskorbit:${TASKORBIT_VERSION:-v0.1.1}
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:4310:4310"
+    environment:
+      APP_ORIGIN: ${APP_ORIGIN:-http://localhost:4310}
+      NODE_ENV: ${NODE_ENV:-development}
+    volumes:
+      - taskorbit-data:/data
+    mem_limit: 512m
+    cpus: 1.0
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+volumes:
+  taskorbit-data:

@@ -29,6 +29,14 @@ docker compose up -d --build
 
 Open `http://localhost:4310`. Create the first administrator and workspace. There is no default password. Public registration closes after this account is created. The administrator then creates user accounts and adds them to a workspace from **Team**. A workspace is the permission boundary: all its members can see its projects.
 
+To use the published multi-architecture image instead of building from source:
+
+```sh
+docker compose -f compose.image.yaml up -d
+```
+
+The public image is `ghcr.io/sajadjanat/taskorbit:v0.1.1` for Linux amd64 and arm64. For HTTPS with this image, combine `compose.image.yaml` with `compose.https.yaml` and set the same `TASKORBIT_DOMAIN` described below.
+
 SQLite, attachments and account data persist in `taskorbit-data`. Do not use `docker compose down -v` unless you intend to delete them.
 
 ## Public server with HTTPS (two containers)
