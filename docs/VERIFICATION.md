@@ -8,6 +8,7 @@ Recorded on 2026-10-05. These checks describe the preview, not production readin
 - [Verification CI](https://github.com/sajadjanat/taskorbit/actions/runs/37313287031) also built the Docker image and checked a running container's health endpoint.
 - [Release build](https://github.com/sajadjanat/taskorbit/actions/runs/37313292330) passed desktop Rust unit tests and produced Windows x64 NSIS, macOS Intel/Apple Silicon DMG, Linux x64 DEB/AppImage and the web/server archive. Its original Android SDK step failed; Android is rebuilt separately with the corrected workflow.
 - The public GHCR image `ghcr.io/sajadjanat/taskorbit:v0.1.1` has Linux amd64 and arm64 manifests, verified with anonymous registry access.
+- [Android recovery build](https://github.com/sajadjanat/taskorbit/actions/runs/37314638147) produced the arm64 APK and passed `apksigner verify` before attaching it to the release, using the persistent release signing key.
 
 Physical-device installation, native-client end-to-end server connection, iPhone PWA installation/resume, production deployment, backup restoration under load and Windows/macOS code signing remain unverified or incomplete. See [ROADMAP.md](ROADMAP.md).
 
