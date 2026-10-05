@@ -123,6 +123,15 @@ input[type="color"] {
   border-radius: 6px;
   object-fit: contain;
 }
+.brand .brand-dark {
+  display: none;
+}
+.dark .brand .brand-light {
+  display: none;
+}
+.dark .brand .brand-dark {
+  display: block;
+}
 .brand-orbit {
   font-weight: 500;
 }

@@ -1,6 +1,12 @@
 # TaskOrbit wordmark
 
-Current version: `taskorbit-wordmark-v4-balanced.png`, with comfortable spacing and slight k/r overlap behind Mercury. Built-in imagegen prompt: keep the sunlit Mercury wordmark unchanged and bring Task/rbit inward only enough for roughly 2–3% planet-diameter overlap; preserve letter readability and comfortable spacing. The earlier tightly overlapped trial was rejected and is not used.
+Current versions: `taskorbit-wordmark-v5-light.png` and `taskorbit-wordmark-v5-dark.png`, generated with built-in imagegen and actual transparent alpha. The opaque dark hemisphere of Mercury is retained. Dark surfaces use ivory lettering; light surfaces use charcoal lettering. Visual checks on dark, stone and tinted surfaces showed readable text without a rectangular backdrop.
+
+Dark-theme edit prompt: preserve the approved geometric white lettering, TaskOrbit spelling, comfortable k/r overlap and solid cratered Mercury; remove the black background to alpha; keep a compact upper-left white-gold glint, narrow rays and restrained halo, clean contours and transparent letter counters; no cloud, grain, matte fringe or added elements.
+
+Light-theme edit prompt: change only the ivory Task/rbit lettering to warm charcoal `#292524`; preserve exact font, spacing, Mercury texture and compact sunlight; retain all alpha transparency, smooth edges and clear counters; no backdrop or letter halo.
+
+Previous approved version: `taskorbit-wordmark-v4-balanced.png`, with comfortable spacing and slight k/r overlap behind Mercury. Its prompt brought Task/rbit inward by roughly 2–3% of the planet diameter. The tightly overlapped earlier trial is not used.
 
 The app icon `taskorbit-icon.png` uses the same sunlit Mercury on charcoal. Built-in imagegen prompt: derive a square icon from the approved planet, retaining crater texture and warm upper-left solar backlight, no text or rings, centered sphere at roughly 66% diameter with safe margins. The previous blue icon is preserved as `taskorbit-icon-v1-blue.png`.
 

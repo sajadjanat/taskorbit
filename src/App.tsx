@@ -185,13 +185,15 @@ function Logo() {
   return (
     <div className="brand">
       <img
-        src="/wordmark.png"
+        className="brand-light"
+        src="/wordmark-light.png"
         alt="TaskOrbit"
         onError={(e) => {
           e.currentTarget.onerror = null;
           e.currentTarget.src = "/icon.png";
         }}
       />
+      <img className="brand-dark" src="/wordmark-dark.png" alt="TaskOrbit" />
     </div>
   );
 }
@@ -1983,7 +1985,7 @@ export default function App() {
           )}
         </div>
         <footer className="app-footer">
-          <span>TaskOrbit 0.1.3</span>
+          <span>TaskOrbit 0.1.4</span>
           <a
             href="https://github.com/sajadjanat/taskorbit"
             target="_blank"
