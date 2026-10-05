@@ -11,7 +11,7 @@
   <p>مدیریت پروژهٔ سبک و سلف‌هاست با React، shadcn/ui و Tauri.</p>
   <p>
     <a href="https://github.com/sajadjanat/taskorbit/actions/workflows/verify.yml"><img src="https://github.com/sajadjanat/taskorbit/actions/workflows/verify.yml/badge.svg" alt="Web and server checks" /></a>
-    <a href="https://github.com/sajadjanat/taskorbit/releases"><img src="https://img.shields.io/badge/version-0.1.4-b88645" alt="Version 0.1.4" /></a>
+    <a href="https://github.com/sajadjanat/taskorbit/releases"><img src="https://img.shields.io/badge/version-0.1.5-b88645" alt="Version 0.1.5" /></a>
     <img src="https://img.shields.io/badge/Tauri-2-24c8db?logo=tauri&amp;logoColor=white" alt="Tauri 2" />
     <img src="https://img.shields.io/badge/UI-shadcn%2Fui-18181b?logo=shadcnui&amp;logoColor=white" alt="shadcn/ui" />
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-b88645" alt="MIT license" /></a>
@@ -66,13 +66,13 @@
 
 ## دانلود
 
-[**TaskOrbit 0.1.4 → GitHub Releases**](https://github.com/sajadjanat/taskorbit/releases/tag/v0.1.4)
+[**TaskOrbit 0.1.5 → GitHub Releases**](https://github.com/sajadjanat/taskorbit/releases/tag/v0.1.5)
 
 | پلتفرم | بسته یا روش دسترسی | روش به‌روزرسانی |
 | --- | --- | --- |
-| Windows x64 | TaskOrbit_0.1.4_x64-setup.exe | updater امضاشده داخل برنامه |
-| macOS Apple Silicon | TaskOrbit_0.1.4_aarch64.dmg | updater امضاشده داخل برنامه |
-| macOS Intel | TaskOrbit_0.1.4_x64.dmg | updater امضاشده داخل برنامه |
+| Windows x64 | TaskOrbit_0.1.5_x64-setup.exe | updater امضاشده داخل برنامه |
+| macOS Apple Silicon | TaskOrbit_0.1.5_aarch64.dmg | updater امضاشده داخل برنامه |
+| macOS Intel | TaskOrbit_0.1.5_x64.dmg | updater امضاشده داخل برنامه |
 | Linux x64 | DEB / AppImage | updater امضاشده داخل برنامه |
 | Android arm64 | taskorbit-android-arm64.apk | APK امضاشده؛ نصب با تأیید کاربر |
 | Web / iPhone / iPad | مرورگر / افزودن به صفحهٔ اصلی | بارگذاری مجدد پس از ارتقای سرور |
@@ -104,7 +104,7 @@ docker compose up -d --build
 docker compose -f compose.image.yaml up -d
 ```
 
-ایمیج `ghcr.io/sajadjanat/taskorbit:v0.1.4` برای Linux amd64/arm64 است. داده‌های SQLite، حساب‌ها و پیوست‌ها در `taskorbit-data` می‌مانند. دستور `docker compose down -v` این حجم و داده‌ها را حذف می‌کند.
+ایمیج `ghcr.io/sajadjanat/taskorbit:v0.1.5` برای Linux amd64/arm64 است. داده‌های SQLite، حساب‌ها و پیوست‌ها در `taskorbit-data` می‌مانند. دستور `docker compose down -v` این حجم و داده‌ها را حذف می‌کند.
 
 ## سرور عمومی با HTTPS؛ دو کانتینر
 
@@ -172,7 +172,7 @@ Compose سقف ۵۱۲ مگابایت حافظه و یک CPU دارد؛ این س
 
 ## انتشار و محدوده
 
-تگ `v0.1.4` آزمون، ساخت بسته‌های بومی، ایمیج چندمعماری و پیش‌نویس ریلیز را فعال می‌کند. انتشار بعد از موفقیت همهٔ پلتفرم‌ها انجام می‌شود. [یادداشت ریلیز](docs/RELEASE-NOTES.md)، [شواهد آزمون](docs/VERIFICATION.md) و [نقشه راه](docs/ROADMAP.md) محدودیت‌ها و قدم‌های بعدی را توضیح می‌دهند.
+تگ `v0.1.5` آزمون، ساخت بسته‌های بومی، ایمیج چندمعماری و پیش‌نویس ریلیز را فعال می‌کند. انتشار بعد از موفقیت همهٔ پلتفرم‌ها انجام می‌شود. [یادداشت ریلیز](docs/RELEASE-NOTES.md)، [شواهد آزمون](docs/VERIFICATION.md) و [نقشه راه](docs/ROADMAP.md) محدودیت‌ها و قدم‌های بعدی را توضیح می‌دهند.
 
 فناوری‌ها: React، TypeScript، Vite، Tailwind، کامپوننت‌های واقعی shadcn/ui، Express، SQLite داخلی Node و Tauri 2. فونت Vazirmatn با مجوز OFL است. نشان عطارد با نور گرم خورشید و زمینهٔ سنگی/زغالی در تم‌های برنامه استفاده می‌شود؛ [جزئیات برند](assets/brand/WORDMARK.md).
 
