@@ -1,0 +1,35 @@
+name: Verify web and server
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium webkit
+      - run: npm run test:e2e
+      - run: docker compose config --quiet
+      - run: docker build -t taskorbit:test .
+      - name: Smoke test container
+        run: |
+          docker run -d --name taskorbit-test -p 4310:4310 taskorbit:test
+          for i in {1..30}; do curl -fsS http://localhost:4310/api/health && break || sleep 2; done
+          curl -fsS http://localhost:4310/api/health
+          docker stop taskorbit-test
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: browser-failure
+          path: test-results/

@@ -1,0 +1,14 @@
+node_modules/
+dist/
+data/
+work/
+.env
+src-tauri/target/
+src-tauri/gen/
+test-results/
+playwright-report/
+*.log
+backups/
+*.jks
+*.keystore
+keystore.properties

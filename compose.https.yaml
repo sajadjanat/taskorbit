@@ -1,0 +1,24 @@
+services:
+  taskorbit:
+    environment:
+      APP_ORIGIN: https://${TASKORBIT_DOMAIN:?Set TASKORBIT_DOMAIN}
+      NODE_ENV: production
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      TASKORBIT_DOMAIN: ${TASKORBIT_DOMAIN:?Set TASKORBIT_DOMAIN}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      taskorbit:
+        condition: service_healthy
+volumes:
+  caddy-data:
+  caddy-config:

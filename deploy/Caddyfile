@@ -1,0 +1,4 @@
+{$TASKORBIT_DOMAIN} {
+  reverse_proxy taskorbit:4310
+  encode zstd gzip
+}
