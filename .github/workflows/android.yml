@@ -1,0 +1,59 @@
+name: Build Android for existing release
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Existing draft release tag to build and attach the APK to
+        required: true
+        default: v0.1.1
+permissions:
+  contents: write
+jobs:
+  android:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.release_tag }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+      - name: Android SDK and NDK
+        run: |
+          sdkmanager 'platforms;android-35' 'build-tools;35.0.0' 'ndk;27.2.12479018'
+          echo "NDK_HOME=$ANDROID_HOME/ndk/27.2.12479018" >> "$GITHUB_ENV"
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri -> target
+          shared-key: android
+      - run: npm ci
+      - run: npx tauri android init --ci
+      - name: Configure persistent APK signing
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: node scripts/android-signing.mjs
+      - run: npx tauri android build --apk --target aarch64
+      - name: Verify and attach APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+        run: |
+          cp "$(find src-tauri/gen/android/app/build/outputs/apk -name '*.apk' | head -n1)" taskorbit-android-arm64.apk
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify taskorbit-android-arm64.apk
+          gh release upload "$RELEASE_TAG" taskorbit-android-arm64.apk --clobber
+      - uses: actions/upload-artifact@v4
+        with:
+          name: taskorbit-android-arm64
+          path: taskorbit-android-arm64.apk

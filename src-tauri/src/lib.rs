@@ -24,7 +24,7 @@ fn connect_server(window: WebviewWindow, address: String) -> Result<(), String> 
 
 fn local_only(window: &WebviewWindow) -> Result<(), String> {
     let current=window.url().map_err(|e|e.to_string())?;
-    let local=current.scheme()=="tauri" || current.host_str()==Some("tauri.localhost") || (matches!(current.host_str(),Some("localhost")|Some("127.0.0.1")) && current.port()==Some(5173));
+    let local=(current.scheme()=="tauri" && current.host_str()==Some("localhost")) || (current.scheme()=="http" && current.host_str()==Some("tauri.localhost")) || (matches!(current.host_str(),Some("localhost")|Some("127.0.0.1")) && current.port()==Some(5173));
     if !local {return Err("Native commands are restricted to the local connection screen".into());}
     Ok(())
 }
