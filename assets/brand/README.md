@@ -1,8 +1,7 @@
 # TaskOrbit brand
 
-Source `taskorbit-icon.png` is a transparent raster edit of the owner's GitOrbit v4 app icon. Created using the built-in imagegen tool. The black central shadow and tilted accretion-disk silhouette are preserved; the warm GitOrbit palette becomes cobalt/azure/cyan with icy white highlights.
+Current wordmark: `taskorbit-wordmark-v4-balanced.png`, with sunlit Mercury as the O and a small k/r overlap. Current square app icon: `taskorbit-icon.png`. Stone/charcoal surfaces and solar-gold accents match this identity. See [prompts and versions](WORDMARK.md).
 
-Prompt: preserve the exact tilted black-hole silhouette, diagonal rising band, projecting tapered tips and three lower ribbons; change only the red-orange-amber palette to cobalt blue #2563eb, cyan #22d3ee and near-white highlights; keep a true transparent exterior, opaque black center, square canvas and no lettering, tile or extra objects.
+`public/wordmark.png` is the application copy. Historical black-hole artwork, including `taskorbit-icon-v1-blue.png`, is preserved and is not the current brand. The lettering was matched to the owner's GitOrbit reference using built-in imagegen; no separate font file has been identified.
 
-Regenerate native icons: `npx tauri icon assets/brand/taskorbit-icon.png`.
-Regenerate PWA derivatives: `npm run icons`. The maskable icon uses a dark background and an inset original to keep the symbol inside the safe zone.
+Run `npm run icons` to regenerate native and PWA icons, including the charcoal Android adaptive-icon background and the maskable safe zone.

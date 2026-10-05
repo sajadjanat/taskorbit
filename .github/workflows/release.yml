@@ -158,13 +158,27 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: ${{ startsWith(github.ref, 'refs/tags/') }}
           tags: ghcr.io/sajadjanat/taskorbit:${{ github.ref_name }}
+      - name: Smoke test published image
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          docker run -d --name taskorbit-release -p 4310:4310 "ghcr.io/sajadjanat/taskorbit:$RELEASE_TAG"
+          for i in {1..30}; do curl -fsS http://localhost:4310/api/health && break || sleep 2; done
+          curl -fsS http://localhost:4310/api/health
+          docker stop taskorbit-release
   publish:
     needs: [verify, desktop, android, container]
     if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-      - name: Publish only after all packages succeed
+      - name: Checksums and publication after all packages succeed
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release edit "$GITHUB_REF_NAME" --draft=false --prerelease
+        run: |
+          mkdir release-files
+          gh release download "$GITHUB_REF_NAME" --dir release-files
+          (cd release-files && sha256sum * > SHA256SUMS)
+          gh release upload "$GITHUB_REF_NAME" release-files/SHA256SUMS --clobber
+          gh release edit "$GITHUB_REF_NAME" --draft=false --prerelease

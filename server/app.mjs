@@ -241,7 +241,7 @@ export function createApp({
 
   app.get("/api/health", (req, res) => {
     db.prepare("SELECT 1").get();
-    res.json({ status: "ok", version: "0.1.1" });
+    res.json({ status: "ok", version: "0.1.2" });
   });
   app.get("/api/setup", (req, res) =>
     res.json({ required: !db.prepare("SELECT 1 FROM users LIMIT 1").get() }),

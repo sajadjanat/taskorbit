@@ -1131,6 +1131,9 @@ tbody tr:hover {
 .auth-card .brand {
   margin-bottom: 28px;
 }
+.mobile-auth-brand {
+  display: none;
+}
 .auth-card p {
   color: var(--muted);
   font-size: 12px;
@@ -1366,13 +1369,8 @@ tbody tr:hover {
   .auth-card {
     padding: 24px;
   }
-  .auth-card:before {
-    content: "TaskOrbit";
+  .mobile-auth-brand {
     display: block;
-    font-size: 26px;
-    font-weight: 700;
-    direction: ltr;
-    margin-bottom: 20px;
   }
   .form-grid {
     gap: 14px;

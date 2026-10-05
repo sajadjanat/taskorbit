@@ -187,7 +187,8 @@ function Logo() {
         src="/wordmark.png"
         alt="TaskOrbit"
         onError={(e) => {
-          e.currentTarget.src = "/icon.svg";
+          e.currentTarget.onerror = null;
+          e.currentTarget.src = "/icon.png";
         }}
       />
     </div>
@@ -267,6 +268,9 @@ export default function App() {
   useEffect(() => {
     document.documentElement.classList.toggle("dark", dark);
     localStorage.setItem("taskorbit.theme", dark ? "dark" : "light");
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute("content", dark ? "#171615" : "#f6f4f0");
   }, [dark]);
   function showError(e: unknown) {
     if (e instanceof ApiError) {
@@ -817,6 +821,9 @@ export default function App() {
           </div>
         </div>
         <div className="auth-card">
+          <div className="mobile-auth-brand">
+            <Logo />
+          </div>
           <div className="auth-options">
             {languageControl}
             {themeControl}
@@ -1971,7 +1978,7 @@ export default function App() {
           )}
         </div>
         <footer className="app-footer">
-          <span>TaskOrbit 0.1.1</span>
+          <span>TaskOrbit 0.1.2</span>
           <a
             href="https://github.com/sajadjanat/taskorbit"
             target="_blank"

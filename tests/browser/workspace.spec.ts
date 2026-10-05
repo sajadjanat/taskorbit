@@ -124,6 +124,18 @@ test("setup, project, sprint, work item, comment, language and persistence", asy
   });
   await page.getByRole("button", { name: "تیره", exact: true }).click();
   await expect(page.locator("html")).toHaveClass(/dark/);
+  // Scan the settled theme, after button color transitions finish.
+  await page.evaluate(async () => {
+    await Promise.all(
+      document
+        .getAnimations()
+        .filter((animation) => {
+          const end = animation.effect?.getComputedTiming().endTime;
+          return typeof end === "number" && Number.isFinite(end);
+        })
+        .map((animation) => animation.finished.catch(() => {})),
+    );
+  });
   const darkScan = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa"])
     .analyze();

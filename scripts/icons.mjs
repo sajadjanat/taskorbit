@@ -9,6 +9,11 @@ const run = (args) => {
   );
   if (r.status) process.exit(r.status);
 };
+run(["icon", "assets/brand/taskorbit-icon.png", "-o", "src-tauri/icons"]);
+writeFileSync(
+  "src-tauri/icons/android/values/ic_launcher_background.xml",
+  '<?xml version="1.0" encoding="utf-8"?>\n<resources><color name="ic_launcher_background">#171615</color></resources>\n',
+);
 run([
   "icon",
   "assets/brand/taskorbit-icon.png",
