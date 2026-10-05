@@ -1,2 +1,25 @@
-import {defineConfig,devices} from '@playwright/test';
-export default defineConfig({testDir:'./tests/browser',timeout:60000,workers:1,use:{baseURL:'http://127.0.0.1:4312',trace:'retain-on-failure'},projects:[{name:'chromium',use:{...devices['Desktop Chrome'],...(process.env.PLAYWRIGHT_CHANNEL?{channel:process.env.PLAYWRIGHT_CHANNEL}:{})}},{name:'iphone-webkit',use:{...devices['iPhone 13']}}],webServer:{command:'node tests/browser-server.mjs',url:'http://127.0.0.1:4312/api/health',reuseExistingServer:false,timeout:30000}});
+import { defineConfig, devices } from "@playwright/test";
+export default defineConfig({
+  testDir: "./tests/browser",
+  timeout: 60000,
+  workers: 1,
+  use: { baseURL: "http://127.0.0.1:4312", trace: "retain-on-failure" },
+  projects: [
+    {
+      name: "chromium",
+      use: {
+        ...devices["Desktop Chrome"],
+        ...(process.env.PLAYWRIGHT_CHANNEL
+          ? { channel: process.env.PLAYWRIGHT_CHANNEL }
+          : {}),
+      },
+    },
+    { name: "iphone-webkit", use: { ...devices["iPhone 13"] } },
+  ],
+  webServer: {
+    command: "node tests/browser-server.mjs",
+    url: "http://127.0.0.1:4312/api/health",
+    reuseExistingServer: false,
+    timeout: 30000,
+  },
+});

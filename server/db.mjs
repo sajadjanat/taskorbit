@@ -1,8 +1,8 @@
-import { DatabaseSync } from 'node:sqlite';
-import { mkdirSync } from 'node:fs';
-import path from 'node:path';
+import { DatabaseSync } from "node:sqlite";
+import { mkdirSync } from "node:fs";
+import path from "node:path";
 export function openDatabase(file) {
-  if (file !== ':memory:') mkdirSync(path.dirname(file), {recursive:true});
+  if (file !== ":memory:") mkdirSync(path.dirname(file), { recursive: true });
   const db = new DatabaseSync(file);
   db.exec(`PRAGMA foreign_keys=ON; PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000;
     CREATE TABLE IF NOT EXISTS users(id TEXT PRIMARY KEY,name TEXT NOT NULL,email TEXT NOT NULL UNIQUE,password TEXT NOT NULL,admin INTEGER NOT NULL DEFAULT 0,active INTEGER NOT NULL DEFAULT 1,created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
@@ -25,4 +25,14 @@ export function openDatabase(file) {
     PRAGMA user_version=1;`);
   return db;
 }
-export function transaction(db, fn) {db.exec('BEGIN IMMEDIATE');try {const result=fn(); db.exec('COMMIT'); return result;} catch(e) {db.exec('ROLLBACK');throw e;}}
+export function transaction(db, fn) {
+  db.exec("BEGIN IMMEDIATE");
+  try {
+    const result = fn();
+    db.exec("COMMIT");
+    return result;
+  } catch (e) {
+    db.exec("ROLLBACK");
+    throw e;
+  }
+}

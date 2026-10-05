@@ -11,7 +11,8 @@
     "desktop": "tauri dev",
     "desktop:build": "tauri build",
     "test:e2e": "playwright test",
-    "icons": "node scripts/icons.mjs"
+    "icons": "node scripts/icons.mjs",
+    "format": "prettier --write src server scripts tests *.ts *.json .github/workflows/*.yml compose*.yaml docs/*.md README.md"
   },
   "dependencies": {
     "@fontsource/vazirmatn": "^5.2.6",
@@ -39,6 +40,7 @@
     "@types/react-dom": "^19.1.9",
     "@vitejs/plugin-react": "^5.0.3",
     "concurrently": "^9.2.1",
+    "prettier": "^3.9.9",
     "tailwindcss": "^4.1.13",
     "typescript": "^5.9.2",
     "vite": "^7.1.5"
