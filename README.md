@@ -1,4 +1,4 @@
-<p align="center"><img src="assets/brand/taskorbit-wordmark-v2-mercury.png" width="800" alt="TaskOrbit wordmark with Mercury as the central O" /></p>
+<p align="center"><img src="assets/brand/taskorbit-wordmark-v3-sunlight.png" width="800" alt="TaskOrbit wordmark with sunlit Mercury as the central O" /></p>
 <h1 align="center">TaskOrbit</h1>
 <p align="center">A lighter orbit for team work. Self-hosted projects, sprints and work items.<br/>مدیریت تیم و پروژه، سبک و روی سرور خودتان.</p>
 
