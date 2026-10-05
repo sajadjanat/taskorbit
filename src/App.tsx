@@ -1974,7 +1974,7 @@ export default function App() {
           )}
         </div>
         <footer className="app-footer">
-          <span>TaskOrbit 0.1.0</span>
+          <span>TaskOrbit 0.1.1</span>
           <a
             href="https://github.com/sajadjanat/taskorbit"
             target="_blank"

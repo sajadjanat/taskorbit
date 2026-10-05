@@ -1,4 +1,4 @@
-# TaskOrbit 0.1.0 preview
+# TaskOrbit 0.1.1 preview
 
 First self-hosted preview: projects, sprints, tasks, subtasks, Kanban/list/due-date timeline, modules, text documents, saved views, comments, files, relations, activity and team roles. Persian/English UI with RTL, light/dark themes and local fonts. One application container and SQLite volume, with optional Caddy HTTPS.
 

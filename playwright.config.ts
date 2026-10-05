@@ -9,6 +9,13 @@ export default defineConfig({
       name: "chromium",
       use: {
         ...devices["Desktop Chrome"],
+        ...(process.env.PLAYWRIGHT_MOBILE
+          ? {
+              viewport: { width: 390, height: 844 },
+              isMobile: true,
+              hasTouch: true,
+            }
+          : {}),
         ...(process.env.PLAYWRIGHT_CHANNEL
           ? { channel: process.env.PLAYWRIGHT_CHANNEL }
           : {}),

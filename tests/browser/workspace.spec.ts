@@ -43,7 +43,12 @@ test("setup, project, sprint, work item, comment, language and persistence", asy
     .fill(testInfo.project.name === "chromium" ? "WEB" : "IOS");
   await dialog.getByRole("button", { name: "Save", exact: true }).click();
   await expect(dialog).not.toBeVisible();
-  if (mobile) await page.locator(".mobile-backdrop").click();
+  if (mobile)
+    await page
+      .locator(".mobile-backdrop")
+      .click({
+        position: { x: (page.viewportSize()?.width || 390) - 12, y: 12 },
+      });
   await nav("Sprints");
   await page.getByRole("button", { name: "New sprint", exact: true }).click();
   await dialog.getByLabel("Name", { exact: true }).fill("Sprint 01");
@@ -81,13 +86,11 @@ test("setup, project, sprint, work item, comment, language and persistence", asy
   await expect(
     dialog.getByText("Ready for review.", { exact: true }),
   ).toBeVisible();
-  await dialog
-    .locator("input[type=file]")
-    .setInputFiles({
-      name: "brief.txt",
-      mimeType: "text/plain",
-      buffer: Buffer.from("TaskOrbit sample brief"),
-    });
+  await dialog.locator("input[type=file]").setInputFiles({
+    name: "brief.txt",
+    mimeType: "text/plain",
+    buffer: Buffer.from("TaskOrbit sample brief"),
+  });
   await expect(dialog.getByRole("link", { name: /brief.txt/ })).toBeVisible();
   await page.keyboard.press("Escape");
   await page.reload();

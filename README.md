@@ -90,7 +90,7 @@ The Compose resource settings cap the application at 512 MB and one CPU; these a
 
 ## Release and scope
 
-Tag `v0.1.0` triggers verification, native packaging, a multi-architecture server image and a draft prerelease. Publication occurs only after all platform jobs succeed. See [release notes](docs/RELEASE-NOTES.md) and [roadmap](docs/ROADMAP.md) for implemented and remaining features.
+Tag `v0.1.1` triggers verification, native packaging, a multi-architecture server image and a draft prerelease. Publication occurs only after all platform jobs succeed. See [release notes](docs/RELEASE-NOTES.md) and [roadmap](docs/ROADMAP.md) for implemented and remaining features.
 
 Stack: React, TypeScript, Vite, Tailwind, genuine shadcn/ui source components, Express, Node's SQLite API and Tauri 2. Font: Vazirmatn (OFL). The blue/cyan orbit brand was derived from the sibling GitOrbit artwork using the built-in image generation tool.
 
