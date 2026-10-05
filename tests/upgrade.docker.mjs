@@ -86,6 +86,49 @@ const me = await fetch("http://taskorbit:4310/api/me", {
   headers: { Cookie: cookie },
 });
 assert.equal(me.status, 200);
+// Start the real authenticated agent against the completed fixture journal.
+const agent = await dockerRequest(
+  "POST",
+  "/containers/create?name=" + instance + "-agent",
+  {
+    Image: "taskorbit:test",
+    User: "0:0",
+    Cmd: ["node", "server/update-agent.mjs"],
+    Env: ["TASKORBIT_INSTANCE=" + instance],
+    Labels: { "io.taskorbit.instance": instance },
+    HostConfig: {
+      Binds: [
+        process.env.TEST_DATA_VOLUME + ":/data",
+        process.env.TEST_UPDATE_VOLUME + ":/updates",
+        "/var/run/docker.sock:/var/run/docker.sock",
+      ],
+    },
+    NetworkingConfig: {
+      EndpointsConfig: { [instance]: { Aliases: ["updater"] } },
+    },
+  },
+);
+await dockerRequest("POST", `/containers/${agent.Id}/start`);
+let agentReady = false;
+for (let i = 0; i < 30; i++) {
+  try {
+    const r = await fetch("http://updater:4311/status");
+    if (r.status === 401) {
+      agentReady = true;
+      break;
+    }
+  } catch {}
+  await new Promise((r) => setTimeout(r, 500));
+}
+assert.equal(agentReady, true);
+const status = await fetch("http://updater:4311/status", {
+  headers: { Authorization: "Bearer " + storage.token },
+});
+assert.equal(status.status, 200);
+const text = await status.text();
+assert.equal(JSON.parse(text).state, engine.job.state);
+assert.equal(text.includes(storage.token), false);
+assert.equal(text.includes("HostConfig"), false);
 console.log(
   failure
     ? "Docker rollback restored original version, user, session and database schema"

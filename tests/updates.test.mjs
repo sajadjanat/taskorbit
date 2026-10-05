@@ -298,6 +298,28 @@ test("server updates require instance admin, reject stale versions and pause wri
     });
     assert.equal(setup.status, 201);
     cookie = setup.headers.get("set-cookie").split(";")[0];
+    const adminCookie = cookie;
+    const created = await req("/admin/users", "POST", {
+      name: "Ordinary member",
+      email: "member@example.test",
+      password: "test-password-123",
+      admin: false,
+    });
+    assert.equal(created.status, 201);
+    const login = await req("/login", "POST", {
+      email: "member@example.test",
+      password: "test-password-123",
+    });
+    assert.equal(login.status, 200);
+    cookie = login.headers.get("set-cookie").split(";")[0];
+    for (const route of ["/admin/updates", "/admin/updates/status"])
+      assert.equal((await req(route)).status, 403);
+    assert.equal(
+      (await req("/admin/updates", "POST", { version: next })).status,
+      403,
+    );
+    assert.equal(starts, 0);
+    cookie = adminCookie;
     const checked = await (await req("/admin/updates")).json();
     assert.equal(checked.current, VERSION);
     assert.equal(checked.available, true);

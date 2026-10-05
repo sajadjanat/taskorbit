@@ -28,7 +28,10 @@ export function dockerClient(socketPath = "/var/run/docker.sock") {
             }
             if (!data) return resolve(undefined);
             try {
-              resolve(JSON.parse(data));
+              const parsed = JSON.parse(data);
+              if (parsed?.error)
+                return reject(new Error("Image download failed"));
+              resolve(parsed);
             } catch {
               try {
                 const lines = data

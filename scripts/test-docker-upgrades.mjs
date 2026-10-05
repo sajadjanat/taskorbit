@@ -57,6 +57,8 @@ for (const failure of [false, true]) {
       "-e",
       "TEST_DATA_VOLUME=" + data,
       "-e",
+      "TEST_UPDATE_VOLUME=" + updates,
+      "-e",
       "TEST_FAILURE=" + (failure ? "1" : "0"),
       "-v",
       "/var/run/docker.sock:/var/run/docker.sock",

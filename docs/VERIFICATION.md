@@ -2,14 +2,11 @@
 
 Recorded on 2026-10-05. These checks describe the preview, not production readiness.
 
-- 22 API tests passed using temporary SQLite databases: authentication, permissions, workspace isolation, optimistic task updates, persistence, attachments, dependency cycles and session revocation.
-- TypeScript checking and the Vite production build passed. The production dependency audit reported zero vulnerabilities at the time of the check.
-- Playwright passed the project/sprint/task/comment/upload workflow in Chromium and iPhone-size WebKit. It checks language switching, the PWA manifest, private-data cache exclusion and serious/critical axe accessibility findings. WebKit emulation does not verify installation on a physical iPhone.
-- [Verification CI](https://github.com/sajadjanat/taskorbit/actions/runs/37313287031) also built the Docker image and checked a running container's health endpoint.
-- [Release build](https://github.com/sajadjanat/taskorbit/actions/runs/37313292330) passed desktop Rust unit tests and produced Windows x64 NSIS, macOS Intel/Apple Silicon DMG, Linux x64 DEB/AppImage and the web/server archive. Its original Android SDK step failed; Android is rebuilt separately with the corrected workflow.
-- The public GHCR image `ghcr.io/sajadjanat/taskorbit:v0.1.1` has Linux amd64 and arm64 manifests, verified with anonymous registry access.
-- [Android recovery build](https://github.com/sajadjanat/taskorbit/actions/runs/37314638147) produced the arm64 APK and passed `apksigner verify` before attaching it to the release, using the persistent release signing key.
+- 31 automated API/update tests passed using temporary SQLite databases: authentication, permissions, workspace isolation, optimistic updates, attachments, dependency cycles, sessions, update validation, concurrent upgrade rejection, backup integrity, rollback and interrupted recovery.
+- TypeScript checking and Vite production build passed. Local Rust unit tests passed with the Windows GNU toolchain; release CI builds on each target OS.
+- Local Chromium passed the full workflow in desktop and 390×844 mobile viewports, including Persian/English switching, public-only PWA cache and serious/critical axe accessibility checks. Physical-device installation is not established by viewport emulation.
+- [Verification CI](https://github.com/sajadjanat/taskorbit/actions/runs/37324446459) passed Chromium and WebKit, Docker build/health, and real Docker upgrade/rollback fixtures. Disposable named volumes were used; user ID, password hash, login session and database schema were checked after replacement and rollback.
+- [0.1.2 release build](https://github.com/sajadjanat/taskorbit/actions/runs/37320732815) successfully produced Windows x64, macOS Intel/Apple Silicon, Linux DEB/AppImage, signed Android arm64 APK, web/server archive and amd64/arm64 container image.
+- The 0.1.3 release pipeline requires the real authenticated updater service fixture and package signature verification before publication. Its finished platform results must be checked at the release's linked Actions run.
 
-Physical-device installation, native-client end-to-end server connection, iPhone PWA installation/resume, production deployment, backup restoration under load and Windows/macOS code signing remain unverified or incomplete. See [ROADMAP.md](ROADMAP.md).
-
-The `v0.1.1` source tag predates the Android Gradle npm-script fix. To build Android from that tag, first run `npm pkg set scripts.tauri=tauri`; the current main branch includes this script. Android SDK setup in CI uses `android-actions/setup-android@v4` with explicit `platform-tools`.
+Physical-device installation, native-client end-to-end update installation/server connection, iPhone PWA installation/resume, production deployment, backup restoration under concurrent production load and Windows/macOS OS code signing remain unverified or incomplete. Updater signatures and Android APK signing are distinct from OS code signing/notarization. See [ROADMAP.md](ROADMAP.md) and [UPDATES.md](UPDATES.md).
