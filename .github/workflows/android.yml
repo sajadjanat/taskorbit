@@ -38,6 +38,8 @@ jobs:
           workspaces: src-tauri -> target
           shared-key: android
       - run: npm ci
+      - name: Ensure Gradle can invoke the Tauri CLI
+        run: npm pkg set scripts.tauri=tauri
       - run: npx tauri android init --ci
       - name: Configure persistent APK signing
         env:

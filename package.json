@@ -12,7 +12,8 @@
     "desktop:build": "tauri build",
     "test:e2e": "playwright test",
     "icons": "node scripts/icons.mjs",
-    "format": "prettier --write src server scripts tests *.ts *.json .github/workflows/*.yml compose*.yaml docs/*.md README.md"
+    "format": "prettier --write src server scripts tests *.ts *.json .github/workflows/*.yml compose*.yaml docs/*.md README.md",
+    "tauri": "tauri"
   },
   "dependencies": {
     "@fontsource/vazirmatn": "^5.2.6",
