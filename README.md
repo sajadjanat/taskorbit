@@ -1,4 +1,4 @@
-<p align="center"><img src="assets/brand/taskorbit-icon.png" width="140" alt="TaskOrbit blue orbit icon" /></p>
+<p align="center"><img src="assets/brand/taskorbit-wordmark-v1.png" width="800" alt="TaskOrbit wordmark with blue black-hole O" /></p>
 <h1 align="center">TaskOrbit</h1>
 <p align="center">A lighter orbit for team work. Self-hosted projects, sprints and work items.<br/>مدیریت تیم و پروژه، سبک و روی سرور خودتان.</p>
 
