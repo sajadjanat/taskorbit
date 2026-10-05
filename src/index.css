@@ -123,6 +123,10 @@ input[type="color"] {
   border-radius: 6px;
   object-fit: contain;
 }
+.sidebar .brand img {
+  width: 160px;
+  max-width: 100%;
+}
 .brand .brand-dark {
   display: none;
 }

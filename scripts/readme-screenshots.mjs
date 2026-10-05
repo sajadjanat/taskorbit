@@ -11,8 +11,8 @@ const { app, db } = createApp({
   secure: false,
   origin: "http://localhost:4313",
   checkRelease: async () => ({
-    version: "0.1.5",
-    url: "https://github.com/sajadjanat/taskorbit/releases/tag/v0.1.5",
+    version: "0.1.6",
+    url: "https://github.com/sajadjanat/taskorbit/releases/tag/v0.1.6",
   }),
   upgradeAgent: { enabled: false },
 });
