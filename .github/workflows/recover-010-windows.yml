@@ -1,6 +1,11 @@
 name: Recover 0.1.10 Windows verification
 on:
   workflow_dispatch:
+    inputs:
+      publish_only:
+        type: boolean
+        default: false
+        description: Publish already verified 0.1.10 packages
 permissions:
   contents: write
   actions: read
@@ -9,6 +14,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   windows:
+    if: ${{ !inputs.publish_only }}
     runs-on: windows-latest
     timeout-minutes: 30
     steps:
@@ -89,6 +95,7 @@ jobs:
           find src-tauri/target/x86_64-pc-windows-msvc/release/bundle -type f \( -name '*.exe' -o -name '*.sig' \) -print0 | while IFS= read -r -d '' file; do gh release upload v0.1.10 "$file" --clobber; done
   publish:
     needs: windows
+    if: ${{ always() && (needs.windows.result == 'success' || (inputs.publish_only && needs.windows.result == 'skipped')) }}
     runs-on: ubuntu-24.04
     permissions:
       contents: write
@@ -106,6 +113,7 @@ jobs:
         run: |
           gh api repos/sajadjanat/taskorbit/actions/runs/37478931104 > original-run.json
           gh api 'repos/sajadjanat/taskorbit/actions/runs/37478931104/jobs?per_page=100' > original-jobs.json
+          gh api 'repos/sajadjanat/taskorbit/actions/runs/37483224541/jobs?per_page=100' > native-jobs.json
           node --input-type=module <<'JS'
           import fs from 'node:fs';
           import assert from 'node:assert/strict';
@@ -118,6 +126,8 @@ jobs:
             'desktop (macos-latest, aarch64-apple-darwin, app,dmg, macos-arm64)',
             'desktop (ubuntu-24.04, x86_64-unknown-linux-gnu, deb,appimage, linux-x64)'];
           for (const name of names) assert.equal(jobs.find(j => j.name === name)?.conclusion, 'success', name);
+          const native = JSON.parse(fs.readFileSync('native-jobs.json')).jobs.find(j => j.name === 'windows');
+          assert.equal(native?.conclusion, 'success', 'Actual Windows regression');
           console.log('All six original non-Windows jobs passed for the immutable release source.');
           JS
       - uses: docker/setup-buildx-action@v3
@@ -129,13 +139,12 @@ jobs:
       - name: Verify signatures, generate manifest and publish
         env:
           GH_TOKEN: ${{ github.token }}
-          GITHUB_REF_NAME: v0.1.10
         run: |
           mkdir release-files
           gh release download v0.1.10 --dir release-files
           sudo apt-get update && sudo apt-get install -y minisign
           node scripts/verify-updater-signatures.mjs release-files
-          node scripts/release-manifest.mjs release-files
+          GITHUB_REF_NAME=v0.1.10 node scripts/release-manifest.mjs release-files
           (cd release-files && sha256sum * > SHA256SUMS)
           gh release upload v0.1.10 release-files/latest.json release-files/SHA256SUMS --clobber
           docker buildx imagetools create --tag ghcr.io/sajadjanat/taskorbit:stable ghcr.io/sajadjanat/taskorbit:v0.1.10
