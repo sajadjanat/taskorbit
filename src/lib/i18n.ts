@@ -3,6 +3,14 @@ import { chinese } from "./locales/zh-CN";
 
 const baseMessages = {
   en: {
+    gettingStarted: "Getting started",
+    showPassword: "Show password",
+    hidePassword: "Hide password",
+    serverAddressHint:
+      "Use your server’s root address, for example https://tasks.example.com.",
+    connecting: "Connecting…",
+    signingIn: "Signing in…",
+    creatingInstance: "Creating your workspace…",
     attachments: "Attachments",
     maxFileSize: "Maximum file size is 10 MB",
     uploading: "Uploading…",
@@ -203,6 +211,14 @@ const baseMessages = {
       "An instance administrator creates accounts; a workspace administrator adds existing accounts to the team.",
   },
   fa: {
+    gettingStarted: "راهنمای شروع",
+    showPassword: "نمایش رمز عبور",
+    hidePassword: "پنهان کردن رمز عبور",
+    serverAddressHint:
+      "نشانی اصلی سرور را وارد کنید؛ مثلاً https://tasks.example.com.",
+    connecting: "در حال اتصال…",
+    signingIn: "در حال ورود…",
+    creatingInstance: "در حال ساخت فضای تیمی…",
     attachments: "پیوست‌ها",
     maxFileSize: "حداکثر حجم فایل ۱۰ مگابایت است",
     uploading: "در حال بارگذاری…",
@@ -415,7 +431,7 @@ export const localeNames: Record<Locale, string> = {
   "zh-CN": "简体中文",
 };
 export function resolveLocale(value: string | null): Locale {
-  return value && Object.hasOwn(messages, value) ? (value as Locale) : "fa";
+  return value && Object.hasOwn(messages, value) ? (value as Locale) : "en";
 }
 export function localeDirection(locale: Locale) {
   return locale === "fa" || locale === "ar" ? "rtl" : "ltr";

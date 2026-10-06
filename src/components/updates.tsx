@@ -5,6 +5,7 @@ import { Button } from "./ui/button";
 import { api } from "../lib/api";
 import { messages, type Locale } from "../lib/i18n";
 import { version as webVersion } from "../../package.json";
+import { ChevronDown, Download } from "lucide-react";
 type Job = {
   state: string;
   phase?: string;
@@ -30,9 +31,11 @@ type MobileUpdate = {
 export function Updates({
   locale,
   native = false,
+  compact = false,
 }: {
   locale: Locale;
   native?: boolean;
+  compact?: boolean;
 }) {
   const t = (key: keyof typeof messages.en) => messages[locale][key];
   const [info, setInfo] = useState<ServerInfo>(),
@@ -131,9 +134,8 @@ export function Updates({
     }
   }
   const available = native ? !!update : info?.available;
-  return (
-    <section className="panel settings-panel update-panel">
-      <h2>{t(native ? "clientUpdates" : "serverUpdates")}</h2>
+  const content = (
+    <>
       <p>
         {t("installedVersion")}:{" "}
         <b dir="ltr">{native ? client?.version : info?.current || "—"}</b>
@@ -156,11 +158,13 @@ export function Updates({
         </p>
       )}
       {available && (
-        <>
-          <p>
-            {t("newVersion")}:{" "}
-            <b dir="ltr">{native ? update?.version : info?.release.version}</b>
-          </p>
+        <p>
+          {t("newVersion")}:{" "}
+          <b dir="ltr">{native ? update?.version : info?.release.version}</b>
+        </p>
+      )}
+      <div className="update-actions">
+        {available && (
           <Button
             onClick={install}
             disabled={busy || (!native && !info?.one_click)}
@@ -171,8 +175,11 @@ export function Updates({
                 : "installUpdate",
             )}
           </Button>
-        </>
-      )}
+        )}
+        <Button variant="outline" disabled={busy} onClick={() => void check()}>
+          {t("checkUpdates")}
+        </Button>
+      </div>
       {native && progress > 0 && (
         <p role="status">
           {t("downloading")}: {(progress / 1048576).toFixed(1)} MB
@@ -193,9 +200,38 @@ export function Updates({
           </a>
         </p>
       )}
-      <Button variant="outline" disabled={busy} onClick={() => void check()}>
-        {t("checkUpdates")}
-      </Button>
+    </>
+  );
+  if (compact)
+    return (
+      <details className="client-update-disclosure">
+        <summary>
+          <Download size={16} aria-hidden="true" />
+          <span>{t("clientUpdates")}</span>
+          <span
+            className={
+              available ? "update-summary available" : "update-summary"
+            }
+          >
+            {busy ? (
+              t("loading")
+            ) : available ? (
+              <>
+                {t("newVersion")} <b dir="ltr">{update?.version}</b>
+              </>
+            ) : (
+              <b dir="ltr">{client?.version || webVersion}</b>
+            )}
+          </span>
+          <ChevronDown size={16} aria-hidden="true" />
+        </summary>
+        <div className="client-update-content">{content}</div>
+      </details>
+    );
+  return (
+    <section className="panel settings-panel update-panel">
+      <h2>{t(native ? "clientUpdates" : "serverUpdates")}</h2>
+      {content}
     </section>
   );
 }

@@ -9,6 +9,7 @@ import {
 import { isTauri, invoke } from "@tauri-apps/api/core";
 import { version as appVersion } from "../package.json";
 import { Updates, WebUpdateNotice } from "./components/updates";
+import { EntryShell } from "./components/entry-shell";
 import {
   LayoutDashboard,
   Layers,
@@ -40,6 +41,9 @@ import {
   Activity as ActivityIcon,
   Archive,
   Trash2,
+  Eye,
+  EyeOff,
+  LoaderCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -214,6 +218,7 @@ export default function App() {
   const [dark, setDark] = useState(
     () => localStorage.getItem("taskorbit.theme") === "dark",
   );
+  const [passwordVisible, setPasswordVisible] = useState(false);
   const t = useCallback(
     (key: string) => messages[locale][key as MessageKey] || key,
     [locale],
@@ -448,6 +453,7 @@ export default function App() {
   }
   async function signIn(e: FormEvent) {
     e.preventDefault();
+    if (busy) return;
     setBusy(true);
     setError("");
     try {
@@ -740,7 +746,11 @@ export default function App() {
     </article>
   );
   const errorBanner = error && (
-    <div role="alert" className="error-banner">
+    <div
+      role="alert"
+      id={!user || connection ? "entry-error" : undefined}
+      className="error-banner"
+    >
       <span>{error}</span>
       <Button
         variant="ghost"
@@ -783,142 +793,220 @@ export default function App() {
       {dark ? <Sun size={17} /> : <Moon size={17} />}
     </Button>
   );
-  if (!ready) return <div className="auth-shell">{t("loading")}</div>;
+  const entryControls = (
+    <>
+      {languageControl}
+      {themeControl}
+    </>
+  );
+  if (!ready)
+    return (
+      <EntryShell
+        brand={<Logo />}
+        controls={entryControls}
+        locale={locale}
+        title={t("loading")}
+        description={t("welcomeHint")}
+      >
+        <div className="entry-loading" role="status">
+          <LoaderCircle
+            className="entry-spinner"
+            size={22}
+            aria-hidden="true"
+          />
+          {t("loading")}
+        </div>
+      </EntryShell>
+    );
   if (connection)
     return (
-      <div className="auth-shell">
-        <div className="auth-card">
-          <Logo />
-          <h1>{t("connection")}</h1>
-          <p>{t("serverHint")}</p>
-          {errorBanner}
-          <WebUpdateNotice locale={locale} />
-          <form
-            onSubmit={async (e) => {
-              e.preventDefault();
-              setBusy(true);
-              try {
-                await invoke("connect_server", { address: serverUrl });
-              } catch (e) {
-                showError(e);
-              } finally {
-                setBusy(false);
-              }
-            }}
-          >
+      <EntryShell
+        brand={<Logo />}
+        controls={entryControls}
+        locale={locale}
+        title={t("connection")}
+        description={t("serverHint")}
+        supplement={<Updates locale={locale} native compact />}
+      >
+        {errorBanner}
+        <form
+          className="entry-form"
+          aria-busy={busy}
+          onSubmit={async (event) => {
+            event.preventDefault();
+            if (busy) return;
+            setBusy(true);
+            setError("");
+            try {
+              await invoke("connect_server", { address: serverUrl.trim() });
+            } catch (error) {
+              showError(typeof error === "string" ? new Error(error) : error);
+            } finally {
+              setBusy(false);
+            }
+          }}
+        >
+          <div className="entry-field">
             <Label htmlFor="server">{t("serverUrl")}</Label>
             <Input
               id="server"
               type="url"
               dir="ltr"
+              autoComplete="url"
+              autoCapitalize="none"
+              spellCheck={false}
               value={serverUrl}
-              onChange={(e) => setServerUrl(e.target.value)}
+              onChange={(event) => setServerUrl(event.target.value)}
               required
+              readOnly={busy}
+              aria-describedby={
+                error ? "server-hint entry-error" : "server-hint"
+              }
               placeholder="https://tasks.example.com"
             />
-            <Button disabled={busy} type="submit">
-              {t("connect")}
-            </Button>
-          </form>
-          <div className="auth-options">
-            {languageControl}
-            {themeControl}
+            <p id="server-hint" className="entry-field-hint">
+              {t("serverAddressHint")}
+            </p>
           </div>
-          <Updates locale={locale} native />
-        </div>
-      </div>
+          <Button disabled={busy} type="submit" className="entry-submit">
+            {busy ? (
+              <LoaderCircle
+                className="entry-spinner"
+                size={17}
+                aria-hidden="true"
+              />
+            ) : (
+              <ArrowRight size={17} aria-hidden="true" />
+            )}
+            {t(busy ? "connecting" : "connect")}
+          </Button>
+        </form>
+      </EntryShell>
     );
   if (!user)
     return (
-      <div className="auth-shell">
-        <div className="auth-intro">
-          <Logo />
-          <h1>{t("welcome")}</h1>
-          <p>{t("welcomeHint")}</p>
-          <div className="orbit-illustration">
-            <span className="orbit-path" />
-            <span className="orbit-center">
-              <CheckCheck size={36} />
-            </span>
-            <span className="orbit-node node-one">
-              <Layers size={20} />
-            </span>
-            <span className="orbit-node node-two">
-              <Users size={20} />
-            </span>
-            <span className="orbit-node node-three">
-              <BookOpen size={20} />
-            </span>
-          </div>
-        </div>
-        <div className="auth-card">
-          <div className="mobile-auth-brand">
-            <Logo />
-          </div>
-          <div className="auth-options">
-            {languageControl}
-            {themeControl}
-          </div>
-          <h2>{t(setup ? "setup" : "login")}</h2>
-          <p>{t(setup ? "setupHint" : "loginHint")}</p>
-          {errorBanner}
-          <form onSubmit={signIn}>
-            {setup && (
-              <>
+      <EntryShell
+        brand={<Logo />}
+        controls={entryControls}
+        locale={locale}
+        title={t(setup ? "setup" : "login")}
+        description={t(setup ? "setupHint" : "loginHint")}
+      >
+        {errorBanner}
+        <form
+          className="entry-form"
+          onSubmit={signIn}
+          aria-busy={busy}
+          aria-describedby={error ? "entry-error" : undefined}
+        >
+          {setup && (
+            <>
+              <div className="entry-field">
                 <Label htmlFor="name">{t("name")}</Label>
                 <Input
                   id="name"
+                  autoComplete="name"
                   value={authForm.name}
                   required
                   maxLength={200}
-                  onChange={(e) =>
-                    setAuthForm({ ...authForm, name: e.target.value })
+                  readOnly={busy}
+                  onChange={(event) =>
+                    setAuthForm({ ...authForm, name: event.target.value })
                   }
                 />
+              </div>
+              <div className="entry-field">
                 <Label htmlFor="workspace">{t("workspace")}</Label>
                 <Input
                   id="workspace"
+                  autoComplete="organization"
                   value={authForm.workspace}
                   required
-                  onChange={(e) =>
-                    setAuthForm({ ...authForm, workspace: e.target.value })
+                  readOnly={busy}
+                  onChange={(event) =>
+                    setAuthForm({ ...authForm, workspace: event.target.value })
                   }
                 />
-              </>
-            )}
+              </div>
+            </>
+          )}
+          <div className="entry-field">
             <Label htmlFor="email">{t("email")}</Label>
             <Input
               id="email"
               type="email"
               autoComplete="username"
+              autoCapitalize="none"
+              spellCheck={false}
               dir="ltr"
               required
               value={authForm.email}
-              onChange={(e) =>
-                setAuthForm({ ...authForm, email: e.target.value })
+              readOnly={busy}
+              placeholder="you@example.com"
+              onChange={(event) =>
+                setAuthForm({ ...authForm, email: event.target.value })
               }
             />
+          </div>
+          <div className="entry-field">
             <Label htmlFor="password">{t("password")}</Label>
-            <Input
-              id="password"
-              type="password"
-              autoComplete={setup ? "new-password" : "current-password"}
-              minLength={setup ? 12 : 1}
-              maxLength={128}
-              required
-              value={authForm.password}
-              onChange={(e) =>
-                setAuthForm({ ...authForm, password: e.target.value })
-              }
-            />
-            {setup && <small>{t("passwordHint")}</small>}
-            <Button type="submit" disabled={busy}>
-              {busy ? t("loading") : t(setup ? "create" : "login")}
-              <ArrowRight size={16} />
-            </Button>
-          </form>
-        </div>
-      </div>
+            <div className="entry-password">
+              <Input
+                id="password"
+                type={passwordVisible ? "text" : "password"}
+                dir="ltr"
+                autoComplete={setup ? "new-password" : "current-password"}
+                minLength={setup ? 12 : 1}
+                maxLength={128}
+                required
+                value={authForm.password}
+                readOnly={busy}
+                aria-describedby={setup ? "password-hint" : undefined}
+                onChange={(event) =>
+                  setAuthForm({ ...authForm, password: event.target.value })
+                }
+              />
+              <Button
+                variant="ghost"
+                size="icon"
+                type="button"
+                aria-label={t(
+                  passwordVisible ? "hidePassword" : "showPassword",
+                )}
+                aria-pressed={passwordVisible}
+                onClick={() => setPasswordVisible(!passwordVisible)}
+              >
+                {passwordVisible ? <EyeOff size={18} /> : <Eye size={18} />}
+              </Button>
+            </div>
+            {setup && (
+              <p id="password-hint" className="entry-field-hint">
+                {t("passwordHint")}
+              </p>
+            )}
+          </div>
+          <Button type="submit" disabled={busy} className="entry-submit">
+            {busy ? (
+              <LoaderCircle
+                className="entry-spinner"
+                size={17}
+                aria-hidden="true"
+              />
+            ) : (
+              <ArrowRight size={17} aria-hidden="true" />
+            )}
+            {t(
+              busy
+                ? setup
+                  ? "creatingInstance"
+                  : "signingIn"
+                : setup
+                  ? "create"
+                  : "login",
+            )}
+          </Button>
+        </form>
+      </EntryShell>
     );
 
   return (
@@ -1118,6 +1206,7 @@ export default function App() {
           </div>
         </header>
         <div className="content">
+          <WebUpdateNotice locale={locale} />
           {errorBanner}
           <div className="page-header">
             <div>

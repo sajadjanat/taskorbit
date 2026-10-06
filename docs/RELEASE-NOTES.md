@@ -1,4 +1,10 @@
-# TaskOrbit 0.1.7 — transparent icon and localized previews
+# TaskOrbit 0.1.8 — consistent connection and sign-in
+
+- English is the default for a new or invalid language preference. Existing valid language choices are preserved.
+- Server connection, sign-in and initial setup share a responsive Mercury layout, consistent spacing, visible labels, 44 px form controls and accessible light/dark styling.
+- Client updates are a compact disclosure below the connection form; new-version availability remains visible.
+- Password visibility, appropriate autocomplete, busy feedback and recoverable error messages improve the entry workflow.
+- Standard desktop File/Edit/Window/Help menus accompany a Connection menu for returning to the local connection and update screen.
 
 - Transparent sunlit Mercury app icon for desktop and standard web icons. Android adaptive and iPhone/maskable home-screen tiles use a light stone surface where a solid background is required.
 - Four-language interface with English, Persian, Arabic and Simplified Chinese selection, localized dates and Arabic/Persian RTL.
@@ -16,7 +22,7 @@
 
 ## Downloads
 
-Windows x64 installer; macOS Intel and Apple Silicon DMGs; Linux x64 DEB/AppImage; Android arm64 APK; web/server archive. Desktop updater packages and signatures, latest.json and SHA256SUMS accompany them. Server image: ghcr.io/sajadjanat/taskorbit:v0.1.7 and :stable, Linux amd64/arm64. See [update guide](https://github.com/sajadjanat/taskorbit/blob/main/docs/UPDATES.md).
+Windows x64 installer; macOS Intel and Apple Silicon DMGs; Linux x64 DEB/AppImage; Android arm64 APK; web/server archive. Desktop updater packages and signatures, latest.json and SHA256SUMS accompany them. Server image: ghcr.io/sajadjanat/taskorbit:v0.1.8 and :stable, Linux amd64/arm64. See [update guide](https://github.com/sajadjanat/taskorbit/blob/main/docs/UPDATES.md).
 
 ## Preview limitations
 

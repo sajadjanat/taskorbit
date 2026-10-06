@@ -163,15 +163,17 @@ pub fn run() {
             {
                 app.handle()
                     .plugin(tauri_plugin_updater::Builder::new().build())?;
-                use tauri::menu::{Menu, MenuItem};
+                use tauri::menu::{Menu, MenuItem, Submenu};
                 let item = MenuItem::with_id(
                     app,
                     "updates",
-                    "Updates / Server connection",
+                    "Server connection and updates…",
                     true,
                     None::<&str>,
                 )?;
-                app.set_menu(Menu::with_items(app, &[&item])?)?;
+                let menu = Menu::default(app.handle())?;
+                menu.append(&Submenu::with_items(app, "Connection", true, &[&item])?)?;
+                app.set_menu(menu)?;
                 let initial = app.get_webview_window("main").unwrap().url()?;
                 app.on_menu_event(move |app, event| {
                     if event.id().as_ref() == "updates" {

@@ -1,4 +1,11 @@
 export const chinese = {
+  gettingStarted: "入门指南",
+  showPassword: "显示密码",
+  hidePassword: "隐藏密码",
+  serverAddressHint: "请输入服务器根地址，例如 https://tasks.example.com。",
+  connecting: "正在连接…",
+  signingIn: "正在登录…",
+  creatingInstance: "正在创建工作空间…",
   webUpdateReady: "新的网页版已就绪。重新加载前请保存工作。",
   reloadApp: "重新加载应用",
   clientUpdates: "客户端更新",

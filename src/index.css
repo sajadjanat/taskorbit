@@ -36,7 +36,7 @@
   --sidebar: #eeeae4;
   --radius: 8px;
   color-scheme: light;
-  font-family: "Vazirmatn", sans-serif;
+  font-family: "Vazirmatn", "Segoe UI", system-ui, sans-serif;
   font-synthesis: none;
 }
 .dark {
@@ -1105,125 +1105,6 @@ tbody tr:hover {
 .mobile-toggle {
   display: none !important;
 }
-.auth-shell {
-  min-height: 100dvh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 100px;
-  padding: 40px;
-}
-.auth-intro {
-  max-width: 390px;
-}
-.auth-intro h1 {
-  font-size: 34px;
-  line-height: 1.6;
-  margin-top: 40px;
-  letter-spacing: -1px;
-}
-.auth-intro p {
-  color: var(--muted);
-  margin-top: 16px;
-  line-height: 1.9;
-  font-size: 14px;
-}
-.auth-card {
-  width: 370px;
-  max-width: 100%;
-  padding: 28px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-}
-.auth-card h1,
-.auth-card h2 {
-  font-size: 23px;
-  margin-bottom: 12px;
-}
-.auth-card .brand {
-  margin-bottom: 28px;
-}
-.mobile-auth-brand {
-  display: none;
-}
-.auth-card p {
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 1.9;
-  margin-bottom: 25px;
-}
-.auth-card form {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.auth-card form > label {
-  font-size: 12px;
-  margin-top: 4px;
-}
-.auth-card form > button {
-  margin-top: 12px;
-}
-.auth-card small {
-  color: var(--muted);
-}
-.auth-options {
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
-  margin-bottom: 22px;
-}
-.orbit-illustration {
-  width: 280px;
-  height: 220px;
-  position: relative;
-  margin: 38px auto 0;
-}
-.orbit-path {
-  width: 250px;
-  height: 145px;
-  border: 1.5px dashed color-mix(in srgb, var(--primary) 35%, transparent);
-  border-radius: 50%;
-  transform: rotate(-25deg);
-  position: absolute;
-  inset: 35px 15px;
-}
-.orbit-center {
-  position: absolute;
-  inset: 65px 95px;
-  width: 90px;
-  height: 90px;
-  border-radius: 26px;
-  background: var(--primary);
-  color: var(--primary-foreground);
-  display: grid;
-  place-items: center;
-  transform: rotate(-8deg);
-}
-.orbit-center > svg {
-  transform: rotate(8deg);
-}
-.orbit-node {
-  width: 44px;
-  height: 44px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  position: absolute;
-  display: grid;
-  place-items: center;
-  color: var(--primary);
-}
-.node-one {
-  inset: 27px 205px auto auto;
-}
-.node-two {
-  inset: 135px 20px auto auto;
-}
-.node-three {
-  inset: 14px 77px auto auto;
-}
 .mobile-backdrop {
   display: none;
 }
@@ -1249,12 +1130,6 @@ tbody tr:hover {
   }
   .topbar {
     padding: 0 24px;
-  }
-  .auth-shell {
-    gap: 40px;
-  }
-  .auth-intro {
-    max-width: 330px;
   }
   .page-header h1 {
     font-size: 22px;
@@ -1371,19 +1246,6 @@ tbody tr:hover {
   }
   .resource-grid {
     grid-template-columns: 1fr;
-  }
-  .auth-shell {
-    padding: 22px;
-    gap: 0;
-  }
-  .auth-intro {
-    display: none;
-  }
-  .auth-card {
-    padding: 24px;
-  }
-  .mobile-auth-brand {
-    display: block;
   }
   .form-grid {
     gap: 14px;

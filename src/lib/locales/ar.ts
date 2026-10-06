@@ -1,4 +1,12 @@
 export const arabic = {
+  gettingStarted: "دليل البدء",
+  showPassword: "إظهار كلمة المرور",
+  hidePassword: "إخفاء كلمة المرور",
+  serverAddressHint:
+    "أدخل العنوان الرئيسي للخادم، مثل https://tasks.example.com.",
+  connecting: "جارٍ الاتصال…",
+  signingIn: "جارٍ تسجيل الدخول…",
+  creatingInstance: "جارٍ إنشاء مساحة العمل…",
   webUpdateReady: "إصدار الويب الجديد جاهز. احفظ عملك قبل إعادة التحميل.",
   reloadApp: "إعادة تحميل التطبيق",
   clientUpdates: "تحديثات التطبيق",
