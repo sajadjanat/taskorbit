@@ -458,6 +458,8 @@ export default function App() {
     setError("");
     try {
       setUser(await api<User>(setup ? "/setup" : "/login", "POST", authForm));
+      setAuthForm((form) => ({ ...form, password: "" }));
+      setPasswordVisible(false);
       setSetup(false);
     } catch (e) {
       showError(e);
@@ -468,6 +470,8 @@ export default function App() {
   async function signOut() {
     try {
       await api("/logout", "POST");
+      setAuthForm((form) => ({ ...form, password: "" }));
+      setPasswordVisible(false);
       setUser(null);
       setDetail(null);
       setEditor(null);

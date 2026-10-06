@@ -3,7 +3,7 @@
 - English is the default for a new or invalid language preference. Existing valid language choices are preserved.
 - Server connection, sign-in and initial setup share a responsive Mercury layout, consistent spacing, visible labels, 44 px form controls and accessible light/dark styling.
 - Client updates are a compact disclosure below the connection form; new-version availability remains visible.
-- Password visibility, appropriate autocomplete, busy feedback and recoverable error messages improve the entry workflow.
+- Password visibility, appropriate autocomplete, busy feedback and recoverable error messages improve the entry workflow. Password fields and visibility state are cleared after successful sign-in and sign-out.
 - Standard desktop File/Edit/Window/Help menus accompany a Connection menu for returning to the local connection and update screen.
 
 - Transparent sunlit Mercury app icon for desktop and standard web icons. Android adaptive and iPhone/maskable home-screen tiles use a light stone surface where a solid background is required.

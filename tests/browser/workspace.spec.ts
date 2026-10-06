@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { messages } from "../../src/lib/i18n";
 test("setup, project, sprint, work item, comment, language and persistence", async ({
   page,
   request,
@@ -15,6 +16,9 @@ test("setup, project, sprint, work item, comment, language and persistence", asy
   }
   await page.getByLabel("Email", { exact: true }).fill("demo@example.test");
   await page.getByLabel("Password", { exact: true }).fill("demo-only-password");
+  await page
+    .getByRole("button", { name: "Show password", exact: true })
+    .click();
   await page
     .getByRole("button", { name: setup ? "Create" : "Sign in", exact: true })
     .click();
@@ -178,4 +182,14 @@ test("setup, project, sprint, work item, comment, language and persistence", asy
     );
   });
   expect(cache.flat().some((url) => url.includes("/api/"))).toBe(false);
+  if (mobile) await page.locator(".mobile-toggle").click();
+  await page
+    .getByRole("button", { name: messages.fa.logout, exact: true })
+    .click();
+  await expect(
+    page.getByLabel(messages.fa.password, { exact: true }),
+  ).toHaveValue("");
+  await expect(
+    page.getByLabel(messages.fa.password, { exact: true }),
+  ).toHaveAttribute("type", "password");
 });
