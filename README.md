@@ -29,6 +29,16 @@ See what is planned, who owns the next step, and what is ready to ship. TaskOrbi
 
 TaskOrbit is an independent, MIT-licensed application for team project management. The current release is an early preview; implemented features and remaining work are documented below.
 
+## Part of the Orbit family
+
+**Every member of the Orbit family has a celestial symbol and a mission.** These symbols tell our story of the role each application plays in managing work.
+
+For [**GitOrbit**](https://github.com/sajadjanat/gitorbit), we chose a black hole: a symbol of a powerful center drawing scattered projects, repositories and workspaces into one shared environment, where they can be seen and managed together.
+
+For **TaskOrbit**, we chose Mercury: the smallest planet in our solar system, with the fastest orbital speed around the Sun. To us, this combination expresses TaskOrbit's purpose: a lightweight, fast application that helps teams coordinate tasks, plan projects and sprints, and keep moving forward. The sunlight in its symbol also reflects Mercury's proximity to the Sun. These planetary facts are documented by [NASA](https://science.nasa.gov/mercury/facts/); their connection to our work is our brand interpretation.
+
+**The Orbit family will grow.** Each new application will have its own celestial symbol and personality, chosen for its mission: tools with different roles and a shared goal of bringing order to the world of work.
+
 <a id="features"></a>
 
 ## Features
