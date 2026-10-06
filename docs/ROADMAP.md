@@ -19,7 +19,7 @@ The 0.1 preview implements the core workflows listed in README. Keep the workspa
 - Sprint burndown/history, velocity, capacity, time tracking and workload reporting.
 - Task order/reordering, additional grouping/sorting and calendar/gantt start/end intervals.
 - Import/export restoration and migration from other project management tools; API tokens, webhooks and integrations.
-- Real-time updates; current version refreshes project data every 15 seconds.
+- Collaborative text editing and presence indicators; live data synchronization is implemented through authenticated server events.
 - Search across projects and project pagination for large data sets.
 - Additional interface languages beyond English/Persian/Arabic/Simplified Chinese, with native-speaker review. User-written task content is preserved when switching the interface language; documentation fixtures use separately localized fictional data.
 - Offline edits and conflict-aware synchronization.

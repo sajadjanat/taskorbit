@@ -1,4 +1,5 @@
 export const arabic = {
+  backToWorkspace: "العودة إلى مساحة العمل",
   gettingStarted: "دليل البدء",
   showPassword: "إظهار كلمة المرور",
   hidePassword: "إخفاء كلمة المرور",

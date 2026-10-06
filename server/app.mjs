@@ -12,6 +12,7 @@ import {
 import path from "node:path";
 import { readFileSync } from "node:fs";
 import { openDatabase, transaction } from "./db.mjs";
+import { createRealtime } from "./realtime.mjs";
 import {
   VERSION,
   releaseChecker,
@@ -124,19 +125,15 @@ export function createApp({
       try {
         const state = JSON.parse(readFileSync(maintenancePath, "utf8"));
         if (state.state === "running" || state.phase === "recovery_required")
-          return res
-            .status(503)
-            .json({
-              error:
-                "Server upgrade in progress; editing resumes after health verification",
-            });
+          return res.status(503).json({
+            error:
+              "Server upgrade in progress; editing resumes after health verification",
+          });
       } catch (e) {
         if (e.code !== "ENOENT")
-          return res
-            .status(503)
-            .json({
-              error: "Upgrade state unavailable; editing temporarily paused",
-            });
+          return res.status(503).json({
+            error: "Upgrade state unavailable; editing temporarily paused",
+          });
       }
     }
     if (
@@ -312,6 +309,9 @@ export function createApp({
     res.json(session(req, res, u));
   });
   app.use("/api", auth);
+  const realtime = createRealtime(db);
+  app.get("/api/events", realtime.connect);
+  app.use("/api", realtime.track);
   app.get("/api/me", (req, res) => res.json(publicUser(req.user)));
   app.post("/api/logout", (req, res) => {
     db.prepare("DELETE FROM sessions WHERE token=?").run(req.session);
@@ -349,13 +349,11 @@ export function createApp({
         one_click: upgradeAgent.enabled,
       });
     } catch {
-      res
-        .status(503)
-        .json({
-          error: "Cannot check releases; try again when online",
-          current: VERSION,
-          one_click: upgradeAgent.enabled,
-        });
+      res.status(503).json({
+        error: "Cannot check releases; try again when online",
+        current: VERSION,
+        one_click: upgradeAgent.enabled,
+      });
     }
   });
   app.get("/api/admin/updates/status", admin, async (req, res) => {
@@ -376,32 +374,26 @@ export function createApp({
         .parse(req.body);
       const release = await checkRelease();
       if (version !== release.version || !newer(version, VERSION))
-        return res
-          .status(409)
-          .json({
-            error: "Check the current eligible release before upgrading",
-          });
+        return res.status(409).json({
+          error: "Check the current eligible release before upgrading",
+        });
       if (!upgradeAgent.enabled)
-        return res
-          .status(409)
-          .json({
-            error:
-              "Enable the Docker upgrade service before using one-click updates",
-          });
+        return res.status(409).json({
+          error:
+            "Enable the Docker upgrade service before using one-click updates",
+        });
       res
         .status(202)
         .json(
           await upgradeAgent.request("/upgrade", { version, from: VERSION }),
         );
     } catch (e) {
-      res
-        .status(e instanceof z.ZodError ? 400 : 503)
-        .json({
-          error:
-            e instanceof z.ZodError
-              ? "Invalid release version"
-              : "Cannot start upgrade; check the release and upgrade service",
-        });
+      res.status(e instanceof z.ZodError ? 400 : 503).json({
+        error:
+          e instanceof z.ZodError
+            ? "Invalid release version"
+            : "Cannot start upgrade; check the release and upgrade service",
+      });
     }
   });
   app.get("/api/admin/users", admin, (req, res) =>
@@ -1013,5 +1005,5 @@ export function createApp({
       .json({ error: error.status ? error.message : "Server error" });
     if (!error.status) console.error(error);
   });
-  return { app, db };
+  return { app, db, closeRealtime: realtime.close };
 }

@@ -3,6 +3,7 @@ import { chinese } from "./locales/zh-CN";
 
 const baseMessages = {
   en: {
+    backToWorkspace: "Back to workspace",
     gettingStarted: "Getting started",
     showPassword: "Show password",
     hidePassword: "Hide password",
@@ -211,6 +212,7 @@ const baseMessages = {
       "An instance administrator creates accounts; a workspace administrator adds existing accounts to the team.",
   },
   fa: {
+    backToWorkspace: "بازگشت به فضای کاری",
     gettingStarted: "راهنمای شروع",
     showPassword: "نمایش رمز عبور",
     hidePassword: "پنهان کردن رمز عبور",

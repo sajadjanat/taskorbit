@@ -25,13 +25,15 @@ Keep both named volumes. Stop the updater and all application containers for thi
 
 ## Desktop clients
 
-Windows, macOS and Linux 0.1.3+ clients check the signed GitHub update manifest from the local connection screen. Use **Updates / Server connection** in the desktop menu to return there from your server. Choose **Install update** to download and verify the package, then install and restart. Remote self-hosted pages have no native updater permissions. The updater signature is distinct from Windows code signing or macOS notarization, which are not configured in this preview.
+Windows, macOS and Linux clients check the signed GitHub update manifest from the local connection screen. Use **Connection → Server connection and updates…** in the desktop menu to open it, and **Back to workspace** to return. The remembered server opens automatically on a new launch. Choose **Install update** to download and verify the package, then install and restart. Remote self-hosted pages have no native updater permissions. The updater signature is distinct from Windows code signing or macOS notarization, which are not configured in this preview.
+
+If an older client opens a blank screen from its Connection menu, close it and install the current installer over it once. This fixes the local navigation code and preserves the saved server. Server data stays on the self-hosted server.
 
 Clients before 0.1.3 need one manual installation of 0.1.3 to acquire the updater. The first updater-enabled release reports up to date until a newer version is published. Keep the persistent updater private key outside Git and configure `TAURI_SIGNING_PRIVATE_KEY` and `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` in release CI. Signing keys must remain consistent across releases.
 
 ## Android
 
-The local connection screen checks the official release for a newer arm64 APK. **Download APK** opens that exact release asset. Android requires the user to approve package installation; retain the same APK signing key to update the existing installation. Relaunch the app to return to the local screen from a connected server.
+The local connection screen checks the official release for a newer arm64 APK. **Download APK** opens that exact release asset. Android requires the user to approve package installation; retain the same APK signing key to update the existing installation. The saved server opens automatically on launch. Use the system Back action through the navigation history to return to the local screen; returning there does not repeat the startup redirect. Physical-device back/resume behavior remains on the verification checklist.
 
 ## Web, iPhone and iPad PWA
 

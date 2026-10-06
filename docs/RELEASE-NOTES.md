@@ -1,29 +1,19 @@
-# TaskOrbit 0.1.8 — consistent connection and sign-in
+# TaskOrbit 0.1.9 — reliable client connection and live collaboration
 
-- English is the default for a new or invalid language preference. Existing valid language choices are preserved.
-- Server connection, sign-in and initial setup share a responsive Mercury layout, consistent spacing, visible labels, 44 px form controls and accessible light/dark styling.
-- Client updates are a compact disclosure below the connection form; new-version availability remains visible.
-- Password visibility, appropriate autocomplete, busy feedback and recoverable error messages improve the entry workflow. Password fields and visibility state are cleared after successful sign-in and sign-out.
-- Standard desktop File/Edit/Window/Help menus accompany a Connection menu for returning to the local connection and update screen.
+- Clients reopen their remembered self-hosted server automatically. Connection settings remain reachable without being redirected back into the workspace.
+- Fixed the Windows blank screen from **Connection → Server connection and updates…**: the menu now uses the actual loaded local page instead of the initial `about:blank` address.
+- Added a localized **Back to workspace** action. Server settings and signed updates retain local-only native permissions; remote servers receive no native updater access.
+- Authenticated live events synchronize tasks, projects, sprints, modules, pages, saved views, comments, attachments, links and membership changes across connected web and native clients.
+- Events respect current workspace access. Logout, session revocation and account deactivation close existing streams. Reconnection refreshes changes missed while offline.
+- Related data is refreshed without reloading the page or replacing unsaved editor/comment drafts. Concurrent task and page saves retain optimistic conflict protection.
+- No additional server service or container is required for live collaboration.
 
-- Transparent sunlit Mercury app icon for desktop and standard web icons. Android adaptive and iPhone/maskable home-screen tiles use a light stone surface where a solid background is required.
-- Four-language interface with English, Persian, Arabic and Simplified Chinese selection, localized dates and Arabic/Persian RTL.
-- Each translated README uses its own four actual UI previews, including localized fictional project/task data and task details.
-- Smaller sidebar wordmark, with a compact 160 px footprint.
-- Transparent Mercury wordmarks switch lettering for light and dark themes, without a black background.
-- README presentation includes centered branding, badges, feature/download tables and actual application previews in four documentation languages.
-- Instance administrator can check official releases and perform a one-click server upgrade with the optional updater container.
-- Database backup and integrity verification precede replacement; failed health checks restore the previous server and database. Interrupted upgrades use a persistent recovery journal.
-- Windows/macOS/Linux clients include a signed updater and a menu for returning to the local connection screen. Clients before 0.1.3 need one manual installation; 0.1.3 clients can use the in-app updater.
-- Android checks newer releases and opens the persistent-key-signed APK for user-approved installation.
-- Web/iPhone PWA detects a changed server version and offers reload after saving unfinished work.
-- Mercury identity throughout the application; English main README and separate Persian, Arabic and Simplified Chinese README files.
-- Independent TaskOrbit product descriptions across project documentation.
+## Upgrade
 
-## Downloads
+If your existing desktop client opens a blank connection screen, close it and install the new installer over the current installation. The remembered server and normal server data are retained. Fixed clients can use the signed in-app updater normally. The administrator must upgrade the self-hosted server to enable live collaboration, then reload open web clients.
 
-Windows x64 installer; macOS Intel and Apple Silicon DMGs; Linux x64 DEB/AppImage; Android arm64 APK; web/server archive. Desktop updater packages and signatures, latest.json and SHA256SUMS accompany them. Server image: ghcr.io/sajadjanat/taskorbit:v0.1.8 and :stable, Linux amd64/arm64. See [update guide](https://github.com/sajadjanat/taskorbit/blob/main/docs/UPDATES.md).
+Windows x64 installer; macOS Intel and Apple Silicon DMGs; Linux x64 DEB/AppImage; Android arm64 APK; web/server archive. Desktop updater packages, signatures, `latest.json` and `SHA256SUMS` accompany them. Server image: `ghcr.io/sajadjanat/taskorbit:v0.1.9` and `:stable`, Linux amd64/arm64. See the [update guide](https://github.com/sajadjanat/taskorbit/blob/main/docs/UPDATES.md).
 
-## Preview limitations
+## Verification limits
 
-TaskOrbit remains an early preview with additional workflows on the roadmap. Installer builds do not establish physical-device installation or native server-connection verification. Windows/macOS OS code signing and macOS notarization are not configured; updater signatures are configured. Android is an APK without a Play Store listing. iPhone uses PWA without an App Store binary. Editing requires connectivity and private work data is not cached by the service worker. No production deployment is implied. See [roadmap](https://github.com/sajadjanat/taskorbit/blob/main/docs/ROADMAP.md) and [verification](https://github.com/sajadjanat/taskorbit/blob/main/docs/VERIFICATION.md).
+Windows startup and the actual native menu/return path are exercised with WebView2, separately from browser IPC stubs. API and two-context browser tests cover live updates, drafts, reconnect and access revocation. Release CI verifies desktop packages, APK signing, updater signatures and Docker upgrade/rollback fixtures before publication. Physical Mac/Linux/Android installation and iPhone PWA installation remain unverified. Windows/macOS OS code signing and macOS notarization are not configured; signed updater packages and the persistent Android APK signing key are configured. Editing requires connectivity. Private work data is not cached by the service worker. See [verification](https://github.com/sajadjanat/taskorbit/blob/main/docs/VERIFICATION.md) and the [roadmap](https://github.com/sajadjanat/taskorbit/blob/main/docs/ROADMAP.md).

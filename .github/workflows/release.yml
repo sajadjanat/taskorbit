@@ -93,6 +93,9 @@ jobs:
           version="$(node -p 'require("./package.json").version')"
           mv "$bundle/TaskOrbit.app.tar.gz" "$bundle/TaskOrbit_${version}_${arch}.app.tar.gz"
           mv "$bundle/TaskOrbit.app.tar.gz.sig" "$bundle/TaskOrbit_${version}_${arch}.app.tar.gz.sig"
+      - name: Verify Windows startup, native Connection menu and return path
+        if: runner.os == 'Windows'
+        run: node scripts/test-native-windows.mjs src-tauri/target/${{ matrix.target }}/release/taskorbit.exe
       - uses: actions/upload-artifact@v4
         with:
           name: taskorbit-${{ matrix.name }}

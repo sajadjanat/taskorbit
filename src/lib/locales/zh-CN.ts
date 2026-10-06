@@ -1,4 +1,5 @@
 export const chinese = {
+  backToWorkspace: "返回工作区",
   gettingStarted: "入门指南",
   showPassword: "显示密码",
   hidePassword: "隐藏密码",

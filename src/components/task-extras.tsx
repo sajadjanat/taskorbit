@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Paperclip, Download, X, Link2 } from "lucide-react";
 import { api, type Task } from "@/lib/api";
 import { Button } from "@/components/ui/button";
@@ -25,6 +25,7 @@ export function TaskExtras({
   locale,
   onError,
   onOpen,
+  revision = 0,
 }: {
   task: Task;
   tasks: Task[];
@@ -32,6 +33,7 @@ export function TaskExtras({
   locale: Locale;
   onError: (e: unknown) => void;
   onOpen: (task: Task) => void;
+  revision?: number;
 }) {
   const [files, setFiles] = useState<FileItem[]>([]),
     [links, setLinks] = useState<Link[]>([]),
@@ -39,16 +41,31 @@ export function TaskExtras({
     [type, setType] = useState("related"),
     [busy, setBusy] = useState(false);
   const t = (key: MessageKey) => messages[locale][key];
+  const selected = useRef(task.id),
+    request = useRef(0);
+  selected.current = task.id;
   const load = async () => {
+    const sequence = ++request.current,
+      id = task.id;
     const [a, b] = await Promise.all([
       api<FileItem[]>(`/tasks/${task.id}/attachments`),
       api<Link[]>(`/tasks/${task.id}/links`),
     ]);
+    if (selected.current !== id || request.current !== sequence) return;
     setFiles(a);
     setLinks(b);
   };
   useEffect(() => {
-    load().catch(onError);
+    let active = true;
+    load().catch((error) => {
+      if (active) onError(error);
+    });
+    return () => {
+      active = false;
+      request.current++;
+    };
+  }, [task.id, revision]);
+  useEffect(() => {
     setTarget("");
   }, [task.id]);
   async function upload(file: File) {

@@ -1,6 +1,21 @@
 use std::fs;
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::Mutex;
 use tauri::{Manager, WebviewWindow};
 use url::Url;
+
+struct ConnectionState {
+    local_url: Mutex<Option<Url>>,
+    first_entry: AtomicBool,
+}
+impl Default for ConnectionState {
+    fn default() -> Self {
+        Self {
+            local_url: Mutex::new(None),
+            first_entry: AtomicBool::new(true),
+        }
+    }
+}
 
 fn validate_server(address: &str) -> Result<Url, String> {
     let mut url = Url::parse(address.trim()).map_err(|_| "Enter a valid server URL")?;
@@ -36,13 +51,18 @@ fn connect_server(window: WebviewWindow, address: String) -> Result<(), String> 
     window.navigate(url).map_err(|e| e.to_string())
 }
 
+fn is_local_url(current: &Url) -> bool {
+    (current.scheme() == "tauri" && current.host_str() == Some("localhost"))
+        || (matches!(current.scheme(), "http" | "https")
+            && current.host_str() == Some("tauri.localhost"))
+        || (cfg!(debug_assertions)
+            && current.scheme() == "http"
+            && matches!(current.host_str(), Some("localhost") | Some("127.0.0.1"))
+            && current.port() == Some(5173))
+}
+
 fn local_only(window: &WebviewWindow) -> Result<(), String> {
-    let current = window.url().map_err(|e| e.to_string())?;
-    let local = (current.scheme() == "tauri" && current.host_str() == Some("localhost"))
-        || (current.scheme() == "http" && current.host_str() == Some("tauri.localhost"))
-        || (matches!(current.host_str(), Some("localhost") | Some("127.0.0.1"))
-            && current.port() == Some(5173));
-    if !local {
+    if !is_local_url(&window.url().map_err(|e| e.to_string())?) {
         return Err("Native commands are restricted to the local connection screen".into());
     }
     Ok(())
@@ -57,6 +77,22 @@ fn saved_server(window: WebviewWindow) -> Result<String, String> {
         .app_config_dir()
         .map_err(|e| e.to_string())?;
     Ok(fs::read_to_string(dir.join("server.txt")).unwrap_or_default())
+}
+
+#[tauri::command]
+fn resume_server(window: WebviewWindow) -> Result<(), String> {
+    let saved = saved_server(window.clone())?;
+    let url = validate_server(&saved)?;
+    window.navigate(url).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+fn should_resume(window: WebviewWindow) -> Result<bool, String> {
+    local_only(&window)?;
+    Ok(window
+        .state::<ConnectionState>()
+        .first_entry
+        .swap(false, Ordering::SeqCst))
 }
 
 #[tauri::command]
@@ -149,10 +185,23 @@ fn restart_client(window: WebviewWindow) -> Result<(), String> {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .manage(ConnectionState::default())
+        .on_page_load(|webview, payload| {
+            // Setup runs before the first navigation: window.url() can still be about:blank.
+            // Capture only the actual bundled origin from a navigation event.
+            if webview.label() == "main" && is_local_url(payload.url()) {
+                let mut url = payload.url().clone();
+                url.set_query(None);
+                url.set_fragment(None);
+                *webview.state::<ConnectionState>().local_url.lock().unwrap() = Some(url);
+            }
+        })
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![
             connect_server,
             saved_server,
+            resume_server,
+            should_resume,
             client_info,
             check_client_update,
             open_apk_update,
@@ -174,26 +223,22 @@ pub fn run() {
                 let menu = Menu::default(app.handle())?;
                 menu.append(&Submenu::with_items(app, "Connection", true, &[&item])?)?;
                 app.set_menu(menu)?;
-                let initial = app.get_webview_window("main").unwrap().url()?;
                 app.on_menu_event(move |app, event| {
                     if event.id().as_ref() == "updates" {
                         if let Some(window) = app.get_webview_window("main") {
-                            let _ = window.navigate(initial.clone());
+                            let local = app
+                                .state::<ConnectionState>()
+                                .local_url
+                                .lock()
+                                .unwrap()
+                                .clone();
+                            if let Some(mut url) = local {
+                                url.set_query(Some("settings=1"));
+                                let _ = window.navigate(url);
+                            }
                         }
                     }
                 });
-            }
-            let window = app.get_webview_window("main").unwrap();
-            let dir = app.path().app_config_dir()?;
-            // Always open the local connection screen. Remember the address, never credentials.
-            if let Ok(value) = fs::read_to_string(dir.join("server.txt")) {
-                if let Ok(url) = validate_server(&value) {
-                    let escaped = url.as_str().replace('\\', "\\\\").replace('\'', "\\'");
-                    window.eval(&format!(
-                        "window.localStorage.setItem('taskorbit.server','{}');",
-                        escaped
-                    ))?;
-                }
             }
             Ok(())
         })
@@ -215,5 +260,16 @@ mod tests {
         assert!(validate_server("https://user:secret@example.com").is_err());
         assert!(validate_server("https://example.com/api").is_err());
         assert!(validate_server("javascript:alert(1)").is_err());
+    }
+    #[test]
+    fn blank_and_remote_pages_cannot_be_local_settings() {
+        assert!(!is_local_url(&Url::parse("about:blank").unwrap()));
+        assert!(!is_local_url(
+            &Url::parse("https://tasks.example.com/").unwrap()
+        ));
+        assert!(is_local_url(
+            &Url::parse("http://tauri.localhost/?settings=1").unwrap()
+        ));
+        assert!(is_local_url(&Url::parse("tauri://localhost/").unwrap()));
     }
 }

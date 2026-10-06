@@ -113,12 +113,13 @@ test("native connection prioritizes the form and exposes updates on demand", asy
     native.__TAURI_INTERNALS__ = {
       invoke: async (command: string, args: { address: string }) => {
         if (command === "saved_server") return "";
+        if (command === "should_resume") return true;
         if (command === "client_info")
-          return { version: "0.1.8", platform: "android" };
+          return { version: "0.1.9", platform: "android" };
         if (command === "check_client_update")
           return {
             android: true,
-            version: "0.1.9",
+            version: "0.1.10",
             url: "https://github.com/sajadjanat/taskorbit/releases",
           };
         if (command === "connect_server") {
@@ -147,7 +148,7 @@ test("native connection prioritizes the form and exposes updates on demand", asy
   await expect(
     page.getByRole("button", { name: "Check for updates", exact: true }),
   ).not.toBeVisible();
-  await expect(page.locator(".update-summary")).toContainText("0.1.9");
+  await expect(page.locator(".update-summary")).toContainText("0.1.10");
   await page.screenshot({
     path: testInfo.outputPath("connection-light.png"),
     fullPage: true,

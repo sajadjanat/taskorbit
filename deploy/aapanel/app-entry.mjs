@@ -6,7 +6,7 @@ const proxyAddress = process.env.TRUSTED_PROXY_ADDRESS;
 if (!isIP(proxyAddress || "")) {
   throw new Error("Set TRUSTED_PROXY_ADDRESS to the reverse proxy's single IP");
 }
-const { app, db } = createApp({
+const { app, db, closeRealtime } = createApp({
   database: process.env.DATABASE_PATH || "/data/taskorbit.sqlite",
 });
 app.set("trust proxy", [proxyAddress]);
@@ -15,6 +15,7 @@ const server = app.listen(4310, "0.0.0.0", () => {
 });
 for (const signal of ["SIGTERM", "SIGINT"]) {
   process.on(signal, () => {
+    closeRealtime?.();
     server.close(() => {
       db.close();
       process.exit(0);

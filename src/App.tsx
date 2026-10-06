@@ -10,6 +10,7 @@ import { isTauri, invoke } from "@tauri-apps/api/core";
 import { version as appVersion } from "../package.json";
 import { Updates, WebUpdateNotice } from "./components/updates";
 import { EntryShell } from "./components/entry-shell";
+import { useRealtime, type LiveChange } from "./lib/realtime";
 import {
   LayoutDashboard,
   Layers,
@@ -256,6 +257,7 @@ export default function App() {
       localStorage.getItem("taskorbit.server") || "",
     ),
     [connection] = useState(isLocalClient()),
+    [rememberedServer, setRememberedServer] = useState(""),
     [authForm, setAuthForm] = useState({
       name: "",
       email: "",
@@ -263,12 +265,44 @@ export default function App() {
       workspace: "",
     });
   useEffect(() => {
-    if (connection)
+    let active = true;
+    if (connection) {
       invoke<string>("saved_server")
-        .then(setServerUrl)
+        .then(async (saved) => {
+          if (!active) return;
+          setServerUrl(saved);
+          setRememberedServer(saved);
+          const firstEntry = await invoke<boolean>("should_resume");
+          if (!active) return;
+          if (
+            saved &&
+            firstEntry &&
+            new URLSearchParams(location.search).get("settings") !== "1"
+          ) {
+            setBusy(true);
+            try {
+              await invoke("resume_server");
+            } catch (error) {
+              if (active)
+                showError(typeof error === "string" ? new Error(error) : error);
+            } finally {
+              if (active) setBusy(false);
+            }
+          }
+        })
         .catch(() => {});
+    }
+    return () => {
+      active = false;
+    };
   }, [connection]);
   const searchRef = useRef<HTMLInputElement>(null);
+  const selection = useRef({ wid, pid, detailId: detail?.id });
+  selection.current = { wid, pid, detailId: detail?.id };
+  const projectRequest = useRef(0),
+    workspaceRequest = useRef(0);
+  const projectVersions = useRef<Record<string, number>>({});
+  const [liveRevision, setLiveRevision] = useState(0);
   const project = projects.find((p) => p.id === pid),
     workspace = workspaces.find((w) => w.id === wid),
     canManage = !!user?.admin || workspace?.role === "admin",
@@ -312,32 +346,63 @@ export default function App() {
     setWorkspaces(ws);
     setWid((old) => (ws.some((w) => w.id === old) ? old : ws[0]?.id || ""));
   }, []);
-  const loadProject = useCallback(async () => {
-    if (!pid) {
-      setTasks([]);
-      setSprints([]);
-      setModules([]);
-      setPages([]);
-      setViews([]);
-      setActivities([]);
-      return;
-    }
-    const [ts, ss, ms, ps, vs, as] = await Promise.all([
-      api<Task[]>(`/projects/${pid}/tasks`),
-      api<Sprint[]>(`/projects/${pid}/sprints`),
-      api<Module[]>(`/projects/${pid}/modules`),
-      api<Page[]>(`/projects/${pid}/pages`),
-      api<View[]>(`/projects/${pid}/views`),
-      api<Activity[]>(`/projects/${pid}/activity`),
-    ]);
-    setTasks(ts);
-    setSprints(ss);
-    setModules(ms);
-    setPages(ps);
-    setViews(vs);
-    setActivities(as);
-  }, [pid]);
+  const loadProject = useCallback(
+    async (resources?: Set<string>) => {
+      const sequence = ++projectRequest.current;
+      for (const resource of [
+        "tasks",
+        "sprints",
+        "modules",
+        "pages",
+        "views",
+        "activity",
+      ]) {
+        if (!resources || resources.has(resource) || resource === "activity")
+          projectVersions.current[resource] = sequence;
+      }
+      if (!pid) {
+        setTasks([]);
+        setSprints([]);
+        setModules([]);
+        setPages([]);
+        setViews([]);
+        setActivities([]);
+        return;
+      }
+      const [ts, ss, ms, ps, vs, as] = await Promise.all([
+        !resources || resources.has("tasks")
+          ? api<Task[]>(`/projects/${pid}/tasks`)
+          : null,
+        !resources || resources.has("sprints")
+          ? api<Sprint[]>(`/projects/${pid}/sprints`)
+          : null,
+        !resources || resources.has("modules")
+          ? api<Module[]>(`/projects/${pid}/modules`)
+          : null,
+        !resources || resources.has("pages")
+          ? api<Page[]>(`/projects/${pid}/pages`)
+          : null,
+        !resources || resources.has("views")
+          ? api<View[]>(`/projects/${pid}/views`)
+          : null,
+        api<Activity[]>(`/projects/${pid}/activity`),
+      ]);
+      if (selection.current.pid !== pid) return;
+      if (ts && projectVersions.current.tasks === sequence) setTasks(ts);
+      if (ss && projectVersions.current.sprints === sequence) setSprints(ss);
+      if (ms && projectVersions.current.modules === sequence) setModules(ms);
+      if (ps && projectVersions.current.pages === sequence) setPages(ps);
+      if (vs && projectVersions.current.views === sequence) setViews(vs);
+      if (projectVersions.current.activity === sequence) setActivities(as);
+      if (ts && projectVersions.current.tasks === sequence)
+        setDetail((old) =>
+          old ? ts.find((task) => task.id === old.id) || null : null,
+        );
+    },
+    [pid],
+  );
   const loadWorkspace = useCallback(async () => {
+    const sequence = ++workspaceRequest.current;
     if (!wid) {
       setProjects([]);
       setMembers([]);
@@ -347,6 +412,8 @@ export default function App() {
       api<Project[]>(`/workspaces/${wid}/projects`),
       api<User[]>(`/workspaces/${wid}/members`),
     ]);
+    if (sequence !== workspaceRequest.current || selection.current.wid !== wid)
+      return;
     setProjects(ps);
     setMembers(ms);
     setPid((old) =>
@@ -395,11 +462,104 @@ export default function App() {
     setDetail(null);
     setFilters(blankFilters);
   }, [pid, user?.id, loadProject]);
-  useEffect(() => {
-    if (!user || !pid) return;
-    const timer = setInterval(() => loadProject().catch(showError), 15000);
-    return () => clearInterval(timer);
-  }, [user?.id, pid, loadProject]);
+  async function refreshLive(changes: LiveChange[] | null) {
+    const access =
+      !changes ||
+      changes.some(
+        (change) => change.kind === "access" || change.kind === "workspace",
+      );
+    if (access) {
+      const me = await api<User>("/me");
+      setUser(me);
+      const ws = await api<Workspace[]>("/workspaces");
+      setWorkspaces(ws);
+      if (!ws.some((w) => w.id === selection.current.wid)) {
+        setWid(ws[0]?.id || "");
+        setPid("");
+        setProjects([]);
+        setMembers([]);
+        setTasks([]);
+        setSprints([]);
+        setModules([]);
+        setPages([]);
+        setViews([]);
+        setActivities([]);
+        setDetail(null);
+        setEditor(null);
+        setDeletion(null);
+        setUsers([]);
+        return;
+      }
+      if (me.admin && (section === "admin" || section === "members"))
+        setUsers(await api<User[]>("/admin/users"));
+      else if (!me.admin) setUsers([]);
+    }
+    if (
+      access ||
+      changes?.some(
+        (change) =>
+          change.workspace_id === wid && change.resource === "projects",
+      )
+    )
+      await loadWorkspace();
+    if (
+      access ||
+      changes?.some(
+        (change) =>
+          change.project_id === pid ||
+          (change.kind === "workspace" && change.workspace_id === wid),
+      )
+    ) {
+      const relevant =
+        changes?.filter((change) => change.project_id === pid) || [];
+      const partial =
+        !access &&
+        relevant.every(
+          (change) => change.resource && change.resource !== "projects",
+        );
+      await loadProject(
+        partial
+          ? new Set(relevant.map((change) => change.resource!))
+          : undefined,
+      );
+      const id = selection.current.detailId;
+      if (
+        id &&
+        (access ||
+          relevant.some(
+            (change) =>
+              change.resource === "comments" || change.resource === "tasks",
+          ))
+      ) {
+        const updated = await api<Comment[]>(`/tasks/${id}/comments`).catch(
+          (e) => {
+            if (e instanceof ApiError && e.status === 404) return [];
+            throw e;
+          },
+        );
+        if (selection.current.detailId === id) setComments(updated);
+      }
+      if (
+        access ||
+        relevant.some((change) =>
+          ["attachments", "links", "tasks"].includes(change.resource || ""),
+        )
+      )
+        setLiveRevision((old) => old + 1);
+    }
+  }
+  useRealtime(!!user && !connection, refreshLive, async () => {
+    try {
+      await api<User>("/me");
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 401) {
+        setUser(null);
+        setDetail(null);
+        setEditor(null);
+        setError(t("sessionExpired"));
+      }
+    }
+  });
   useEffect(() => {
     if (user?.admin && (section === "admin" || section === "members"))
       api<User[]>("/admin/users").then(setUsers).catch(showError);
@@ -885,6 +1045,25 @@ export default function App() {
             {t(busy ? "connecting" : "connect")}
           </Button>
         </form>
+        {rememberedServer && (
+          <Button
+            variant="outline"
+            className="w-full mt-3"
+            disabled={busy}
+            onClick={async () => {
+              setBusy(true);
+              try {
+                await invoke("resume_server");
+              } catch (error) {
+                showError(typeof error === "string" ? new Error(error) : error);
+              } finally {
+                setBusy(false);
+              }
+            }}
+          >
+            {t("backToWorkspace")}
+          </Button>
+        )}
       </EntryShell>
     );
   if (!user)
@@ -2351,6 +2530,7 @@ export default function App() {
                       </button>
                     ))}
                   <TaskExtras
+                    revision={liveRevision}
                     task={detail}
                     tasks={tasks}
                     writable={writable}

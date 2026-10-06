@@ -1,5 +1,14 @@
 # Preview verification
 
+## 2026-10-06 connection and live collaboration fixes
+
+- The installed Windows client reproduced the reported issues: startup stayed on the connection form despite a saved server, and invoking the real native menu navigated to `about:blank`. The corrected local Windows executable automatically opened the saved server, passed three real native menu/return cycles, kept history-based settings reachable and rejected native commands from the remote server. WebView2 used an isolated temporary profile and anonymous requests; production work data was not changed. Local executable linking used an `rlib`-only build workaround for the GNU linker's DLL export limit; release packaging retains the normal crate types.
+- 32 API/update tests passed, including a new temporary-database live-event integration test covering tasks, comments, files, relationships, sprints, modules, pages, views, deletion scopes, workspace isolation, membership removal, deactivation, logout and reconnect.
+- TypeScript checking and the production build passed. Three Rust validation tests passed. Desktop Chromium browser tests passed; the two-context live-collaboration test observed task changes, comments and files within four seconds without reloading, preserved an unsent comment draft and caught up after an offline interval. Physical Android/Mac/Linux and iPhone installation remains unverified.
+- The release pipeline additionally runs the real packaged Windows navigation test on a disposable runner. Publication and the production server upgrade are recorded separately after they complete; local tests alone do not establish either.
+
+## Earlier preview verification
+
 Recorded on 2026-10-05. These checks describe the preview, not production readiness.
 
 - 31 automated API/update tests passed using temporary SQLite databases: authentication, permissions, workspace isolation, optimistic updates, attachments, dependency cycles, sessions, update validation, concurrent upgrade rejection, backup integrity, rollback and interrupted recovery.
