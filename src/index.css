@@ -1401,3 +1401,95 @@ tbody tr:hover {
 .dark .priority-urgent {
   color: #fda4af;
 }
+/* Personal MCP integration settings follow the common settings spacing and palette. */
+.mcp-panel {
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+.mcp-panel h2,
+.mcp-actions,
+.mcp-endpoint {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+.mcp-panel h3 {
+  margin: 1.6rem 0 0.8rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+.mcp-panel p {
+  line-height: 1.7;
+}
+.mcp-token-form {
+  display: grid;
+  gap: 0.8rem;
+  max-width: 34rem;
+}
+.mcp-check {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  cursor: pointer;
+}
+.mcp-check input {
+  accent-color: var(--primary);
+}
+.mcp-secret {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--primary);
+  border-radius: 0.65rem;
+  max-width: 42rem;
+}
+.mcp-actions {
+  margin-top: 0.7rem;
+  flex-wrap: wrap;
+}
+.mcp-panel select {
+  width: 100%;
+  max-width: 34rem;
+  padding: 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  color: var(--foreground);
+  background: var(--background);
+  margin: 0.5rem 0;
+}
+.mcp-code {
+  max-width: 100%;
+  padding: 1rem;
+  background: var(--secondary);
+  border: 1px solid var(--border);
+  border-radius: 0.65rem;
+  margin: 0.8rem 0;
+}
+.mcp-code pre {
+  overflow-x: auto;
+  font-size: 0.8rem;
+  line-height: 1.6;
+  margin-bottom: 0.75rem;
+  user-select: text;
+}
+.mcp-endpoint {
+  flex-wrap: wrap;
+  overflow-wrap: anywhere;
+  font-size: 0.85rem;
+}
+.mcp-token-list {
+  list-style: none;
+  padding: 0;
+}
+.mcp-token-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.8rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.mcp-token-list small {
+  display: block;
+  color: var(--muted);
+  margin-top: 0.3rem;
+}

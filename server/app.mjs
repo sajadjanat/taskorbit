@@ -1,6 +1,6 @@
 import express from "express";
 import helmet from "helmet";
-import { rateLimit } from "express-rate-limit";
+import { rateLimit, ipKeyGenerator } from "express-rate-limit";
 import { z } from "zod";
 import {
   randomUUID,
@@ -13,6 +13,7 @@ import path from "node:path";
 import { readFileSync } from "node:fs";
 import { openDatabase, transaction } from "./db.mjs";
 import { createRealtime } from "./realtime.mjs";
+import { mountMcp } from "./mcp.mjs";
 import {
   VERSION,
   releaseChecker,
@@ -118,7 +119,10 @@ export function createApp({
       },
     }),
   );
-  app.use(express.json({ limit: "256kb" }));
+  const json = express.json({ limit: "256kb" });
+  app.use((req, res, next) =>
+    req.path === "/mcp" || req.path === "/mcp/" ? next() : json(req, res, next),
+  );
   app.use("/api", (req, res, next) => {
     res.set("Cache-Control", "no-store");
     if (maintenancePath && !["GET", "HEAD", "OPTIONS"].includes(req.method)) {
@@ -144,18 +148,26 @@ export function createApp({
       return res.status(403).json({ error: "Origin not allowed" });
     next();
   });
-  app.use(
-    "/api",
-    rateLimit({
-      windowMs: 60000,
-      limit: 300,
-      standardHeaders: "draft-8",
-      legacyHeaders: false,
-    }),
-  );
+  app.use("/api", identifySession);
+  const apiLimit = rateLimit({
+    windowMs: 60000,
+    limit: 300,
+    keyGenerator: (req) =>
+      req.token
+        ? `token:${req.token.id}`
+        : req.session
+          ? `session:${req.session}`
+          : `ip:${ipKeyGenerator(req.ip)}`,
+    message: { error: "Too many requests; retry shortly" },
+    standardHeaders: "draft-8",
+    legacyHeaders: false,
+  });
+  app.use("/api", apiLimit);
+  mountMcp(app, { origin, identify: identifySession, limit: apiLimit });
   const authLimit = rateLimit({
     windowMs: 15 * 60000,
     limit: 20,
+    message: { error: "Too many sign-in attempts; try again later" },
     standardHeaders: "draft-8",
     legacyHeaders: false,
   });
@@ -176,7 +188,34 @@ export function createApp({
     });
     return publicUser(u);
   }
-  function auth(req, res, next) {
+  function identifySession(req, res, next) {
+    if (req.headers.authorization) {
+      const bearer = /^Bearer (to_[A-Za-z0-9_-]{43})$/.exec(
+        req.headers.authorization,
+      )?.[1];
+      const t =
+        bearer &&
+        db
+          .prepare("SELECT * FROM api_tokens WHERE token_hash=? AND expires>?")
+          .get(hash(bearer), Date.now());
+      const u =
+        t &&
+        db
+          .prepare("SELECT * FROM users WHERE id=? AND active=1")
+          .get(t.user_id);
+      if (u) {
+        const scopes = JSON.parse(t.scopes);
+        req.token = { id: t.id, name: t.name, scopes, expires: t.expires };
+        req.user = {
+          ...u,
+          admin: Number(!!u.admin && scopes.includes("admin")),
+        };
+        db.prepare(
+          "UPDATE api_tokens SET last_used_at=CURRENT_TIMESTAMP WHERE id=? AND (last_used_at IS NULL OR last_used_at<datetime('now','-1 minute'))",
+        ).run(t.id);
+      }
+      return next();
+    }
     const token = req.headers.cookie
       ?.split(";")
       .map((s) => s.trim())
@@ -189,9 +228,29 @@ export function createApp({
           "SELECT u.* FROM users u JOIN sessions s ON s.user_id=u.id WHERE s.token=? AND s.expires>? AND u.active=1",
         )
         .get(hash(token), Date.now());
-    if (!u) return res.status(401).json({ error: "Sign in required" });
-    req.user = u;
-    req.session = hash(token);
+    if (u) {
+      req.user = u;
+      req.session = hash(token);
+    }
+    next();
+  }
+  function auth(req, res, next) {
+    if (!req.user) return res.status(401).json({ error: "Sign in required" });
+    if (
+      req.token &&
+      !["GET", "HEAD", "OPTIONS"].includes(req.method) &&
+      !req.token.scopes.includes("write")
+    )
+      return res.status(403).json({ error: "Token requires write permission" });
+    next();
+  }
+  function sessionOnly(req, res, next) {
+    if (!req.session)
+      return res
+        .status(403)
+        .json({
+          error: "Use the signed-in application to manage account credentials",
+        });
     next();
   }
   function admin(req, res, next) {
@@ -310,10 +369,70 @@ export function createApp({
   });
   app.use("/api", auth);
   const realtime = createRealtime(db);
-  app.get("/api/events", realtime.connect);
+  app.get("/api/events", sessionOnly, realtime.connect);
   app.use("/api", realtime.track);
   app.get("/api/me", (req, res) => res.json(publicUser(req.user)));
-  app.post("/api/logout", (req, res) => {
+  app.get("/api/me/token-info", (req, res) =>
+    res.json({
+      user: publicUser(req.user),
+      scopes: req.token?.scopes ?? [
+        "read",
+        "write",
+        ...(req.user.admin ? ["admin"] : []),
+      ],
+      expires: req.token?.expires ?? null,
+    }),
+  );
+  app.get("/api/me/tokens", sessionOnly, (req, res) => {
+    res.json(
+      db
+        .prepare(
+          "SELECT id,name,scopes,expires,created_at,last_used_at FROM api_tokens WHERE user_id=? ORDER BY rowid DESC",
+        )
+        .all(req.user.id)
+        .map((t) => ({ ...t, scopes: JSON.parse(t.scopes) })),
+    );
+  });
+  app.post("/api/me/tokens", sessionOnly, (req, res) => {
+    const v = z
+      .object({
+        name: short,
+        days: z.number().int().min(1).max(365).default(30),
+        write: z.boolean().default(false),
+        admin: z.boolean().default(false),
+      })
+      .strict()
+      .parse(req.body);
+    if (v.admin && !req.user.admin)
+      fail(403, "Instance administrator required");
+    const tid = randomUUID(),
+      token = "to_" + randomBytes(32).toString("base64url"),
+      expires = Date.now() + v.days * 86400000;
+    const scopes = [
+      "read",
+      ...(v.write ? ["write"] : []),
+      ...(v.admin ? ["admin"] : []),
+    ];
+    db.prepare(
+      "INSERT INTO api_tokens(id,user_id,name,token_hash,scopes,expires) VALUES(?,?,?,?,?,?)",
+    ).run(
+      tid,
+      req.user.id,
+      v.name,
+      hash(token),
+      JSON.stringify(scopes),
+      expires,
+    );
+    res.status(201).json({ id: tid, name: v.name, scopes, expires, token });
+  });
+  app.delete("/api/me/tokens/:id", sessionOnly, (req, res) => {
+    const result = db
+      .prepare("DELETE FROM api_tokens WHERE id=? AND user_id=?")
+      .run(req.params.id, req.user.id);
+    if (!result.changes) fail(404, "Token not found");
+    res.json({ ok: true });
+  });
+  app.post("/api/logout", sessionOnly, (req, res) => {
     db.prepare("DELETE FROM sessions WHERE token=?").run(req.session);
     res
       .clearCookie("taskorbit_session", {
@@ -324,7 +443,7 @@ export function createApp({
       })
       .json({ ok: true });
   });
-  app.put("/api/me/password", (req, res) => {
+  app.put("/api/me/password", sessionOnly, (req, res) => {
     const v = z
       .object({ current: z.string().max(128), password })
       .parse(req.body);
@@ -336,6 +455,7 @@ export function createApp({
         req.user.id,
       );
       db.prepare("DELETE FROM sessions WHERE user_id=?").run(req.user.id);
+      db.prepare("DELETE FROM api_tokens WHERE user_id=?").run(req.user.id);
     });
     res.clearCookie("taskorbit_session", { path: "/" }).json({ ok: true });
   });
@@ -441,8 +561,10 @@ export function createApp({
         v.password ? hashPassword(v.password) : u.password,
         u.id,
       );
-      if (v.password || v.active === false)
+      if (v.password || v.active === false) {
         db.prepare("DELETE FROM sessions WHERE user_id=?").run(u.id);
+        db.prepare("DELETE FROM api_tokens WHERE user_id=?").run(u.id);
+      }
     });
     res.json(
       publicUser(db.prepare("SELECT * FROM users WHERE id=?").get(u.id)),

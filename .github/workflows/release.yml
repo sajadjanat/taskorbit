@@ -31,8 +31,10 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          npm pack ./mcp --pack-destination /tmp
+          cp /tmp/taskorbit-mcp-*.tgz "taskorbit-mcp-$(node -p 'require("./package.json").version').tgz"
           gh release create "$GITHUB_REF_NAME" --draft --title "TaskOrbit $GITHUB_REF_NAME" --notes-file docs/RELEASE-NOTES.md
-          gh release upload "$GITHUB_REF_NAME" taskorbit-web-server.tar.gz --clobber
+          gh release upload "$GITHUB_REF_NAME" taskorbit-web-server.tar.gz taskorbit-mcp-*.tgz --clobber
       - uses: actions/upload-artifact@v4
         with:
           name: taskorbit-web-server

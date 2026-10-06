@@ -10,6 +10,7 @@ import { isTauri, invoke } from "@tauri-apps/api/core";
 import { version as appVersion } from "../package.json";
 import { Updates, WebUpdateNotice } from "./components/updates";
 import { EntryShell } from "./components/entry-shell";
+import { McpIntegrations } from "./components/mcp-integrations";
 import { useRealtime, type LiveChange } from "./lib/realtime";
 import {
   LayoutDashboard,
@@ -517,11 +518,11 @@ export default function App() {
         relevant.every(
           (change) => change.resource && change.resource !== "projects",
         );
-      await loadProject(
-        partial
-          ? new Set(relevant.map((change) => change.resource!))
-          : undefined,
-      );
+      const resources = new Set(relevant.map((change) => change.resource!));
+      // Removing a module/sprint also clears task references through SQLite foreign keys.
+      if (resources.has("modules") || resources.has("sprints"))
+        resources.add("tasks");
+      await loadProject(partial ? resources : undefined);
       const id = selection.current.detailId;
       if (
         id &&
@@ -2222,6 +2223,7 @@ export default function App() {
               )}
               {section === "settings" && (
                 <div className="settings-grid">
+                  <McpIntegrations locale={locale} admin={user.admin === 1} />
                   {user.admin === 1 && <Updates locale={locale} />}
                   <section className="panel settings-panel">
                     <h2>{t("theme")}</h2>

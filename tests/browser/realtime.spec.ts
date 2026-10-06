@@ -25,9 +25,14 @@ test("two independent clients receive changes immediately without reloading or l
       data: { name: "Live project", identifier: "LIVE" },
     })
   ).json();
+  const module = await (
+    await request.post(`/api/projects/${project.id}/modules`, {
+      data: { name: "Linked live module" },
+    })
+  ).json();
   const task = await (
     await request.post(`/api/projects/${project.id}/tasks`, {
-      data: { title: "Original live item" },
+      data: { title: "Original live item", module_id: module.id },
     })
   ).json();
   const a = await browser.newContext({
@@ -97,6 +102,30 @@ test("two independent clients receive changes immediately without reloading or l
     await expect(
       receiver.getByRole("link", { name: /live-note.txt/ }),
     ).toBeVisible({ timeout: 4000 });
+    await request.delete(`/api/modules/${module.id}`);
+    await expect(
+      receiver
+        .getByRole("dialog")
+        .getByText("Linked live module", { exact: true }),
+    ).toHaveCount(0);
+    await receiver
+      .getByRole("dialog")
+      .getByRole("button", { name: "Edit", exact: true })
+      .click();
+    await receiver
+      .getByRole("dialog")
+      .getByLabel("Title", { exact: true })
+      .fill("Edited after module deletion");
+    await receiver
+      .getByRole("dialog")
+      .getByRole("button", { name: "Save", exact: true })
+      .click();
+    await expect(receiver.getByRole("dialog")).not.toBeVisible({
+      timeout: 4000,
+    });
+    await receiver
+      .getByRole("button", { name: /Edited after module deletion/ })
+      .click();
     await request.delete(`/api/tasks/${task.id}`);
     for (const page of pages) {
       await expect(page.getByRole("dialog")).not.toBeVisible({ timeout: 4000 });
@@ -106,14 +135,58 @@ test("two independent clients receive changes immediately without reloading or l
     }
     // Suspend transport, mutate while disconnected, then verify reconnect catches up.
     await b.setOffline(true);
-    await request.post(`/api/projects/${project.id}/tasks`, {
-      data: { title: "Created while disconnected" },
-    });
+    const missed = await (
+      await request.post(`/api/projects/${project.id}/tasks`, {
+        data: { title: "Created while disconnected" },
+      })
+    ).json();
     await b.setOffline(false);
     await expect(
       receiver.getByRole("button", { name: /Created while disconnected/ }),
     ).toBeVisible({ timeout: 6000 });
+    // A failed API refresh must retry even while the event stream stays connected.
+    await receiver.evaluate((projectId) => {
+      const original = window.fetch;
+      Object.assign(window, { quotaFixtureRejected: false });
+      window.fetch = async (input, init) => {
+        const url =
+          typeof input === "string"
+            ? input
+            : input instanceof URL
+              ? input.href
+              : input.url;
+        if (
+          url === "/api/projects/" + projectId + "/tasks" &&
+          !(window as unknown as { quotaFixtureRejected: boolean })
+            .quotaFixtureRejected
+        ) {
+          Object.assign(window, { quotaFixtureRejected: true });
+          return new Response(
+            JSON.stringify({ error: "Temporary quota fixture" }),
+            { status: 429, headers: { "Content-Type": "application/json" } },
+          );
+        }
+        return original(input, init);
+      };
+    }, project.id);
+    await request.put(`/api/tasks/${missed.id}`, {
+      data: { ...missed, title: "Recovered after a temporary quota error" },
+    });
+    await expect(
+      receiver.getByRole("button", {
+        name: /Recovered after a temporary quota error/,
+      }),
+    ).toBeVisible({ timeout: 8000 });
+    expect(
+      await receiver.evaluate(
+        () =>
+          (window as unknown as { quotaFixtureRejected: boolean })
+            .quotaFixtureRejected,
+      ),
+    ).toBe(true);
   } finally {
+    // End fixture event streams before closing WebKit contexts on Windows.
+    await request.post("/api/logout");
     await a.close();
     await b.close();
   }

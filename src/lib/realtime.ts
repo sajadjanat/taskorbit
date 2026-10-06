@@ -25,6 +25,7 @@ export function useRealtime(
       timer = undefined;
       if (!active || running) return;
       running = true;
+      let failed = false;
       try {
         do {
           const changes = full ? null : pending;
@@ -33,9 +34,13 @@ export function useRealtime(
           await callbacks.current.refresh(changes);
         } while (active && (full || pending.length));
       } catch {
+        failed = true;
+        full = true;
         if (active) await callbacks.current.onError();
       } finally {
         running = false;
+        if (active && failed && !timer)
+          timer = setTimeout(() => void flush(), 5000);
       }
     }
     function schedule(change?: LiveChange) {

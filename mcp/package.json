@@ -1,0 +1,30 @@
+{
+  "name": "@taskorbit/mcp",
+  "version": "0.1.10",
+  "type": "module",
+  "description": "Connect MCP agents to your self-hosted TaskOrbit server",
+  "license": "MIT",
+  "bin": {
+    "taskorbit-mcp": "server.mjs"
+  },
+  "files": [
+    "server.mjs",
+    "tools.mjs",
+    "api.mjs",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.1",
+    "taskorbit": "file:..",
+    "zod": "^4.1.5"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sajadjanat/taskorbit.git",
+    "directory": "mcp"
+  }
+}

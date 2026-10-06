@@ -115,11 +115,11 @@ test("native connection prioritizes the form and exposes updates on demand", asy
         if (command === "saved_server") return "";
         if (command === "should_resume") return true;
         if (command === "client_info")
-          return { version: "0.1.9", platform: "android" };
+          return { version: "0.1.10", platform: "android" };
         if (command === "check_client_update")
           return {
             android: true,
-            version: "0.1.10",
+            version: "0.1.11",
             url: "https://github.com/sajadjanat/taskorbit/releases",
           };
         if (command === "connect_server") {
@@ -148,7 +148,7 @@ test("native connection prioritizes the form and exposes updates on demand", asy
   await expect(
     page.getByRole("button", { name: "Check for updates", exact: true }),
   ).not.toBeVisible();
-  await expect(page.locator(".update-summary")).toContainText("0.1.10");
+  await expect(page.locator(".update-summary")).toContainText("0.1.11");
   await page.screenshot({
     path: testInfo.outputPath("connection-light.png"),
     fullPage: true,

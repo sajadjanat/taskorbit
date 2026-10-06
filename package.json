@@ -1,6 +1,6 @@
 {
   "name": "taskorbit",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "private": true,
   "type": "module",
   "scripts": {
@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@fontsource/vazirmatn": "^5.2.6",
+    "@modelcontextprotocol/sdk": "1.32.1",
     "@tauri-apps/api": "^2.8.0",
     "@tauri-apps/plugin-opener": "^2.7.0",
     "@tauri-apps/plugin-updater": "^2.13.1",
