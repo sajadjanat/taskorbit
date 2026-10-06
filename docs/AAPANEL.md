@@ -1,6 +1,6 @@
 # aaPanel deployment: board.sepehra.ir
 
-TaskOrbit 0.1.8 is deployed at **https://board.sepehra.ir** using the published `ghcr.io/sajadjanat/taskorbit:stable` image. The application and its updater are two containers; the existing aaPanel Nginx provides HTTPS. This installation does not add Caddy or a separate database container.
+TaskOrbit 0.1.10 is deployed at **https://board.sepehra.ir** using the published release image, also available as `ghcr.io/sajadjanat/taskorbit:stable`. The application and its updater are two containers; the existing aaPanel Nginx provides HTTPS. This installation does not add Caddy or a separate database container.
 
 ## Find it in aaPanel
 
@@ -46,7 +46,11 @@ systemctl status certbot.timer
 
 The initial administrator and workspace were provisioned before public proxy access was enabled. Public setup is closed. The unique initial password is stored privately outside the repository and is never included in deployment logs. Change it after signing in.
 
-The instance administrator can check releases and install a newer server release from **Admin → Server updates**. The updater makes an integrity-checked backup before replacement and can roll back failed upgrades. No newer release was available at deployment, so an actual production upgrade was not performed. Real replacement and rollback fixtures were verified in release CI; see [verification](VERIFICATION.md).
+The instance administrator can check releases and install a newer server release from **Admin → Server updates**. The updater makes an integrity-checked backup before replacement and can roll back failed upgrades. The production installation was upgraded from 0.1.8 to 0.1.10 through this API on October 6, 2026: status reached `complete`, the backup was ready, and database integrity and aggregate work-record counts were preserved. The running application image ID matches the published 0.1.10 image; the updater pins an image ID during replacement. aaPanel still lists the site and both original container names. Production rollback was not needed; failed replacement and rollback were verified in isolated real-Docker CI fixtures. See [verification](VERIFICATION.md).
+
+Live collaboration uses the application itself. Nginx disables buffering and caching for the proxy; receiving the authenticated initial event promptly verifies the public stream. Nginx consumes the `X-Accel-Buffering` response header, so its absence from the public response is expected.
+
+To connect an agent, open **Settings → AI integrations · MCP**, create a personal token and follow the generated configuration. The remote endpoint is `https://board.sepehra.ir/mcp`; preserve the Host header in the proxy. MCP requires no additional container. See the [English](MCP.md), [Persian](MCP.fa.md), [Arabic](MCP.ar.md) or [Simplified Chinese](MCP.zh-CN.md) setup guide.
 
 ```sh
 /opt/taskorbit-board/manage.sh ps

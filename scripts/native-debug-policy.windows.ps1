@@ -11,6 +11,15 @@ $taskPolicies = @{
   'AdditionalBrowserArguments' = '--remote-debugging-port=8767 --no-proxy-server'
   'UserDataFolder' = $taskProfile
 }
+if ($Mode -eq 'Enable') {
+  # Check both values before creating either; existing runner policy is retained.
+  foreach ($taskPolicy in $taskPolicies.Keys) {
+    $taskKey = 'HKLM:\SOFTWARE\Policies\Microsoft\Edge\WebView2\' + $taskPolicy
+    if (Get-ItemProperty -LiteralPath $taskKey -Name 'taskorbit.exe' -ErrorAction SilentlyContinue) {
+      throw 'Refusing to overwrite existing TaskOrbit WebView2 policy'
+    }
+  }
+}
 foreach ($taskPolicy in $taskPolicies.Keys) {
   $taskKey = 'HKLM:\SOFTWARE\Policies\Microsoft\Edge\WebView2\' + $taskPolicy
   $taskCurrent = Get-ItemProperty -LiteralPath $taskKey -Name 'taskorbit.exe' -ErrorAction SilentlyContinue

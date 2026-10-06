@@ -18,7 +18,7 @@ Create `backups/` beforehand and ensure it is writable by the container's `node`
 
 ## Upgrade
 
-Back up first, check release notes, pull the new version and run `docker compose up -d --build`. Database schema version 1 uses additive initialization. There is no automatic downgrade support. Keep the prior source/image and a known-good backup available.
+Back up first, check release notes, pull the new version and run `docker compose up -d --build`. Database schema version 2 adds personal-token storage through additive initialization. Manual upgrades have no automatic downgrade support; the optional updater handles failed-upgrade recovery as described in [UPDATES.md](UPDATES.md). Keep the prior source/image and a known-good backup available.
 
 ## Deployment boundaries
 
