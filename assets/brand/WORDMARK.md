@@ -8,7 +8,11 @@ Light-theme edit prompt: change only the ivory Task/rbit lettering to warm charc
 
 Previous approved version: `taskorbit-wordmark-v4-balanced.png`, with comfortable spacing and slight k/r overlap behind Mercury. Its prompt brought Task/rbit inward by roughly 2–3% of the planet diameter. The tightly overlapped earlier trial is not used.
 
-The app icon `taskorbit-icon.png` uses the same sunlit Mercury on charcoal. Built-in imagegen prompt: derive a square icon from the approved planet, retaining crater texture and warm upper-left solar backlight, no text or rings, centered sphere at roughly 66% diameter with safe margins. The previous blue icon is preserved as `taskorbit-icon-v1-blue.png`.
+The app icon `taskorbit-icon.png` now uses the transparent master `taskorbit-icon-v2-transparent.png` (2026-10-06). It contains only the cratered Mercury and compact upper-left sunlight, with real alpha outside the element. The previous charcoal master is preserved as `taskorbit-icon-v1-charcoal.png`. Desktop ICO/ICNS, standard web PNGs and Android foregrounds derive from the transparent master. Android adaptive backgrounds and iPhone/maskable home-screen tiles use light stone `#f6f4f0` where the platform requires a solid tile; no black tile is baked in.
+
+Built-in imagegen edit prompt (background-extraction): remove only the black square background to genuine alpha; preserve the same centered solid cratered grey/taupe Mercury, orientation, texture, proportions, shading and compact white-gold upper-left solar backlight. Keep the shadow inside the planet opaque. Use clean alpha edges, short sunburst fading to transparent, safe margins, no opaque dark halo, rectangular matte, text, rounded square, rings, black hole or added objects. Saved as `assets/brand/taskorbit-icon-v2-transparent.png` and the current `taskorbit-icon.png`.
+
+The earlier icon was generated with built-in imagegen using: derive a square icon from the approved planet, retaining crater texture and warm upper-left solar backlight, no text or rings, centered sphere at roughly 66% diameter with safe margins. The previous blue icon is preserved as `taskorbit-icon-v1-blue.png`.
 
 UI palette: light stone `#f6f4f0`, dark charcoal `#171615`, warm dark amber `#7d4b0b` on light surfaces and solar gold `#e9b75f` on dark surfaces. Semantic task status colors remain distinguishable. Earlier versions follow below.
 

@@ -12,3 +12,10 @@ Recorded on 2026-10-05. These checks describe the preview, not production readin
 - Transparent Mercury lettering was checked on light, dark and tinted backgrounds. The sidebar wordmark uses a compact 160 px width; documentation screenshots were regenerated using a temporary database and fictional accounts. The main README is English with separate Persian, Arabic and Simplified Chinese translations.
 
 Physical-device installation, native-client end-to-end update installation/server connection, iPhone PWA installation/resume, production deployment, backup restoration under concurrent production load and Windows/macOS OS code signing remain unverified or incomplete. Updater signatures and Android APK signing are distinct from OS code signing/notarization. See [ROADMAP.md](ROADMAP.md) and [UPDATES.md](UPDATES.md).
+
+## 2026-10-06 icon and localized documentation
+
+- The transparent Mercury master, desktop ICO/ICNS, standard web PNGs and Android foreground contain real alpha with transparent corners. They were checked on white, light stone and charcoal surfaces. Android adaptive and iPhone/maskable tiles use light stone where a solid tile is required.
+- Arabic and Simplified Chinese dictionaries are checked against every English message key during TypeScript compilation. A four-language picker controls interface labels, document language/direction and dates; stored locale values are validated before use.
+- Local Chromium passed the complete workflow on desktop and 390×844 mobile, including switching between all four languages, RTL/LTR, persistence and accessibility checks. API/update tests: 31 passed. TypeScript and production build passed.
+- Sixteen documentation previews were captured from actual UI with separately localized fictional accounts, projects, work items, labels and comments in disposable databases. Each README links exclusively to the four images in its own locale directory. The English main README has no Persian/Arabic prose. Dependency lock entries were compared against v0.1.6 and are unchanged apart from root version metadata.

@@ -12,7 +12,7 @@ const run = (args) => {
 run(["icon", "assets/brand/taskorbit-icon.png", "-o", "src-tauri/icons"]);
 writeFileSync(
   "src-tauri/icons/android/values/ic_launcher_background.xml",
-  '<?xml version="1.0" encoding="utf-8"?>\n<resources><color name="ic_launcher_background">#171615</color></resources>\n',
+  '<?xml version="1.0" encoding="utf-8"?>\n<resources><color name="ic_launcher_background">#f6f4f0</color></resources>\n',
 );
 run([
   "icon",
@@ -36,7 +36,18 @@ copyFileSync("public/icon-192.png", "public/icon.png");
 const png = readFileSync("assets/brand/taskorbit-icon.png").toString("base64");
 writeFileSync(
   "work/pwa-icons/mask.svg",
-  `<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512"><rect width="512" height="512" fill="#171615"/><image x="90" y="90" width="332" height="332" href="data:image/png;base64,${png}"/></svg>`,
+  `<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512"><rect width="512" height="512" fill="#f6f4f0"/><image x="90" y="90" width="332" height="332" href="data:image/png;base64,${png}"/></svg>`,
 );
-run(["icon", "work/pwa-icons/mask.svg", "-o", "work/mask-icons", "-p", "512"]);
+run([
+  "icon",
+  "work/pwa-icons/mask.svg",
+  "-o",
+  "work/mask-icons",
+  "-p",
+  "180",
+  "-p",
+  "512",
+]);
 copyFileSync("work/mask-icons/512x512.png", "public/maskable-512.png");
+// iOS home-screen icons require a solid tile; use stone rather than a black alpha matte.
+copyFileSync("work/mask-icons/180x180.png", "public/apple-touch-icon.png");

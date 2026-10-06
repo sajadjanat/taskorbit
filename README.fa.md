@@ -11,7 +11,7 @@
   <p>مدیریت پروژهٔ سبک و سلف‌هاست با React، shadcn/ui و Tauri.</p>
   <p>
     <a href="https://github.com/sajadjanat/taskorbit/actions/workflows/verify.yml"><img src="https://github.com/sajadjanat/taskorbit/actions/workflows/verify.yml/badge.svg" alt="Web and server checks" /></a>
-    <a href="https://github.com/sajadjanat/taskorbit/releases"><img src="https://img.shields.io/badge/version-0.1.6-b88645" alt="Version 0.1.6" /></a>
+    <a href="https://github.com/sajadjanat/taskorbit/releases"><img src="https://img.shields.io/badge/version-0.1.7-b88645" alt="Version 0.1.7" /></a>
     <img src="https://img.shields.io/badge/Tauri-2-24c8db?logo=tauri&amp;logoColor=white" alt="Tauri 2" />
     <img src="https://img.shields.io/badge/UI-shadcn%2Fui-18181b?logo=shadcnui&amp;logoColor=white" alt="shadcn/ui" />
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-b88645" alt="MIT license" /></a>
@@ -19,7 +19,7 @@
   <p><a href="#download">دانلود</a> · <a href="#features">امکانات</a> · <a href="#quick-start">شروع سریع</a> · <a href="#updates">به‌روزرسانی</a> · <a href="docs/OPERATIONS.md">Docker</a></p>
 </div>
 
-![TaskOrbit Kanban workspace with the Mercury dark theme](docs/images/taskorbit-board-dark.png)
+![برد کارهای TaskOrbit به فارسی](docs/images/fa/board-dark.png)
 
 *تصاویر واقعی برنامه با پروژه‌های نمونه و حساب‌های ساختگی گرفته شده‌اند؛ هیچ اطلاعات شخصی پروژه‌ها در آن‌ها نیست.*
 
@@ -43,22 +43,22 @@
 | **همکاری** | دیدگاه، تاریخچهٔ فعالیت و پیوست؛ حداکثر ۱۰ مگابایت برای هر فایل و ۲۰ فایل برای هر تسک. |
 | **دانش پروژه** | ماژول‌ها، اسناد متنی پروژه و فیلترهای ذخیره‌شدهٔ مشترک. |
 | **مدیریت تیم** | ادمین کل، ساخت و غیرفعال‌سازی کاربر، بازنشانی رمز و نقش‌های ادمین/عضو/بینندهٔ فضای کاری. |
-| **زبان و ظاهر** | رابط فارسی/انگلیسی، راست‌به‌چپ/چپ‌به‌راست، فونت محلی و تم روشن/تیره با خاکستری عطارد و طلایی خورشیدی. |
+| **زبان و ظاهر** | رابط فارسی، انگلیسی، عربی و چینی ساده‌شده، راست‌به‌چپ/چپ‌به‌راست، فونت محلی و تم روشن/تیره با خاکستری عطارد و طلایی خورشیدی. |
 | **وب و PWA آیفون** | وب و PWA آیفون/آیپد با صفحهٔ قطع اتصال؛ ویرایش نیازمند اینترنت است. |
 | **کلاینت بومی** | کلاینت Tauri ویندوز، مک، لینوکس و اندروید با آدرس سرور شخصی قابل تنظیم. |
 | **سرور سبک** | یک کانتینر سرور و حجم پایدار SQLite؛ بدون Redis، صف پیام و سرویس دیتابیس جداگانه. |
 | **آپدیت برنامه و سرور** | updater امضاشده دسکتاپ، بررسی APK اندروید، بارگذاری مجدد وب/PWA و ارتقای یک‌کلیکی سرور با بکاپ و بازگشت در شکست. |
 
-ترجمه‌های README به چهار زبان هستند؛ رابط فعلی برنامه فارسی و انگلیسی است.
+رابط برنامه و README به فارسی، انگلیسی، عربی و چینی ساده‌شده در دسترس هستند. تصاویر هر README از برنامه با همان زبان تهیه شده‌اند.
 
 <details>
-<summary><strong>پیشرفت پروژه، تم روشن و رابط فارسی</strong></summary>
+<summary><strong>پیشرفت پروژه، تم روشن و جزئیات کار به فارسی</strong></summary>
 
-![TaskOrbit project progress and active sprint](docs/images/taskorbit-overview-dark.png)
+![نمای کلی پروژه TaskOrbit به فارسی](docs/images/fa/overview-dark.png)
 
-![TaskOrbit light theme with stone surfaces and gold accents](docs/images/taskorbit-board-light.png)
+![تم روشن TaskOrbit به فارسی](docs/images/fa/board-light.png)
 
-![TaskOrbit Persian RTL workspace](docs/images/taskorbit-fa-board.png)
+![جزئیات کار TaskOrbit به فارسی](docs/images/fa/task-detail-light.png)
 
 </details>
 
@@ -66,13 +66,13 @@
 
 ## دانلود
 
-[**TaskOrbit 0.1.6 → GitHub Releases**](https://github.com/sajadjanat/taskorbit/releases/tag/v0.1.6)
+[**TaskOrbit 0.1.7 → GitHub Releases**](https://github.com/sajadjanat/taskorbit/releases/tag/v0.1.7)
 
 | پلتفرم | بسته یا روش دسترسی | روش به‌روزرسانی |
 | --- | --- | --- |
-| Windows x64 | TaskOrbit_0.1.6_x64-setup.exe | updater امضاشده داخل برنامه |
-| macOS Apple Silicon | TaskOrbit_0.1.6_aarch64.dmg | updater امضاشده داخل برنامه |
-| macOS Intel | TaskOrbit_0.1.6_x64.dmg | updater امضاشده داخل برنامه |
+| Windows x64 | TaskOrbit_0.1.7_x64-setup.exe | updater امضاشده داخل برنامه |
+| macOS Apple Silicon | TaskOrbit_0.1.7_aarch64.dmg | updater امضاشده داخل برنامه |
+| macOS Intel | TaskOrbit_0.1.7_x64.dmg | updater امضاشده داخل برنامه |
 | Linux x64 | DEB / AppImage | updater امضاشده داخل برنامه |
 | Android arm64 | taskorbit-android-arm64.apk | APK امضاشده؛ نصب با تأیید کاربر |
 | Web / iPhone / iPad | مرورگر / افزودن به صفحهٔ اصلی | بارگذاری مجدد پس از ارتقای سرور |
@@ -104,7 +104,7 @@ docker compose up -d --build
 docker compose -f compose.image.yaml up -d
 ```
 
-ایمیج `ghcr.io/sajadjanat/taskorbit:v0.1.6` برای Linux amd64/arm64 است. داده‌های SQLite، حساب‌ها و پیوست‌ها در `taskorbit-data` می‌مانند. دستور `docker compose down -v` این حجم و داده‌ها را حذف می‌کند.
+ایمیج `ghcr.io/sajadjanat/taskorbit:v0.1.7` برای Linux amd64/arm64 است. داده‌های SQLite، حساب‌ها و پیوست‌ها در `taskorbit-data` می‌مانند. دستور `docker compose down -v` این حجم و داده‌ها را حذف می‌کند.
 
 ## سرور عمومی با HTTPS؛ دو کانتینر
 
@@ -172,7 +172,7 @@ Compose سقف ۵۱۲ مگابایت حافظه و یک CPU دارد؛ این س
 
 ## انتشار و محدوده
 
-تگ `v0.1.6` آزمون، ساخت بسته‌های بومی، ایمیج چندمعماری و پیش‌نویس ریلیز را فعال می‌کند. انتشار بعد از موفقیت همهٔ پلتفرم‌ها انجام می‌شود. [یادداشت ریلیز](docs/RELEASE-NOTES.md)، [شواهد آزمون](docs/VERIFICATION.md) و [نقشه راه](docs/ROADMAP.md) محدودیت‌ها و قدم‌های بعدی را توضیح می‌دهند.
+تگ `v0.1.7` آزمون، ساخت بسته‌های بومی، ایمیج چندمعماری و پیش‌نویس ریلیز را فعال می‌کند. انتشار بعد از موفقیت همهٔ پلتفرم‌ها انجام می‌شود. [یادداشت ریلیز](docs/RELEASE-NOTES.md)، [شواهد آزمون](docs/VERIFICATION.md) و [نقشه راه](docs/ROADMAP.md) محدودیت‌ها و قدم‌های بعدی را توضیح می‌دهند.
 
 فناوری‌ها: React، TypeScript، Vite، Tailwind، کامپوننت‌های واقعی shadcn/ui، Express، SQLite داخلی Node و Tauri 2. فونت Vazirmatn با مجوز OFL است. نشان عطارد با نور گرم خورشید و زمینهٔ سنگی/زغالی در تم‌های برنامه استفاده می‌شود؛ [جزئیات برند](assets/brand/WORDMARK.md).
 

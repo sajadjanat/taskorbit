@@ -1,5 +1,20 @@
-export const messages = {
+import { arabic } from "./locales/ar";
+import { chinese } from "./locales/zh-CN";
+
+const baseMessages = {
   en: {
+    attachments: "Attachments",
+    maxFileSize: "Maximum file size is 10 MB",
+    uploading: "Uploading…",
+    addFile: "Add a file (up to 10 MB)",
+    relations: "Relations and dependencies",
+    blocks: "Blocks",
+    relatedTo: "Related to",
+    removeRelation: "Remove relation",
+    relatedItem: "Related item",
+    selectItem: "Select item",
+    relationType: "Relation type",
+    related: "Related",
     webUpdateReady:
       "A new web version is ready. Save your work before reloading.",
     reloadApp: "Reload app",
@@ -188,6 +203,18 @@ export const messages = {
       "An instance administrator creates accounts; a workspace administrator adds existing accounts to the team.",
   },
   fa: {
+    attachments: "پیوست‌ها",
+    maxFileSize: "حداکثر حجم فایل ۱۰ مگابایت است",
+    uploading: "در حال بارگذاری…",
+    addFile: "افزودن فایل (حداکثر ۱۰ مگابایت)",
+    relations: "کارهای مرتبط و وابستگی‌ها",
+    blocks: "پیش‌نیاز برای",
+    relatedTo: "مرتبط با",
+    removeRelation: "حذف ارتباط",
+    relatedItem: "کار مرتبط",
+    selectItem: "انتخاب کار",
+    relationType: "نوع ارتباط",
+    related: "مرتبط",
     webUpdateReady:
       "نسخهٔ جدید وب آماده است. پیش از بارگذاری مجدد، تغییرات خود را ذخیره کنید.",
     reloadApp: "بارگذاری نسخهٔ جدید",
@@ -374,5 +401,28 @@ export const messages = {
       "ادمین کل حساب می‌سازد؛ مدیر فضای تیمی حساب موجود را به تیم اضافه می‌کند.",
   },
 } as const;
+export type MessageKey = keyof typeof baseMessages.en;
+export const messages = {
+  ...baseMessages,
+  ar: arabic satisfies Record<MessageKey, string>,
+  "zh-CN": chinese satisfies Record<MessageKey, string>,
+} as const;
 export type Locale = keyof typeof messages;
-export type MessageKey = keyof typeof messages.en;
+export const localeNames: Record<Locale, string> = {
+  en: "English",
+  fa: "فارسی",
+  ar: "العربية",
+  "zh-CN": "简体中文",
+};
+export function resolveLocale(value: string | null): Locale {
+  return value && Object.hasOwn(messages, value) ? (value as Locale) : "fa";
+}
+export function localeDirection(locale: Locale) {
+  return locale === "fa" || locale === "ar" ? "rtl" : "ltr";
+}
+export const dateLocales: Record<Locale, string> = {
+  en: "en-GB",
+  fa: "fa-IR",
+  ar: "ar",
+  "zh-CN": "zh-CN",
+};

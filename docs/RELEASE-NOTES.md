@@ -1,5 +1,8 @@
-# TaskOrbit 0.1.6 — transparent Mercury identity
+# TaskOrbit 0.1.7 — transparent icon and localized previews
 
+- Transparent sunlit Mercury app icon for desktop and standard web icons. Android adaptive and iPhone/maskable home-screen tiles use a light stone surface where a solid background is required.
+- Four-language interface with English, Persian, Arabic and Simplified Chinese selection, localized dates and Arabic/Persian RTL.
+- Each translated README uses its own four actual UI previews, including localized fictional project/task data and task details.
 - Smaller sidebar wordmark, with a compact 160 px footprint.
 - Transparent Mercury wordmarks switch lettering for light and dark themes, without a black background.
 - README presentation includes centered branding, badges, feature/download tables and actual application previews in four documentation languages.
@@ -13,7 +16,7 @@
 
 ## Downloads
 
-Windows x64 installer; macOS Intel and Apple Silicon DMGs; Linux x64 DEB/AppImage; Android arm64 APK; web/server archive. Desktop updater packages and signatures, latest.json and SHA256SUMS accompany them. Server image: ghcr.io/sajadjanat/taskorbit:v0.1.6 and :stable, Linux amd64/arm64. See [update guide](https://github.com/sajadjanat/taskorbit/blob/main/docs/UPDATES.md).
+Windows x64 installer; macOS Intel and Apple Silicon DMGs; Linux x64 DEB/AppImage; Android arm64 APK; web/server archive. Desktop updater packages and signatures, latest.json and SHA256SUMS accompany them. Server image: ghcr.io/sajadjanat/taskorbit:v0.1.7 and :stable, Linux amd64/arm64. See [update guide](https://github.com/sajadjanat/taskorbit/blob/main/docs/UPDATES.md).
 
 ## Preview limitations
 

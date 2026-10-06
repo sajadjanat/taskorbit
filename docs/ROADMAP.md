@@ -21,7 +21,7 @@ The 0.1 preview implements the core workflows listed in README. Keep the workspa
 - Import/export restoration and migration from other project management tools; API tokens, webhooks and integrations.
 - Real-time updates; current version refreshes project data every 15 seconds.
 - Search across projects and project pagination for large data sets.
-- Localization beyond Persian/English; a language selector for translated content is distinct from translating user-written task content.
+- Additional interface languages beyond English/Persian/Arabic/Simplified Chinese, with native-speaker review. User-written task content is preserved when switching the interface language; documentation fixtures use separately localized fictional data.
 - Offline edits and conflict-aware synchronization.
 - Mobile app distribution beyond the initial Android arm64 APK. iPhone uses PWA in this release.
 

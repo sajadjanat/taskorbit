@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Paperclip, Download, X, Link2 } from "lucide-react";
 import { api, type Task } from "@/lib/api";
 import { Button } from "@/components/ui/button";
+import { messages, type Locale, type MessageKey } from "@/lib/i18n";
 import {
   Select,
   SelectTrigger,
@@ -28,7 +29,7 @@ export function TaskExtras({
   task: Task;
   tasks: Task[];
   writable: boolean;
-  locale: string;
+  locale: Locale;
   onError: (e: unknown) => void;
   onOpen: (task: Task) => void;
 }) {
@@ -37,7 +38,7 @@ export function TaskExtras({
     [target, setTarget] = useState(""),
     [type, setType] = useState("related"),
     [busy, setBusy] = useState(false);
-  const fa = locale === "fa";
+  const t = (key: MessageKey) => messages[locale][key];
   const load = async () => {
     const [a, b] = await Promise.all([
       api<FileItem[]>(`/tasks/${task.id}/attachments`),
@@ -52,11 +53,7 @@ export function TaskExtras({
   }, [task.id]);
   async function upload(file: File) {
     if (file.size > 10 * 1024 * 1024) {
-      onError(
-        new Error(
-          fa ? "حداکثر حجم فایل ۱۰ مگابایت است" : "Maximum file size is 10 MB",
-        ),
-      );
+      onError(new Error(t("maxFileSize")));
       return;
     }
     setBusy(true);
@@ -82,7 +79,7 @@ export function TaskExtras({
     <>
       <h3>
         <Paperclip size={17} />
-        {fa ? "پیوست‌ها" : "Attachments"}
+        {t("attachments")}
       </h3>
       <div className="file-list">
         {files.map((f) => (
@@ -98,6 +95,8 @@ export function TaskExtras({
         <label className="file-upload">
           <input
             type="file"
+            className="sr-only"
+            aria-label={t("addFile")}
             disabled={busy}
             onChange={(e) => {
               const f = e.target.files?.[0];
@@ -105,31 +104,17 @@ export function TaskExtras({
               e.target.value = "";
             }}
           />
-          {busy
-            ? fa
-              ? "در حال بارگذاری…"
-              : "Uploading…"
-            : fa
-              ? "افزودن فایل (حداکثر ۱۰ مگابایت)"
-              : "Add a file (up to 10 MB)"}
+          {t(busy ? "uploading" : "addFile")}
         </label>
       )}
       <h3>
         <Link2 size={17} />
-        {fa ? "کارهای مرتبط و وابستگی‌ها" : "Relations and dependencies"}
+        {t("relations")}
       </h3>
       <div className="link-list">
         {links.map((l) => (
           <div key={l.id}>
-            <span>
-              {l.type === "blocks"
-                ? fa
-                  ? "پیش‌نیاز برای"
-                  : "Blocks"
-                : fa
-                  ? "مرتبط با"
-                  : "Related to"}
-            </span>
+            <span>{t(l.type === "blocks" ? "blocks" : "relatedTo")}</span>
             <button
               onClick={() => {
                 const target = tasks.find((t) => t.id === l.target_id);
@@ -142,7 +127,7 @@ export function TaskExtras({
               <Button
                 variant="ghost"
                 size="icon"
-                aria-label={fa ? "حذف ارتباط" : "Remove relation"}
+                aria-label={t("removeRelation")}
                 onClick={async () => {
                   try {
                     await api(`/links/${l.id}`, "DELETE");
@@ -161,8 +146,8 @@ export function TaskExtras({
       {writable && (
         <div className="relation-form">
           <Select value={target} onValueChange={setTarget}>
-            <SelectTrigger aria-label={fa ? "کار مرتبط" : "Related item"}>
-              <SelectValue placeholder={fa ? "انتخاب کار" : "Select item"} />
+            <SelectTrigger aria-label={t("relatedItem")}>
+              <SelectValue placeholder={t("selectItem")} />
             </SelectTrigger>
             <SelectContent>
               {tasks
@@ -175,16 +160,12 @@ export function TaskExtras({
             </SelectContent>
           </Select>
           <Select value={type} onValueChange={setType}>
-            <SelectTrigger aria-label={fa ? "نوع ارتباط" : "Relation type"}>
+            <SelectTrigger aria-label={t("relationType")}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="related">
-                {fa ? "مرتبط" : "Related"}
-              </SelectItem>
-              <SelectItem value="blocks">
-                {fa ? "پیش‌نیاز" : "Blocks"}
-              </SelectItem>
+              <SelectItem value="related">{t("related")}</SelectItem>
+              <SelectItem value="blocks">{t("blocks")}</SelectItem>
             </SelectContent>
           </Select>
           <Button
@@ -207,7 +188,7 @@ export function TaskExtras({
               }
             }}
           >
-            {fa ? "افزودن" : "Add"}
+            {t("add")}
           </Button>
         </div>
       )}

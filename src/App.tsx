@@ -7,6 +7,7 @@ import {
   type ReactNode,
 } from "react";
 import { isTauri, invoke } from "@tauri-apps/api/core";
+import { version as appVersion } from "../package.json";
 import { Updates, WebUpdateNotice } from "./components/updates";
 import {
   LayoutDashboard,
@@ -77,7 +78,15 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { TaskExtras } from "@/components/task-extras";
-import { messages, type Locale, type MessageKey } from "./lib/i18n";
+import {
+  messages,
+  localeNames,
+  resolveLocale,
+  localeDirection,
+  dateLocales,
+  type Locale,
+  type MessageKey,
+} from "./lib/i18n";
 import {
   api,
   ApiError,
@@ -199,8 +208,8 @@ function Logo() {
 }
 
 export default function App() {
-  const [locale, setLocale] = useState<Locale>(
-    () => (localStorage.getItem("taskorbit.locale") as Locale) || "fa",
+  const [locale, setLocale] = useState<Locale>(() =>
+    resolveLocale(localStorage.getItem("taskorbit.locale")),
   );
   const [dark, setDark] = useState(
     () => localStorage.getItem("taskorbit.theme") === "dark",
@@ -265,7 +274,8 @@ export default function App() {
   const writable = canWrite && !project?.archived;
   useEffect(() => {
     document.documentElement.lang = locale;
-    document.documentElement.dir = locale === "fa" ? "rtl" : "ltr";
+    document.documentElement.dir = localeDirection(locale);
+    document.title = `TaskOrbit | ${t("projects")} · ${t("tasks")}`;
     localStorage.setItem("taskorbit.locale", locale);
   }, [locale]);
   useEffect(() => {
@@ -488,7 +498,7 @@ export default function App() {
   );
   const formatDate = (d: string | null) =>
     d
-      ? new Intl.DateTimeFormat(locale === "fa" ? "fa-IR" : "en-GB", {
+      ? new Intl.DateTimeFormat(dateLocales[locale], {
           dateStyle: "medium",
         }).format(
           new Date(
@@ -702,7 +712,11 @@ export default function App() {
           <span /> {t(task.priority)}
         </span>
         <span className="meta-end">
-          {task.estimate > 0 && <span>{task.estimate}pt</span>}
+          {task.estimate > 0 && (
+            <span>
+              {task.estimate} {t("points")}
+            </span>
+          )}
           {task.due_date && (
             <span
               className={overdue.some((o) => o.id === task.id) ? "overdue" : ""}
@@ -739,13 +753,25 @@ export default function App() {
     </div>
   );
   const languageControl = (
-    <Button
-      variant="ghost"
-      size="sm"
-      onClick={() => setLocale(locale === "fa" ? "en" : "fa")}
-    >
-      {locale === "fa" ? "English" : "فارسی"}
-    </Button>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="sm" aria-label={t("language")}>
+          {localeNames[locale]}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        {(Object.keys(localeNames) as Locale[]).map((language) => (
+          <DropdownMenuItem
+            key={language}
+            lang={language}
+            dir={localeDirection(language)}
+            onSelect={() => setLocale(language)}
+          >
+            {localeNames[language]}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
   const themeControl = (
     <Button
@@ -1985,7 +2011,7 @@ export default function App() {
           )}
         </div>
         <footer className="app-footer">
-          <span>TaskOrbit 0.1.6</span>
+          <span>TaskOrbit {appVersion}</span>
           <a
             href="https://github.com/sajadjanat/taskorbit"
             target="_blank"

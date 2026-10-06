@@ -110,8 +110,23 @@ test("setup, project, sprint, work item, comment, language and persistence", asy
       (v) => v.impact === "critical" || v.impact === "serious",
     ),
   ).toEqual([]);
-  await page.getByRole("button", { name: "فارسی", exact: true }).click();
+  await page.getByRole("button", { name: "Language", exact: true }).click();
+  await page.getByRole("menuitem", { name: "فارسی", exact: true }).click();
   await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
+  for (const [currentLabel, language, direction, taskLabel] of [
+    ["زبان", "العربية", "rtl", "المهام"],
+    ["اللغة", "简体中文", "ltr", "任务"],
+    ["语言", "فارسی", "rtl", "کارها"],
+  ]) {
+    await page.getByRole("button", { name: currentLabel, exact: true }).click();
+    await page.getByRole("menuitem", { name: language, exact: true }).click();
+    await expect(page.locator("html")).toHaveAttribute("dir", direction);
+    await expect(
+      page
+        .locator(".main-nav")
+        .getByRole("button", { name: new RegExp(`^${taskLabel}`) }),
+    ).toBeVisible();
+  }
   await page.getByRole("button", { name: "برد", exact: true }).click();
   expect(
     await page.evaluate(

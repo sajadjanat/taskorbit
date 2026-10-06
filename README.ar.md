@@ -11,7 +11,7 @@
   <p>إدارة مشاريع خفيفة وذاتية الاستضافة باستخدام React وshadcn/ui وTauri.</p>
   <p>
     <a href="https://github.com/sajadjanat/taskorbit/actions/workflows/verify.yml"><img src="https://github.com/sajadjanat/taskorbit/actions/workflows/verify.yml/badge.svg" alt="Web and server checks" /></a>
-    <a href="https://github.com/sajadjanat/taskorbit/releases"><img src="https://img.shields.io/badge/version-0.1.6-b88645" alt="Version 0.1.6" /></a>
+    <a href="https://github.com/sajadjanat/taskorbit/releases"><img src="https://img.shields.io/badge/version-0.1.7-b88645" alt="Version 0.1.7" /></a>
     <img src="https://img.shields.io/badge/Tauri-2-24c8db?logo=tauri&amp;logoColor=white" alt="Tauri 2" />
     <img src="https://img.shields.io/badge/UI-shadcn%2Fui-18181b?logo=shadcnui&amp;logoColor=white" alt="shadcn/ui" />
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-b88645" alt="MIT license" /></a>
@@ -19,9 +19,9 @@
   <p><a href="#download">التنزيل</a> · <a href="#features">الميزات</a> · <a href="#quick-start">البدء السريع</a> · <a href="#updates">التحديثات</a> · <a href="docs/OPERATIONS.md">Docker</a></p>
 </div>
 
-![TaskOrbit Kanban workspace with the Mercury dark theme](docs/images/taskorbit-board-dark.png)
+![لوحة مهام TaskOrbit باللغة العربية](docs/images/ar/board-dark.png)
 
-*صور فعلية للتطبيق ببيانات تجريبية وحسابات وهمية، دون بيانات شخصية. واجهة التطبيق تدعم حالياً الفارسية والإنجليزية.*
+*صور فعلية للتطبيق ببيانات تجريبية وحسابات وهمية، دون بيانات شخصية. واجهة التطبيق تدعم العربية والإنجليزية والفارسية والصينية المبسطة، والصور باللغة العربية.*
 
 ## لماذا TaskOrbit؟
 
@@ -43,22 +43,22 @@
 | **التعاون** | تعليقات وسجل نشاط ومرفقات؛ 10 ميغابايت للملف و20 ملفاً للمهمة. |
 | **معرفة المشروع** | وحدات ومستندات نصية للمشروع ومرشحات مشتركة محفوظة. |
 | **إدارة الفريق** | مدير عام، إنشاء المستخدمين وتعطيلهم وإعادة تعيين كلمات المرور، وأدوار مدير/عضو/مشاهد لمساحة العمل. |
-| **اللغة والمظهر** | واجهة بالفارسية والإنجليزية، اتجاه RTL/LTR وخطوط محلية ومظهر فاتح/داكن بألوان عطارد الرمادية والذهبية. |
+| **اللغة والمظهر** | واجهة بالعربية والإنجليزية والفارسية والصينية المبسطة، اتجاه RTL/LTR وخطوط محلية ومظهر فاتح/داكن بألوان عطارد الرمادية والذهبية. |
 | **الويب وPWA** | تطبيق ويب وPWA لأجهزة iPhone/iPad، مع شاشة انقطاع الاتصال. التعديل يحتاج اتصالاً. |
 | **العملاء الأصليون** | عملاء Tauri لأنظمة Windows وmacOS وLinux وAndroid مع عنوان خادم ذاتي الاستضافة قابل للتحديد. |
 | **خادم خفيف** | حاوية خادم واحدة ووحدة تخزين SQLite دائمة، دون Redis أو طابور رسائل أو خدمة قاعدة بيانات منفصلة. |
 | **تحديث التطبيق والخادم** | تحديث سطح مكتب موقّع، فحص APK، إعادة تحميل الويب/PWA، وترقية خادم اختيارية بنقرة واحدة مع نسخ احتياطي واستعادة. |
 
-توثيق README متاح بأربع لغات؛ واجهة التطبيق حالياً بالفارسية والإنجليزية.
+الواجهة وREADME متاحان بالعربية والإنجليزية والفارسية والصينية المبسطة. تعرض كل نسخة صوراً فعلية بلغتها.
 
 <details>
-<summary><strong>تقدم المشروع والمظهر الفاتح والواجهة الفارسية</strong></summary>
+<summary><strong>تقدم المشروع والمظهر الفاتح وتفاصيل المهمة بالعربية</strong></summary>
 
-![TaskOrbit project progress and active sprint](docs/images/taskorbit-overview-dark.png)
+![نظرة عامة على المشروع باللغة العربية](docs/images/ar/overview-dark.png)
 
-![TaskOrbit light theme with stone surfaces and gold accents](docs/images/taskorbit-board-light.png)
+![المظهر الفاتح باللغة العربية](docs/images/ar/board-light.png)
 
-![TaskOrbit Persian RTL workspace](docs/images/taskorbit-fa-board.png)
+![تفاصيل المهمة باللغة العربية](docs/images/ar/task-detail-light.png)
 
 </details>
 
@@ -66,13 +66,13 @@
 
 ## التنزيل
 
-[**TaskOrbit 0.1.6 → GitHub Releases**](https://github.com/sajadjanat/taskorbit/releases/tag/v0.1.6)
+[**TaskOrbit 0.1.7 → GitHub Releases**](https://github.com/sajadjanat/taskorbit/releases/tag/v0.1.7)
 
 | المنصة | الحزمة أو الوصول | طريقة التحديث |
 | --- | --- | --- |
-| Windows x64 | TaskOrbit_0.1.6_x64-setup.exe | تحديث موقّع داخل التطبيق |
-| macOS Apple Silicon | TaskOrbit_0.1.6_aarch64.dmg | تحديث موقّع داخل التطبيق |
-| macOS Intel | TaskOrbit_0.1.6_x64.dmg | تحديث موقّع داخل التطبيق |
+| Windows x64 | TaskOrbit_0.1.7_x64-setup.exe | تحديث موقّع داخل التطبيق |
+| macOS Apple Silicon | TaskOrbit_0.1.7_aarch64.dmg | تحديث موقّع داخل التطبيق |
+| macOS Intel | TaskOrbit_0.1.7_x64.dmg | تحديث موقّع داخل التطبيق |
 | Linux x64 | DEB / AppImage | تحديث موقّع داخل التطبيق |
 | Android arm64 | taskorbit-android-arm64.apk | APK موقّع؛ التثبيت بموافقة المستخدم |
 | Web / iPhone / iPad | المتصفح / الإضافة إلى الشاشة الرئيسية | إعادة التحميل بعد تحديث الخادم |
@@ -104,7 +104,7 @@ docker compose up -d --build
 docker compose -f compose.image.yaml up -d
 ```
 
-الصورة `ghcr.io/sajadjanat/taskorbit:v0.1.6` متاحة لـ Linux amd64 وarm64. تحفظ الحسابات والمرفقات وSQLite في `taskorbit-data`. الأمر `docker compose down -v` يحذف وحدة التخزين والبيانات.
+الصورة `ghcr.io/sajadjanat/taskorbit:v0.1.7` متاحة لـ Linux amd64 وarm64. تحفظ الحسابات والمرفقات وSQLite في `taskorbit-data`. الأمر `docker compose down -v` يحذف وحدة التخزين والبيانات.
 
 ## خادم عام مع HTTPS: حاويتان
 
@@ -124,7 +124,7 @@ docker compose -f compose.yaml -f compose.https.yaml up -d --build
 
 ## التحديثات
 
-يمكن للمشرف العام التحقق من الإصدارات في لوحة الإدارة. لتفعيل تحديث الخادم بنقرة واحدة مع نسخة احتياطية واستعادة تلقائية عند الفشل، اسحب الصور ثم شغّل `docker compose -f compose.image.yaml -f compose.updates.yaml up -d`. تضاف حاوية تحديث: حاويتان إجمالاً أو ثلاث مع Caddy. يتضمن سطح المكتب منذ 0.1.3 تحديثات موقعة عبر شاشة الاتصال وقائمة **Updates / Server connection**. يتيح Android تنزيل APK الموقّع ويتطلب موافقة المستخدم للتثبيت. يقدم الويب وPWA على iPhone إعادة التحميل بعد تحديث الخادم. الإصدارات الأقدم تحتاج تثبيت 0.1.6 يدويًا مرة واحدة. راجع [دليل التحديث](docs/UPDATES.md).
+يمكن للمشرف العام التحقق من الإصدارات في لوحة الإدارة. لتفعيل تحديث الخادم بنقرة واحدة مع نسخة احتياطية واستعادة تلقائية عند الفشل، اسحب الصور ثم شغّل `docker compose -f compose.image.yaml -f compose.updates.yaml up -d`. تضاف حاوية تحديث: حاويتان إجمالاً أو ثلاث مع Caddy. يتضمن سطح المكتب منذ 0.1.3 تحديثات موقعة عبر شاشة الاتصال وقائمة **Updates / Server connection**. يتيح Android تنزيل APK الموقّع ويتطلب موافقة المستخدم للتثبيت. يقدم الويب وPWA على iPhone إعادة التحميل بعد تحديث الخادم. الإصدارات الأقدم تحتاج تثبيت 0.1.7 يدويًا مرة واحدة. راجع [دليل التحديث](docs/UPDATES.md).
 
 
 ## التثبيت على الأجهزة
@@ -172,7 +172,7 @@ npm run test:e2e
 
 ## الإصدار والنطاق
 
-يشغّل الوسم `v0.1.6` الاختبارات وبناء الحزم الأصلية والصورة متعددة المعماريات ومسودة إصدار. ينشر الإصدار بعد نجاح جميع المنصات. راجع [ملاحظات الإصدار](docs/RELEASE-NOTES.md) و[نتائج التحقق](docs/VERIFICATION.md) و[خارطة الطريق](docs/ROADMAP.md).
+يشغّل الوسم `v0.1.7` الاختبارات وبناء الحزم الأصلية والصورة متعددة المعماريات ومسودة إصدار. ينشر الإصدار بعد نجاح جميع المنصات. راجع [ملاحظات الإصدار](docs/RELEASE-NOTES.md) و[نتائج التحقق](docs/VERIFICATION.md) و[خارطة الطريق](docs/ROADMAP.md).
 
 التقنيات: React وTypeScript وVite وTailwind ومكونات shadcn/ui الفعلية وExpress وSQLite المدمجة في Node وTauri 2. الخط Vazirmatn بترخيص OFL. تعتمد الهوية على عطارد وإضاءة شمسية دافئة وألوان حجرية/فحمية وذهبية؛ [تفاصيل الهوية](assets/brand/WORDMARK.md).
 
