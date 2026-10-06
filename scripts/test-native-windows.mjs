@@ -68,13 +68,21 @@ try {
       },
     ).trim(),
   );
-  for (let attempt = 0; attempt < 80; attempt++) {
+  let connectionError;
+  for (let attempt = 0; attempt < 120; attempt++) {
     try {
       browser = await chromium.connectOverCDP(`http://127.0.0.1:${debugPort}`);
       break;
-    } catch {
+    } catch (error) {
+      connectionError = error.message.split("\n")[0];
       await new Promise((r) => setTimeout(r, 250));
     }
+  }
+  if (!browser) {
+    // Process metadata only: never dump environment variables or user files.
+    execFileSync("pwsh", ["-NoProfile", "-Command",
+      `Get-Process -Id ${clientId} -ErrorAction SilentlyContinue | Select-Object Id,ProcessName,Responding; Get-Process msedgewebview2 -ErrorAction SilentlyContinue | Select-Object Id,ProcessName,Responding`], { stdio: "inherit" });
+    console.error("Last CDP connection error:", connectionError);
   }
   assert.ok(browser, "Native WebView must start");
   const page = browser.contexts()[0].pages()[0];

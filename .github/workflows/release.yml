@@ -95,6 +95,9 @@ jobs:
           version="$(node -p 'require("./package.json").version')"
           mv "$bundle/TaskOrbit.app.tar.gz" "$bundle/TaskOrbit_${version}_${arch}.app.tar.gz"
           mv "$bundle/TaskOrbit.app.tar.gz.sig" "$bundle/TaskOrbit_${version}_${arch}.app.tar.gz.sig"
+      - name: Ensure Windows test runner has the WebView2 runtime
+        if: runner.os == 'Windows'
+        run: ./scripts/ensure-webview2.windows.ps1
       - name: Verify Windows startup, native Connection menu and return path
         if: runner.os == 'Windows'
         run: node scripts/test-native-windows.mjs src-tauri/target/${{ matrix.target }}/release/taskorbit.exe

@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { request as httpRequest } from "node:http";
+import { request as httpRequest, createServer } from "node:http";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
@@ -453,4 +453,36 @@ test("stdio addresses disallow credentials, paths and nonlocal cleartext; redire
     assert.throws(() => serverAddress(url));
   assert.equal(serverAddress("https://example.test/"), "https://example.test");
   assert.throws(() => createApi(base, "bad-token"));
+  let forwarded = false;
+  const target = createServer((request, response) => {
+    forwarded = true;
+    response.end("unexpected");
+  });
+  target.listen(0, "127.0.0.1");
+  await new Promise((r) => target.once("listening", r));
+  const redirect = createServer((request, response) => {
+    response.writeHead(307, {
+      Location: `http://127.0.0.1:${target.address().port}/api/me`,
+    });
+    response.end();
+  });
+  redirect.listen(0, "127.0.0.1");
+  await new Promise((r) => redirect.once("listening", r));
+  try {
+    const api = createApi(
+      `http://127.0.0.1:${redirect.address().port}`,
+      write.token,
+    );
+    await assert.rejects(api("/me"), /Cannot reach TaskOrbit/);
+    assert.equal(
+      forwarded,
+      false,
+      "A redirect must not forward the request or credentials",
+    );
+  } finally {
+    await Promise.all([
+      new Promise((r) => redirect.close(r)),
+      new Promise((r) => target.close(r)),
+    ]);
+  }
 });
