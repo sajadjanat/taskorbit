@@ -45,9 +45,13 @@ if (!existing) {
   mkdirSync(path.dirname(file), { recursive: true });
   writeFileSync(file, target);
 }
-let clientId, browser;
+let clientId, browser, nativePolicy = false;
 try {
   const debugPort = 8767;
+  if (process.env.CI === "true") {
+    execFileSync("pwsh", ["-NoProfile", "-File", "scripts/native-debug-policy.windows.ps1", "-Mode", "Enable", "-Profile", path.join(dir, "webview")], { stdio: "inherit" });
+    nativePolicy = true;
+  }
   clientId = Number(
     execFileSync(
       "pwsh",
@@ -84,7 +88,7 @@ try {
       `Get-Process -Id ${clientId} -ErrorAction SilentlyContinue | Select-Object Id,ProcessName,Responding; Get-Process msedgewebview2 -ErrorAction SilentlyContinue | Select-Object Id,ProcessName,Responding`], { stdio: "inherit" });
     console.error("Last CDP connection error:", connectionError);
   }
-  assert.ok(browser, "Native WebView must start");
+  assert.ok(browser, "Native WebView CDP test endpoint must be reachable");
   const page = browser.contexts()[0].pages()[0];
   await page.waitForURL(target, { timeout: 20000 });
   console.log("Remembered server opened automatically.");
@@ -147,6 +151,9 @@ try {
         stdio: "ignore",
       });
     } catch {}
+  }
+  if (nativePolicy) {
+    execFileSync("pwsh", ["-NoProfile", "-File", "scripts/native-debug-policy.windows.ps1", "-Mode", "Disable", "-Profile", path.join(dir, "webview")], { stdio: "inherit" });
   }
   if (!existing) unlinkSync(file);
   closeRealtime();

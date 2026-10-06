@@ -3,6 +3,7 @@ on:
   workflow_dispatch:
 permissions:
   contents: write
+  actions: read
 concurrency:
   group: recover-taskorbit-010
   cancel-in-progress: false
@@ -26,25 +27,50 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: x86_64-pc-windows-msvc
-      - uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: src-tauri -> target
-          shared-key: x86_64-pc-windows-msvc
       - name: Provision and report WebView2 runtime
         run: ./ci-harness/scripts/ensure-webview2.windows.ps1
       - run: npm ci
       - run: npm run build
-      - run: cargo test --lib --locked --manifest-path src-tauri/Cargo.toml
-      - run: npx tauri build --target x86_64-pc-windows-msvc --bundles nsis
+      - name: Require original successful Windows compilation
+        shell: bash
         env:
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api 'repos/sajadjanat/taskorbit/actions/runs/37481743226/jobs?per_page=100' > windows-build.json
+          node --input-type=module <<'JS'
+          import fs from 'node:fs';
+          import assert from 'node:assert/strict';
+          const steps = JSON.parse(fs.readFileSync('windows-build.json')).jobs.find(j => j.name === 'windows').steps;
+          for (const name of ['Verify immutable product source', 'Run cargo test --lib --locked --manifest-path src-tauri/Cargo.toml', 'Run npx tauri build --target x86_64-pc-windows-msvc --bundles nsis']) {
+            assert.equal(steps.find(s => s.name === name)?.conclusion, 'success', name);
+          }
+          JS
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 37481743226
+          name: taskorbit-010-windows-recovery
+          path: src-tauri/target/x86_64-pc-windows-msvc/release
+      - name: Verify unchanged Windows product bytes
+        shell: bash
+        run: |
+          node --input-type=module <<'JS'
+          import fs from 'node:fs';
+          import {createHash} from 'node:crypto';
+          import assert from 'node:assert/strict';
+          const root = 'src-tauri/target/x86_64-pc-windows-msvc/release/';
+          const expected = {
+            'taskorbit.exe': 'd8ff6de2eadf2ee51306f99a21fe123e137e703495bf9592242a14f41eb8291d',
+            'bundle/nsis/TaskOrbit_0.1.10_x64-setup.exe': 'a7d9f67756a0fa684923f3eb183cf0b0c30110048d2d4e7f83af66ec6afcbe0e',
+            'bundle/nsis/TaskOrbit_0.1.10_x64-setup.exe.sig': '0f5b4e1c4c3edd0bf8769288fef9343b42342d861c45edb874d187ab54c61940'
+          };
+          for (const [file, hash] of Object.entries(expected)) assert.equal(createHash('sha256').update(fs.readFileSync(root + file)).digest('hex'), hash, file);
+          console.log('Executable, installer and signature match the immutable product build.');
+          JS
       - name: Run actual native regression with diagnostic harness
         run: |
           Copy-Item -LiteralPath ci-harness/scripts/test-native-windows.mjs -Destination scripts/test-native-windows.mjs
+          Copy-Item -LiteralPath ci-harness/scripts/native-debug-policy.windows.ps1 -Destination scripts/native-debug-policy.windows.ps1
           node scripts/test-native-windows.mjs src-tauri/target/x86_64-pc-windows-msvc/release/taskorbit.exe
       - uses: actions/upload-artifact@v4
         if: always()
