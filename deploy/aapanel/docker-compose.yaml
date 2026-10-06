@@ -1,0 +1,60 @@
+services:
+  taskorbit:
+    image: ghcr.io/sajadjanat/taskorbit:stable
+    container_name: taskorbit-board
+    restart: unless-stopped
+    command: [node, /app/aapanel-entry.mjs]
+    depends_on: [updater]
+    ports: ["127.0.0.1:4310:4310"]
+    environment:
+      APP_ORIGIN: https://board.sepehra.ir
+      NODE_ENV: production
+      TRUSTED_PROXY_ADDRESS: 192.168.240.1
+      UPDATE_AGENT_URL: http://updater:4311
+      UPDATE_TOKEN_PATH: /updates/control-token
+      UPDATE_STATE_PATH: /updates/state.json
+    labels:
+      io.taskorbit.role: server
+      io.taskorbit.instance: board-sepehra
+    volumes:
+      - taskorbit-data:/data
+      - taskorbit-updates:/updates:ro
+      - ./app-entry.mjs:/app/aapanel-entry.mjs:ro
+    mem_limit: 512m
+    cpus: 1.0
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    logging:
+      driver: json-file
+      options: {max-size: "10m", max-file: "3"}
+  updater:
+    image: ghcr.io/sajadjanat/taskorbit:stable
+    container_name: taskorbit-board-updater
+    restart: unless-stopped
+    user: "0:0"
+    command: [node, server/update-agent.mjs]
+    environment:
+      TASKORBIT_INSTANCE: board-sepehra
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - taskorbit-data:/data
+      - taskorbit-updates:/updates
+    healthcheck: {disable: true}
+    mem_limit: 256m
+    cpus: 0.5
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    cap_add: [CHOWN, FOWNER, DAC_OVERRIDE]
+    logging:
+      driver: json-file
+      options: {max-size: "10m", max-file: "3"}
+volumes:
+  taskorbit-data: {name: taskorbit-board-data}
+  taskorbit-updates: {name: taskorbit-board-updates}
+networks:
+  default:
+    name: taskorbit-board
+    ipam:
+      config:
+        - subnet: 192.168.240.0/24
+          gateway: 192.168.240.1

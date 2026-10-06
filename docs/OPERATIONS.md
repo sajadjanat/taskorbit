@@ -2,6 +2,8 @@
 
 Start using Docker Compose as described in README. `/api/health` checks the database connection and returns the version. Keep the server root at `/`, not a URL subpath, and match `APP_ORIGIN` to that public address. With HTTPS use `NODE_ENV=production` for Secure cookies.
 
+For the deployed `board.sepehra.ir` instance, see the [aaPanel deployment guide](AAPANEL.md), including panel access, certificate renewal, backups and the Compose project identity.
+
 ## Complete volume backup
 
 For a source checkout installed with Compose, on a Linux host:
