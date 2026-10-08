@@ -1,4 +1,14 @@
-# TaskOrbit 0.2.0 — team workflows and a clearer workspace
+# TaskOrbit 0.2.1 — team accounts, RTL filters and glass themes
+
+- Workspace administrators can create a user directly from Team, setting name, email, password and workspace role. Login and membership save in one transaction. New accounts remain ordinary instance users; existing emails are not overwritten. Share initial passwords privately; this flow does not send invitation emails.
+- Account creation requires a signed-in session and workspace management permission. Members, viewers, unrelated users and API/MCP tokens cannot create account credentials.
+- Persian and Arabic Radix selectors use RTL direction, logical padding and selection indicators. Filter text follows the locale reading direction.
+- Added explicit Light/Dark choices in Appearance, persistent device preferences and system preference on first use.
+- Added glass navigation, cards, dialogs and menus in both themes, with subtle warm ambient light, readable foregrounds and an opaque fallback for unsupported blur.
+- Made the horizontally scrolling MCP configuration keyboard accessible on mobile Safari.
+- No database schema change since 0.2.0. API and browser verification use disposable databases; see the verification guide for the recorded checks.
+
+## Included from 0.2.0
 
 - Added global search across accessible tasks, projects, sprints and pages, with Ctrl / ⌘ K, arrow-key navigation and direct result navigation.
 - Added an inbox for assignments, discussions, completions and approaching/overdue deadlines. Notifications respect membership and ownership, retain read state and avoid duplicate deadline reminders.
@@ -16,7 +26,7 @@
 
 Back up your complete data volume, upgrade the server, then reload open web/PWA clients. Schema version 3 is additive and retains existing accounts, sessions, tasks and references. SMTP recovery requires private server configuration; see the [recovery guide](https://github.com/sajadjanat/taskorbit/blob/main/docs/PASSWORD-RECOVERY.md). See the [workflow guide](https://github.com/sajadjanat/taskorbit/blob/main/docs/WORKFLOWS.md) for import limits and recurrence/history behavior.
 
-The release pipeline packages Windows x64, macOS Intel/Apple Silicon, Linux x64 DEB/AppImage, Android arm64 and the web/server archive. It also builds Linux amd64/arm64 server images at `ghcr.io/sajadjanat/taskorbit:v0.2.0`; `stable` advances only after all required publication checks pass. Desktop updater packages, signatures, `latest.json`, MCP bridge and checksums accompany a successful release.
+The release pipeline packages Windows x64, macOS Intel/Apple Silicon, Linux x64 DEB/AppImage, Android arm64 and the web/server archive. It also builds Linux amd64/arm64 server images at `ghcr.io/sajadjanat/taskorbit:v0.2.1`; `stable` advances only after all required publication checks pass. Desktop updater packages, signatures, `latest.json`, MCP bridge and checksums accompany a successful release.
 
 ## Verification limits
 

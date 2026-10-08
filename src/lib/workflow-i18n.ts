@@ -1,6 +1,12 @@
 import type { Locale } from "./i18n";
 
 const en = {
+  accountExists:
+    "This email already has an account. Use Add member to add it to this workspace.",
+  teamAccountsHint:
+    "Create an account for a new teammate, or add an existing account by email.",
+  createTeamAccountHint:
+    "Creates a login and adds it to this workspace. Use a password of at least 12 characters and share it privately with your teammate.",
   globalSearch: "Search your workspace",
   searchHint:
     "Search work items, projects, sprints and pages. Use ↑ ↓ and Enter to open a result.",
@@ -136,6 +142,12 @@ const en = {
 } as const;
 type Key = keyof typeof en;
 const fa: Record<Key, string> = {
+  accountExists:
+    "این ایمیل قبلاً حساب دارد. از «افزودن عضو» برای اضافه کردن آن به فضای کاری استفاده کنید.",
+  teamAccountsHint:
+    "برای همکار جدید حساب بسازید یا حساب موجود را با ایمیل به تیم اضافه کنید.",
+  createTeamAccountHint:
+    "حساب ورود ساخته و به این فضای کاری اضافه می‌شود. رمز باید حداقل ۱۲ کاراکتر باشد؛ آن را خصوصی به همکارتان بدهید.",
   globalSearch: "جست‌وجو در فضای کاری",
   searchHint:
     "کارها، پروژه‌ها، اسپرینت‌ها و صفحه‌ها را جست‌وجو کنید. با ↑ ↓ و Enter نتیجه را باز کنید.",
@@ -270,6 +282,12 @@ const fa: Record<Key, string> = {
 };
 const ar: Record<Key, string> = {
   ...en,
+  accountExists:
+    "يوجد حساب بهذا البريد. استخدم إضافة عضو لإضافته إلى مساحة العمل.",
+  teamAccountsHint:
+    "أنشئ حساباً لزميل جديد أو أضف حساباً موجوداً باستخدام البريد الإلكتروني.",
+  createTeamAccountHint:
+    "ينشئ حساباً للدخول ويضيفه إلى مساحة العمل. استخدم كلمة مرور من 12 حرفاً على الأقل وشاركها مع زميلك بشكل خاص.",
   globalSearch: "البحث في مساحة العمل",
   searchHint:
     "ابحث في المهام والمشاريع والدورات والصفحات. استخدم ↑ ↓ وEnter لفتح نتيجة.",
@@ -397,6 +415,10 @@ const ar: Record<Key, string> = {
 };
 const zh: Record<Key, string> = {
   ...en,
+  accountExists: "此邮箱已有账户，请使用添加成员将其加入工作空间。",
+  teamAccountsHint: "为新同事创建账户，或通过邮箱添加已有账户。",
+  createTeamAccountHint:
+    "创建登录账户并加入此工作空间。密码至少12个字符，请私下分享给同事。",
   globalSearch: "搜索工作区",
   searchHint: "搜索工作项、项目、迭代和页面。使用↑ ↓和Enter打开结果。",
   searchMinimum: "请输入至少两个字符",

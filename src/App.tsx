@@ -7,6 +7,7 @@ import {
   type ReactNode,
 } from "react";
 import { isTauri, invoke } from "@tauri-apps/api/core";
+import { Direction } from "radix-ui";
 import { version as appVersion } from "../package.json";
 import { Updates, WebUpdateNotice } from "./components/updates";
 import { EntryShell } from "./components/entry-shell";
@@ -138,6 +139,7 @@ type Editor = {
     | "module"
     | "page"
     | "user"
+    | "teamUser"
     | "workspace"
     | "view"
     | "password"
@@ -229,9 +231,25 @@ export default function App() {
   const [locale, setLocale] = useState<Locale>(() =>
     resolveLocale(localStorage.getItem("taskorbit.locale")),
   );
-  const [dark, setDark] = useState(
-    () => localStorage.getItem("taskorbit.theme") === "dark",
+  return (
+    <Direction.Provider dir={localeDirection(locale)}>
+      <AppContent locale={locale} setLocale={setLocale} />
+    </Direction.Provider>
   );
+}
+function AppContent({
+  locale,
+  setLocale,
+}: {
+  locale: Locale;
+  setLocale: (locale: Locale) => void;
+}) {
+  const [dark, setDark] = useState(() => {
+    const saved = localStorage.getItem("taskorbit.theme");
+    return saved
+      ? saved === "dark"
+      : matchMedia("(prefers-color-scheme: dark)").matches;
+  });
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [pendingTask, setPendingTask] = useState("");
@@ -357,6 +375,11 @@ export default function App() {
       } else if (e.message === "Invalid email or password")
         setError(t("invalidCredentials"));
       else if (e.message === "Origin not allowed") setError(t("originError"));
+      else if (
+        e.message ===
+        "Account already exists. Add the existing account by email."
+      )
+        setError(t("accountExists"));
       else if (e.message === "Recurring tasks need a due date")
         setError(t("recurrenceHint"));
       else
@@ -817,6 +840,16 @@ export default function App() {
           };
         }
       }
+      if (kind === "teamUser") {
+        url = `/workspaces/${wid}/members/create`;
+        method = "POST";
+        body = {
+          name: data.name,
+          email: data.email,
+          password: data.password,
+          role: data.role,
+        };
+      }
       if (kind === "workspace") url = "/workspaces";
       if (kind === "member") {
         url = isNew
@@ -849,7 +882,8 @@ export default function App() {
       } else if (kind === "user") {
         setUsers(await api<User[]>("/admin/users"));
         await loadWorkspace();
-      } else if (kind === "member") await loadWorkspace();
+      } else if (kind === "member" || kind === "teamUser")
+        await loadWorkspace();
       else await loadProject();
     } catch (e) {
       showError(e);
@@ -1041,6 +1075,7 @@ export default function App() {
       variant="ghost"
       size="icon"
       aria-label={t(dark ? "light" : "dark")}
+      title={t(dark ? "light" : "dark")}
       onClick={() => setDark(!dark)}
     >
       {dark ? <Sun size={17} /> : <Moon size={17} />}
@@ -1593,14 +1628,30 @@ export default function App() {
                 </Button>
               )}
               {canManage && wid && section === "members" && (
-                <Button
-                  onClick={() =>
-                    open("member", { user_id: "", role: "member" })
-                  }
-                >
-                  <Plus size={16} />
-                  {t("addMember")}
-                </Button>
+                <>
+                  <Button
+                    variant="outline"
+                    onClick={() =>
+                      open("member", { user_id: "", role: "member" })
+                    }
+                  >
+                    <Plus size={16} />
+                    {t("addMember")}
+                  </Button>
+                  <Button
+                    onClick={() =>
+                      open("teamUser", {
+                        name: "",
+                        email: "",
+                        password: "",
+                        role: "member",
+                      })
+                    }
+                  >
+                    <Plus size={16} />
+                    {t("newUser")}
+                  </Button>
+                </>
               )}
               {!!user.admin && section === "admin" && (
                 <Button
@@ -2276,7 +2327,7 @@ export default function App() {
               )}
               {section === "members" && (
                 <>
-                  <p className="muted mb-5">{t("inviteHint")}</p>
+                  <p className="muted mb-5">{t("teamAccountsHint")}</p>
                   <div className="table-wrap">
                     <table>
                       <thead>
@@ -2419,7 +2470,30 @@ export default function App() {
                     </div>
                     <div className="settings-row">
                       <span>{t("theme")}</span>
-                      {themeControl}
+                      <div
+                        className="theme-options"
+                        role="group"
+                        aria-label={t("theme")}
+                      >
+                        <Button
+                          variant={!dark ? "secondary" : "ghost"}
+                          size="sm"
+                          aria-pressed={!dark}
+                          onClick={() => setDark(false)}
+                        >
+                          <Sun size={16} />
+                          {t("light")}
+                        </Button>
+                        <Button
+                          variant={dark ? "secondary" : "ghost"}
+                          size="sm"
+                          aria-pressed={dark}
+                          onClick={() => setDark(true)}
+                        >
+                          <Moon size={16} />
+                          {t("dark")}
+                        </Button>
+                      </div>
                     </div>
                     <Button
                       variant="outline"
@@ -2509,6 +2583,7 @@ export default function App() {
                               module: "newModule",
                               page: "newPage",
                               user: "newUser",
+                              teamUser: "newUser",
                               workspace: "newWorkspace",
                               view: "viewSave",
                               member: "addMember",
@@ -2521,9 +2596,11 @@ export default function App() {
             <DialogDescription>
               {editor?.kind === "task"
                 ? project?.name
-                : editor?.kind === "user"
-                  ? t("passwordHint")
-                  : t("save")}
+                : editor?.kind === "teamUser"
+                  ? t("createTeamAccountHint")
+                  : editor?.kind === "user"
+                    ? t("passwordHint")
+                    : t("save")}
             </DialogDescription>
           </DialogHeader>
           {editor && (
@@ -2871,9 +2948,15 @@ export default function App() {
     const add = (key: string, extra: Omit<Field, "key"> = {}) =>
       fields.push({ key, ...extra });
     if (
-      ["workspace", "module", "sprint", "project", "user", "view"].includes(
-        e.kind,
-      )
+      [
+        "workspace",
+        "module",
+        "sprint",
+        "project",
+        "user",
+        "teamUser",
+        "view",
+      ].includes(e.kind)
     )
       add("name", { required: true, wide: true });
     if (["task", "page"].includes(e.kind))
@@ -2937,6 +3020,14 @@ export default function App() {
       add("password", { type: "password", required: e.isNew, wide: true });
       add("admin", { type: "checkbox" });
       if (!e.isNew) add("active", { type: "checkbox" });
+    }
+    if (e.kind === "teamUser") {
+      add("email", { type: "email", required: true, wide: true });
+      add("password", { type: "password", required: true, wide: true });
+      add("role", {
+        options: optionList(["admin", "member", "viewer"]),
+        wide: true,
+      });
     }
     if (e.kind === "member") {
       if (e.isNew) add("email", { type: "email", required: true, wide: true });

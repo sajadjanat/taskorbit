@@ -11,7 +11,7 @@
   <p>مدیریت پروژهٔ سبک و سلف‌هاست با React، shadcn/ui و Tauri.</p>
   <p>
     <a href="https://github.com/sajadjanat/taskorbit/actions/workflows/verify.yml"><img src="https://github.com/sajadjanat/taskorbit/actions/workflows/verify.yml/badge.svg" alt="Web and server checks" /></a>
-    <a href="https://github.com/sajadjanat/taskorbit/releases"><img src="https://img.shields.io/badge/version-0.2.0-b88645" alt="Version 0.2.0" /></a>
+    <a href="https://github.com/sajadjanat/taskorbit/releases"><img src="https://img.shields.io/badge/version-0.2.1-b88645" alt="Version 0.2.1" /></a>
     <img src="https://img.shields.io/badge/Tauri-2-24c8db?logo=tauri&amp;logoColor=white" alt="Tauri 2" />
     <img src="https://img.shields.io/badge/UI-shadcn%2Fui-18181b?logo=shadcnui&amp;logoColor=white" alt="shadcn/ui" />
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-b88645" alt="MIT license" /></a>
@@ -79,13 +79,13 @@ _تصاویر واقعی برنامه با پروژه‌های نمونه و ح�
 
 ## دانلود
 
-[**TaskOrbit 0.2.0 → GitHub Releases**](https://github.com/sajadjanat/taskorbit/releases/tag/v0.2.0)
+[**TaskOrbit 0.2.1 → GitHub Releases**](https://github.com/sajadjanat/taskorbit/releases/tag/v0.2.1)
 
 | پلتفرم              | بسته یا روش دسترسی            | روش به‌روزرسانی                 |
 | ------------------- | ----------------------------- | ------------------------------- |
-| Windows x64         | TaskOrbit_0.2.0_x64-setup.exe | updater امضاشده داخل برنامه     |
-| macOS Apple Silicon | TaskOrbit_0.2.0_aarch64.dmg   | updater امضاشده داخل برنامه     |
-| macOS Intel         | TaskOrbit_0.2.0_x64.dmg       | updater امضاشده داخل برنامه     |
+| Windows x64         | TaskOrbit_0.2.1_x64-setup.exe | updater امضاشده داخل برنامه     |
+| macOS Apple Silicon | TaskOrbit_0.2.1_aarch64.dmg   | updater امضاشده داخل برنامه     |
+| macOS Intel         | TaskOrbit_0.2.1_x64.dmg       | updater امضاشده داخل برنامه     |
 | Linux x64           | DEB / AppImage                | updater امضاشده داخل برنامه     |
 | Android arm64       | taskorbit-android-arm64.apk   | APK امضاشده؛ نصب با تأیید کاربر |
 | Web / iPhone / iPad | مرورگر / افزودن به صفحهٔ اصلی | بارگذاری مجدد پس از ارتقای سرور |
@@ -109,7 +109,7 @@ cd taskorbit
 docker compose up -d --build
 ```
 
-آدرس `http://localhost:4310` را باز و اولین ادمین و فضای کاری را بسازید. رمز پیش‌فرض وجود ندارد؛ ثبت‌نام عمومی بعد از ساخت ادمین بسته می‌شود. ادمین کاربران را می‌سازد و از بخش **تیم** به فضای کاری اضافه می‌کند. مرز دسترسی، فضای کاری است؛ اعضای آن همهٔ پروژه‌های همان فضا را می‌بینند.
+آدرس `http://localhost:4310` را باز و اولین ادمین و فضای کاری را بسازید. رمز پیش‌فرض وجود ندارد؛ ثبت‌نام عمومی بعد از ساخت ادمین بسته می‌شود. مدیر فضای کاری از **تیم ← ساخت کاربر** حساب ورود و عضویت را با هم می‌سازد؛ برای حساب موجود از **افزودن عضو** استفاده کنید. رمز اولیه را خصوصی به همکار بدهید؛ ایمیل دعوت ارسال نمی‌شود. مرز دسترسی، فضای کاری است؛ اعضای آن همهٔ پروژه‌های همان فضا را می‌بینند. در **تنظیمات ← ظاهر** تم روشن و تیره با ظاهر شیشه‌ای و انتخاب ذخیره‌شده در دسترس است؛ فیلترهای فارسی و عربی راست‌چین‌اند.
 
 برای استفاده از ایمیج عمومی آماده:
 
@@ -117,7 +117,7 @@ docker compose up -d --build
 docker compose -f compose.image.yaml up -d
 ```
 
-ایمیج `ghcr.io/sajadjanat/taskorbit:v0.2.0` برای Linux amd64/arm64 است. داده‌های SQLite، حساب‌ها و پیوست‌ها در `taskorbit-data` می‌مانند. دستور `docker compose down -v` این حجم و داده‌ها را حذف می‌کند.
+ایمیج `ghcr.io/sajadjanat/taskorbit:v0.2.1` برای Linux amd64/arm64 است. داده‌های SQLite، حساب‌ها و پیوست‌ها در `taskorbit-data` می‌مانند. دستور `docker compose down -v` این حجم و داده‌ها را حذف می‌کند.
 
 ## سرور عمومی با HTTPS؛ دو کانتینر
 
@@ -184,7 +184,7 @@ Compose سقف ۵۱۲ مگابایت حافظه و یک CPU دارد؛ این س
 
 ## انتشار و محدوده
 
-تگ `v0.2.0` آزمون، ساخت بسته‌های بومی، ایمیج چندمعماری و پیش‌نویس ریلیز را فعال می‌کند. انتشار بعد از موفقیت همهٔ پلتفرم‌ها انجام می‌شود. [یادداشت ریلیز](docs/RELEASE-NOTES.md)، [شواهد آزمون](docs/VERIFICATION.md) و [نقشه راه](docs/ROADMAP.md) محدودیت‌ها و قدم‌های بعدی را توضیح می‌دهند.
+تگ `v0.2.1` آزمون، ساخت بسته‌های بومی، ایمیج چندمعماری و پیش‌نویس ریلیز را فعال می‌کند. انتشار بعد از موفقیت همهٔ پلتفرم‌ها انجام می‌شود. [یادداشت ریلیز](docs/RELEASE-NOTES.md)، [شواهد آزمون](docs/VERIFICATION.md) و [نقشه راه](docs/ROADMAP.md) محدودیت‌ها و قدم‌های بعدی را توضیح می‌دهند.
 
 فناوری‌ها: React، TypeScript، Vite، Tailwind، کامپوننت‌های واقعی shadcn/ui، Express، SQLite داخلی Node و Tauri 2. فونت Vazirmatn با مجوز OFL است. نشان عطارد با نور گرم خورشید و زمینهٔ سنگی/زغالی در تم‌های برنامه استفاده می‌شود؛ [جزئیات برند](assets/brand/WORDMARK.md).
 

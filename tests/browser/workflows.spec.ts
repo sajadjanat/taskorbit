@@ -61,6 +61,105 @@ async function accessible(page: Page) {
     ).violations,
   ).toEqual([]);
 }
+async function saveCreated(page: Page, resource: string) {
+  const [response] = await Promise.all([
+    page.waitForResponse(
+      (r) =>
+        r.request().method() === "POST" &&
+        new URL(r.url()).pathname.endsWith(resource),
+    ),
+    page
+      .getByRole("dialog")
+      .getByRole("button", { name: "Save", exact: true })
+      .click(),
+  ]);
+  expect(response.status()).toBe(201);
+  await expect(page.getByRole("dialog")).not.toBeVisible();
+}
+
+test("team account creation, Persian filter direction and glass themes", async ({
+  page,
+  request,
+}, info) => {
+  const { ws } = await workspace(
+    page,
+    request,
+    `${info.project.name}-accounts`,
+  );
+  await nav(page, /^Team$/);
+  await page
+    .locator(".header-actions")
+    .getByRole("button", { name: "Create user", exact: true })
+    .click();
+  const dialog = page.getByRole("dialog");
+  const email = `created-${info.project.name}@example.test`;
+  await dialog.getByLabel("Name", { exact: true }).fill("New teammate");
+  await dialog.getByLabel("Email", { exact: true }).fill(email);
+  await dialog
+    .getByLabel("Password", { exact: true })
+    .fill("test-password-123");
+  await accessible(page);
+  await saveCreated(page, "/members/create");
+  await expect(
+    page.getByRole("cell", { name: email, exact: true }),
+  ).toBeVisible();
+  const members = await (
+    await request.get(`/api/workspaces/${ws.id}/members`)
+  ).json();
+  expect(members.find((m: { email: string }) => m.email === email).role).toBe(
+    "member",
+  );
+  await page
+    .locator(".topbar-actions")
+    .getByRole("button", { name: "Language", exact: true })
+    .click();
+  await page.getByRole("menuitem", { name: "فارسی", exact: true }).click();
+  await nav(page, /کارها/);
+  const status = page.locator(".filter-bar").getByRole("combobox").first();
+  await expect(status).toHaveAttribute("dir", "rtl");
+  await expect(status).toHaveCSS("text-align", "start");
+  await status.click();
+  await expect(page.getByRole("listbox")).toHaveAttribute("dir", "rtl");
+  await expect(page.getByRole("option").first()).toHaveCSS(
+    "text-align",
+    "start",
+  );
+  await page.screenshot({
+    path: info.outputPath("persian-filters.png"),
+    fullPage: true,
+  });
+  await page.keyboard.press("Escape");
+  await nav(page, /تنظیمات/);
+  const themes = page.getByRole("group", { name: "ظاهر", exact: true });
+  await themes.getByRole("button", { name: "تیره", exact: true }).click();
+  await expect(page.locator("html")).toHaveClass(/dark/);
+  await expect(
+    themes.getByRole("button", { name: "تیره", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
+  await page.evaluate(async () => {
+    await Promise.all(
+      document.getAnimations().map((a) => a.finished.catch(() => {})),
+    );
+  });
+  expect(
+    (await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze())
+      .violations,
+  ).toEqual([]);
+  await page.screenshot({
+    path: info.outputPath("glass-dark.png"),
+    fullPage: true,
+  });
+  await page.reload();
+  await expect(page.locator("html")).toHaveClass(/dark/);
+  await nav(page, /تنظیمات/);
+  await themes.getByRole("button", { name: "روشن", exact: true }).click();
+  await expect(page.locator("html")).not.toHaveClass(/dark/);
+  await expect(page.locator(".topbar")).toHaveCSS("backdrop-filter", /blur/);
+  await page.screenshot({
+    path: info.outputPath("glass-light.png"),
+    fullPage: true,
+  });
+});
 
 test("global keyboard search opens a task; recurring completion and bulk editing persist", async ({
   page,
@@ -87,8 +186,7 @@ test("global keyboard search opens a task; recurring completion and bulk editing
   await dialog.getByLabel("Due date", { exact: true }).fill("2026-10-15");
   await dialog.getByLabel("Repeat", { exact: true }).click();
   await page.getByRole("option", { name: "Every week", exact: true }).click();
-  await dialog.getByRole("button", { name: "Save", exact: true }).click();
-  await expect(dialog).not.toBeVisible();
+  await saveCreated(page, "/tasks");
   await expect(page.locator(".recurrence-badge").first()).toHaveText(
     "Every week",
   );

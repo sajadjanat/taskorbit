@@ -638,6 +638,32 @@ export function createApp({
         .all(req.params.wid),
     );
   });
+  app.post("/api/workspaces/:wid/members/create", sessionOnly, (req, res) => {
+    workspace(req, req.params.wid, true, true);
+    const v = credentials
+      .extend({
+        role: z.enum(["admin", "member", "viewer"]).default("member"),
+      })
+      .strict()
+      .parse(req.body);
+    if (db.prepare("SELECT 1 FROM users WHERE email=?").get(v.email))
+      fail(409, "Account already exists. Add the existing account by email.");
+    const uid = randomUUID();
+    transaction(db, () => {
+      db.prepare(
+        "INSERT INTO users(id,name,email,password,admin) VALUES(?,?,?,?,0)",
+      ).run(uid, v.name, v.email, hashPassword(v.password));
+      db.prepare("INSERT INTO members VALUES(?,?,?)").run(
+        req.params.wid,
+        uid,
+        v.role,
+      );
+    });
+    res.status(201).json({
+      ...publicUser(db.prepare("SELECT * FROM users WHERE id=?").get(uid)),
+      role: v.role,
+    });
+  });
   app.post("/api/workspaces/:wid/members", (req, res) => {
     workspace(req, req.params.wid, true, true);
     const v = z

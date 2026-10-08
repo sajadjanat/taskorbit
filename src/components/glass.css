@@ -1,0 +1,114 @@
+:root {
+  --glass-surface: rgba(255, 255, 255, 0.76);
+  --glass-navigation: rgba(245, 242, 235, 0.78);
+  --glass-floating: rgba(255, 255, 255, 0.94);
+  --glass-edge: rgba(255, 255, 255, 0.88);
+  --glass-shadow: 0 8px 28px rgba(73, 49, 21, 0.055);
+  --glass-glow: rgba(207, 156, 72, 0.14);
+}
+.dark {
+  --glass-surface: rgba(38, 35, 31, 0.76);
+  --glass-navigation: rgba(29, 27, 24, 0.82);
+  --glass-floating: rgba(38, 35, 31, 0.96);
+  --glass-edge: rgba(255, 236, 201, 0.065);
+  --glass-shadow: 0 8px 28px rgba(0, 0, 0, 0.16);
+  --glass-glow: rgba(199, 146, 65, 0.1);
+}
+body {
+  background-image:
+    radial-gradient(ellipse at 85% 0%, var(--glass-glow), transparent 52%),
+    radial-gradient(ellipse at 12% 80%, var(--glass-glow), transparent 48%);
+  background-attachment: fixed;
+}
+.sidebar,
+.topbar {
+  background: var(--glass-navigation);
+  -webkit-backdrop-filter: blur(22px) saturate(130%);
+  backdrop-filter: blur(22px) saturate(130%);
+}
+.panel,
+.table-wrap,
+.task-card,
+.entry-card,
+[data-slot="card"] {
+  background: var(--glass-surface);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  box-shadow:
+    inset 0 1px 0 var(--glass-edge),
+    var(--glass-shadow);
+}
+.overview-stats [data-slot="card"] {
+  box-shadow:
+    inset 0 1px 0 var(--glass-edge),
+    var(--glass-shadow);
+}
+.panel,
+.table-wrap,
+.entry-card,
+[data-slot="card"] {
+  border-radius: 14px;
+}
+.task-card {
+  border-radius: 10px;
+  /* Cards sit on a flat board surface; avoid redundant blur on every item. */
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.task-card:hover {
+  border-color: color-mix(in srgb, var(--primary) 45%, var(--border));
+}
+[data-slot="dialog-content"],
+[data-slot="alert-dialog-content"],
+[data-slot="select-content"],
+[data-slot="dropdown-menu-content"] {
+  background: var(--glass-floating);
+  -webkit-backdrop-filter: blur(24px) saturate(125%);
+  backdrop-filter: blur(24px) saturate(125%);
+  border-color: var(--border);
+  box-shadow:
+    inset 0 1px 0 var(--glass-edge),
+    0 20px 64px rgba(0, 0, 0, 0.18);
+}
+.filter-bar {
+  justify-content: flex-start;
+  text-align: start;
+}
+.filter-bar > button[data-slot="select-trigger"] {
+  background: var(--glass-surface);
+}
+[data-slot="select-trigger"],
+[data-slot="select-content"],
+[data-slot="select-item"] {
+  text-align: start;
+}
+[data-slot="select-value"] {
+  flex: 1;
+}
+.theme-options {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+@supports not (
+  (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
+) {
+  .sidebar,
+  .topbar {
+    background: var(--sidebar);
+  }
+  .panel,
+  .table-wrap,
+  .task-card,
+  .entry-card,
+  [data-slot="card"],
+  [data-slot="dialog-content"],
+  [data-slot="alert-dialog-content"],
+  [data-slot="select-content"],
+  [data-slot="dropdown-menu-content"] {
+    background: var(--card);
+  }
+}

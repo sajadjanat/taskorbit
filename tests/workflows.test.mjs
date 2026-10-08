@@ -81,6 +81,7 @@ async function fixture(t, mailer = null) {
     return u;
   }
   return {
+    base,
     req,
     ok,
     db,
@@ -91,6 +92,111 @@ async function fixture(t, mailer = null) {
     user,
   };
 }
+
+test("workspace administrators create ordinary accounts with atomic membership and no instance privileges", async (t) => {
+  const f = await fixture(t);
+  await f.user("manager", "admin");
+  await f.user("writer", "member");
+  await f.user("reader", "viewer");
+  await f.user("outsider");
+  const url = `/workspaces/${f.workspace.id}/members/create`;
+  const body = {
+    name: "New colleague",
+    email: "NEW@example.test",
+    password: "test-password-123",
+    role: "viewer",
+  };
+  const token = await f.ok("/me/tokens", "POST", {
+    name: "Admin test",
+    write: true,
+    admin: true,
+  });
+  assert.equal(
+    (
+      await fetch(f.base + "/api" + url, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token.token}`,
+          Origin: "https://tasks.example.test",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      })
+    ).status,
+    403,
+  );
+  for (const actor of ["writer", "reader", "outsider"])
+    assert.equal((await f.req(url, "POST", body, actor)).status, 403);
+  assert.equal(
+    (await f.req(url, "POST", { ...body, admin: true }, "manager")).status,
+    400,
+  );
+  assert.equal(
+    (await f.req(url, "POST", { ...body, password: "short" }, "manager"))
+      .status,
+    400,
+  );
+  assert.equal(
+    f.db
+      .prepare("SELECT count(*) AS n FROM users WHERE email=?")
+      .get("new@example.test").n,
+    0,
+  );
+  const created = await f.ok(url, "POST", body, "manager");
+  assert.equal(created.admin, 0);
+  assert.equal(created.email, "new@example.test");
+  assert.equal(created.role, "viewer");
+  assert.equal(created.password, undefined);
+  assert.equal((await f.req(url, "POST", body, "manager")).status, 409);
+  assert.equal(
+    f.db
+      .prepare("SELECT count(*) AS n FROM users WHERE email=?")
+      .get("new@example.test").n,
+    1,
+  );
+  await f.ok(
+    "/login",
+    "POST",
+    { email: created.email, password: body.password },
+    "new",
+  );
+  const visible = await f.ok("/workspaces", "GET", undefined, "new");
+  assert.equal(visible.length, 1);
+  assert.equal(visible[0].id, f.workspace.id);
+  assert.equal(visible[0].role, "viewer");
+  assert.equal(
+    (
+      await f.req(
+        `/projects/${f.project.id}/tasks`,
+        "POST",
+        { title: "Denied" },
+        "new",
+      )
+    ).status,
+    403,
+  );
+  // Roll back the account if membership insertion fails, without leaving an orphan login.
+  f.db.exec(
+    "CREATE TRIGGER reject_test_membership BEFORE INSERT ON members BEGIN SELECT RAISE(ABORT, 'test constraint'); END",
+  );
+  assert.equal(
+    (
+      await f.req(
+        url,
+        "POST",
+        { ...body, email: "rollback@example.test" },
+        "manager",
+      )
+    ).status,
+    409,
+  );
+  assert.equal(
+    f.db
+      .prepare("SELECT count(*) AS n FROM users WHERE email=?")
+      .get("rollback@example.test").n,
+    0,
+  );
+});
 
 test("v2 migration preserves populated work, sessions and references and can reopen twice", async (t) => {
   const f = await fixture(t);

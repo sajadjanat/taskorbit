@@ -1,5 +1,13 @@
 # Preview verification
 
+## 2026-10-08 team accounts, RTL selectors and glass themes — 0.2.1
+
+- All 53 API/MCP/update/workflow tests passed with temporary databases. Added coverage for workspace-admin account creation, member/viewer/outsider rejection, privileged token rejection, strict validation, case-normalized duplicate email rejection, ordinary instance privileges, successful login with the selected workspace role, and account rollback when membership insertion fails.
+- TypeScript and the 0.2.1 production build passed. Locked Rust metadata resolves TaskOrbit 0.2.1. Production dependency audit reported zero vulnerabilities.
+- All 20 combined browser scenarios passed in desktop Chrome and iPhone WebKit emulation. Added Team account creation, actual RTL Radix popup direction, saved light/dark selection, glass navigation and WCAG checks on the user form and dark settings. The mobile Safari MCP configuration block is keyboard focusable. Local WebKit saves sometimes exceeded the former five-second visibility assertion; creation tests now wait for a successful creation response before checking the closed dialog, without suppressing failed responses.
+- The updated four previews per locale use disposable fictional workspaces. The preview at localhost:4321 also uses fictional data in a temporary SQLite database. No production data or deployed instance was modified.
+- Physical-device installation, Windows/macOS OS signing and macOS notarization remain unverified or unconfigured as documented in release notes. Native/container packaging and publication are gated separately by release CI.
+
 ## 2026-10-08 team workflows and release candidate 0.2.0
 
 - 52 API/MCP/upgrade/workflow tests passed with temporary SQLite databases. A populated schema-2 fixture was upgraded and reopened twice, preserving accounts, sessions, labels, discussions and sprint references, with a clean foreign-key check.

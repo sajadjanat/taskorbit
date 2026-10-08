@@ -1,6 +1,6 @@
 [package]
 name = "taskorbit"
-version = "0.2.0"
+version = "0.2.1"
 description = "TaskOrbit self-hosted team workspace client"
 authors = ["TaskOrbit contributors"]
 license = "MIT"

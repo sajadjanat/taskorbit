@@ -1,5 +1,11 @@
 # Team workflows in 0.2.0
 
+## Team account creation (0.2.1)
+
+In **Team**, workspace administrators and instance administrators can choose **Create user**, set a name, email, password of 12–128 characters and workspace role, and create the login and membership together. The new account is an ordinary instance user, including when its workspace role is Admin. Creation requires a signed-in session; API/MCP tokens cannot create credentials. Existing email addresses are not overwritten: use **Add member** instead. Passwords must be shared privately; this flow does not send an invitation email.
+
+Appearance settings provide explicit Light and Dark choices, saved on the current device. The initial choice follows the system preference when none has been saved. Persian and Arabic selection menus follow RTL direction, including their selection indicator and keyboard behavior. Glass surfaces have an opaque fallback when background blur is unavailable.
+
 ## Search and inbox
 
 Use **Search everything** in the top bar or **Ctrl / ⌘ K**. Enter at least two characters, then use the arrow keys and Enter. Search includes accessible, unarchived projects, tasks and references, sprint names/goals and page titles/content. Task results open the task; page and sprint results focus the matching resource. Results are capped at 30 tasks and 10 of each other kind.

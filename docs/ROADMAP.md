@@ -2,6 +2,11 @@
 
 The 0.2 preview implements the core workflows listed in README. Completed release work and the longer-term product roadmap are tracked separately.
 
+## Added in 0.2.1
+
+- Workspace administrators can create ordinary user accounts and team membership together.
+- Persian/Arabic selection direction and logical spacing, explicit persistent Light/Dark choices, glass surfaces with opaque fallback.
+
 ## Added in 0.2.0
 
 - Search across accessible projects, tasks, sprints and pages, with keyboard navigation.

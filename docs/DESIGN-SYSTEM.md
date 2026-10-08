@@ -37,6 +37,8 @@ The distinctive visual is the approved transparent Mercury artwork. Supporting l
 
 Version 0.2.0 adds a search command dialog, inbox, import review, bulk selection and sprint reports using the same palette, typography and spacing. Dialog text and close controls follow locale direction; mobile dialogs scroll within the viewport. Cards use the existing quiet border token rather than a foreground-colored outline.
 
+Version 0.2.1 adds glass surfaces in both themes: translucent navigation, cards and panels over a subtle warm radial background, soft inset edges and restrained shadows. Floating menus and dialogs stay near opaque for legibility. Navigation and floating surfaces use background blur; task cards retain transparency without a redundant filter per item. Unsupported blur falls back to solid surfaces. Radix controls inherit locale direction from a Direction provider, with logical padding and selection indicators. Appearance includes explicit pressed-state Light/Dark choices and retains the saved device preference.
+
 The empty-project illustration is an AI-generated transparent Mercury sphere with three fine solar-gold orbits, based on the approved `public/icon-512.png` brand reference. Source: `assets/brand/onboarding-orbit.png`; optimized transparent 512 px WebP: `public/onboarding-orbit.webp`. Prompt: quiet rocky Mercury, sunlight from the upper-left, thin elliptical paths and restrained gold markers, no text, UI, logos or people. It is decorative, has an empty alternative text, and accompanies a real next-step action. It is not used for task status or data.
 
 - A new or invalid locale preference starts in English. Valid saved language choices are respected; Persian and Arabic use RTL, while URL/email fields remain LTR.

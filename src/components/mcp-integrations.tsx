@@ -384,7 +384,9 @@ export function McpIntegrations({
       </select>
       <p className="muted">{client.startsWith("stdio") ? t.stdio : t.hint}</p>
       <div className="mcp-code">
-        <pre dir="ltr">{config}</pre>
+        <pre dir="ltr" tabIndex={0}>
+          {config}
+        </pre>
         <Button
           onClick={() => void copyText(config, "config")}
           variant="outline"

@@ -11,7 +11,7 @@
   <p>Lightweight self-hosted project management, built with React, shadcn/ui and Tauri.</p>
   <p>
     <a href="https://github.com/sajadjanat/taskorbit/actions/workflows/verify.yml"><img src="https://github.com/sajadjanat/taskorbit/actions/workflows/verify.yml/badge.svg" alt="Web and server checks" /></a>
-    <a href="https://github.com/sajadjanat/taskorbit/releases"><img src="https://img.shields.io/badge/version-0.2.0-b88645" alt="Version 0.2.0" /></a>
+    <a href="https://github.com/sajadjanat/taskorbit/releases"><img src="https://img.shields.io/badge/version-0.2.1-b88645" alt="Version 0.2.1" /></a>
     <img src="https://img.shields.io/badge/Tauri-2-24c8db?logo=tauri&amp;logoColor=white" alt="Tauri 2" />
     <img src="https://img.shields.io/badge/UI-shadcn%2Fui-18181b?logo=shadcnui&amp;logoColor=white" alt="shadcn/ui" />
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-b88645" alt="MIT license" /></a>
@@ -79,13 +79,13 @@ The interface and README are available in English, Persian, Arabic and Simplifie
 
 ## Download
 
-[**TaskOrbit 0.2.0 → GitHub Releases**](https://github.com/sajadjanat/taskorbit/releases/tag/v0.2.0)
+[**TaskOrbit 0.2.1 → GitHub Releases**](https://github.com/sajadjanat/taskorbit/releases/tag/v0.2.1)
 
 | Platform            | Package / access              | Update method                          |
 | ------------------- | ----------------------------- | -------------------------------------- |
-| Windows x64         | TaskOrbit_0.2.0_x64-setup.exe | Signed in-app updater                  |
-| macOS Apple Silicon | TaskOrbit_0.2.0_aarch64.dmg   | Signed in-app updater                  |
-| macOS Intel         | TaskOrbit_0.2.0_x64.dmg       | Signed in-app updater                  |
+| Windows x64         | TaskOrbit_0.2.1_x64-setup.exe | Signed in-app updater                  |
+| macOS Apple Silicon | TaskOrbit_0.2.1_aarch64.dmg   | Signed in-app updater                  |
+| macOS Intel         | TaskOrbit_0.2.1_x64.dmg       | Signed in-app updater                  |
 | Linux x64           | DEB / AppImage                | Signed in-app updater                  |
 | Android arm64       | taskorbit-android-arm64.apk   | Signed APK; user-approved installation |
 | Web / iPhone / iPad | Browser / Add to Home Screen  | Reload after server upgrade            |
@@ -109,7 +109,7 @@ cd taskorbit
 docker compose up -d --build
 ```
 
-Open `http://localhost:4310`. Create the first administrator and workspace. There is no default password. Public registration closes after this account is created. The administrator then creates user accounts and adds them to a workspace from **Team**. A workspace is the permission boundary: all its members can see its projects.
+Open `http://localhost:4310`. Create the first administrator and workspace. There is no default password. Public registration closes after this account is created. Workspace administrators can use **Team → Create user** to create an ordinary login and membership together, or **Add member** for an existing email. Share initial passwords privately; invitation emails are not sent. A workspace is the permission boundary: all its members can see its projects. **Settings → Appearance** provides persistent Light/Dark choices with glass surfaces; Persian and Arabic filters follow RTL direction.
 
 To use the published multi-architecture image instead of building from source:
 
@@ -117,7 +117,7 @@ To use the published multi-architecture image instead of building from source:
 docker compose -f compose.image.yaml up -d
 ```
 
-The public image is `ghcr.io/sajadjanat/taskorbit:v0.2.0` for Linux amd64 and arm64. For HTTPS with this image, combine `compose.image.yaml` with `compose.https.yaml` and set the same `TASKORBIT_DOMAIN` described below.
+The public image is `ghcr.io/sajadjanat/taskorbit:v0.2.1` for Linux amd64 and arm64. For HTTPS with this image, combine `compose.image.yaml` with `compose.https.yaml` and set the same `TASKORBIT_DOMAIN` described below.
 
 SQLite, attachments and account data persist in `taskorbit-data`. Do not use `docker compose down -v` unless you intend to delete them.
 
@@ -186,7 +186,7 @@ The Compose resource settings cap the application at 512 MB and one CPU; these a
 
 ## Release and scope
 
-Tag `v0.2.0` triggers verification, native packaging, a multi-architecture server image and a draft release. Publication occurs only after all platform jobs succeed. See [release notes](docs/RELEASE-NOTES.md) and [roadmap](docs/ROADMAP.md) for implemented and remaining features.
+Tag `v0.2.1` triggers verification, native packaging, a multi-architecture server image and a draft release. Publication occurs only after all platform jobs succeed. See [release notes](docs/RELEASE-NOTES.md) and [roadmap](docs/ROADMAP.md) for implemented and remaining features.
 
 Stack: React, TypeScript, Vite, Tailwind, genuine shadcn/ui source components, Express, Node's SQLite API and Tauri 2. Font: Vazirmatn (OFL). The Mercury wordmark and app icon use warm solar lighting, with stone/charcoal surfaces and gold accents throughout both UI themes. Brand artwork was generated from the owner's GitOrbit reference; see [brand details](assets/brand/WORDMARK.md).
 

@@ -89,7 +89,7 @@ Install Node.js ≥22.18 first. Open the client's MCP configuration (Claude Desk
       "command": "npx",
       "args": [
         "-y",
-        "--package=https://github.com/sajadjanat/taskorbit/releases/download/v0.2.0/taskorbit-mcp-0.2.0.tgz",
+        "--package=https://github.com/sajadjanat/taskorbit/releases/download/v0.2.1/taskorbit-mcp-0.2.1.tgz",
         "taskorbit-mcp"
       ],
       "env": {
