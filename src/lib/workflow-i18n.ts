@@ -1,6 +1,8 @@
 import type { Locale } from "./i18n";
 
 const en = {
+  mobileNavigation: "Main navigation",
+  moreNavigation: "More",
   accountExists:
     "This email already has an account. Use Add member to add it to this workspace.",
   teamAccountsHint:
@@ -142,6 +144,8 @@ const en = {
 } as const;
 type Key = keyof typeof en;
 const fa: Record<Key, string> = {
+  mobileNavigation: "ناوبری اصلی",
+  moreNavigation: "بیشتر",
   accountExists:
     "این ایمیل قبلاً حساب دارد. از «افزودن عضو» برای اضافه کردن آن به فضای کاری استفاده کنید.",
   teamAccountsHint:
@@ -282,6 +286,8 @@ const fa: Record<Key, string> = {
 };
 const ar: Record<Key, string> = {
   ...en,
+  mobileNavigation: "التنقل الرئيسي",
+  moreNavigation: "المزيد",
   accountExists:
     "يوجد حساب بهذا البريد. استخدم إضافة عضو لإضافته إلى مساحة العمل.",
   teamAccountsHint:
@@ -415,6 +421,8 @@ const ar: Record<Key, string> = {
 };
 const zh: Record<Key, string> = {
   ...en,
+  mobileNavigation: "主导航",
+  moreNavigation: "更多",
   accountExists: "此邮箱已有账户，请使用添加成员将其加入工作空间。",
   teamAccountsHint: "为新同事创建账户，或通过邮箱添加已有账户。",
   createTeamAccountHint:

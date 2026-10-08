@@ -1,4 +1,4 @@
-# Team workflows in 0.2.0
+# Team workflows
 
 ## Team account creation (0.2.1)
 
@@ -48,3 +48,11 @@ CSV requires **title**, **Summary** or **name**. Optional columns:
 | labels              | Labels separated by semicolons or Persian commas                                          |
 
 Quoted cells, escaped quotes, UTF-8 BOM and CRLF are supported. This is a generic CSV import, not a complete proprietary project-management migration.
+
+## Mobile workspace (0.2.2)
+
+Below 760 pixels, the bottom bar opens Overview, Work items and Team. **More** opens workspace/project selection and the remaining sections. Tap the close button or press Escape to return; the drawer keeps keyboard focus inside while open.
+
+The mobile board shows one status at a time. Tap a status and its count to switch columns, or use the arrow keys, Home and End. **Filters** expands status, priority, assignee and sprint controls. Choosing a status filter also selects that board column; the active-filter badge shows how many filters are applied. Search stays above the board. **List** shows every matching status as cards.
+
+Forms open from the bottom and scroll when their content is taller than the screen. Larger inputs and actions, safe-area spacing and light/dark glass surfaces apply to both left-to-right and right-to-left layouts.

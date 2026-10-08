@@ -1,4 +1,14 @@
-# TaskOrbit 0.2.1 — team accounts, RTL filters and glass themes
+# TaskOrbit 0.2.2 — cleaner mobile workspace
+
+- Added a fixed bottom navigation for Overview, Work items, Team and More, with safe-area spacing and accessible page selection.
+- Mobile boards display one full-width status column at a time. Status tabs expose counts, support keyboard arrows in both reading directions and follow the selected status filter. Desktop boards retain all columns.
+- Search, view controls and actions now fit small screens. Filters expand into a two-column grid, with a visible active-filter count.
+- Work-item lists and Team tables become readable cards on mobile. Dialogs use full-width bottom sheets, scrollable content and larger inputs to avoid iOS input zoom.
+- Mobile navigation locks background scrolling, manages focus, supports Escape and closes when opening a form. Closed navigation is excluded from keyboard focus.
+- Light/Dark glass surfaces and Persian/Arabic direction remain available. Added browser checks at 320, 390 and 430 pixels for overflow, touch targets, status/filter behavior, forms and navigation focus.
+- No database schema change since 0.2.1. All local API and browser checks use disposable databases.
+
+## Included from 0.2.1
 
 - Workspace administrators can create a user directly from Team, setting name, email, password and workspace role. Login and membership save in one transaction. New accounts remain ordinary instance users; existing emails are not overwritten. Share initial passwords privately; this flow does not send invitation emails.
 - Account creation requires a signed-in session and workspace management permission. Members, viewers, unrelated users and API/MCP tokens cannot create account credentials.
@@ -26,7 +36,7 @@
 
 Back up your complete data volume, upgrade the server, then reload open web/PWA clients. Schema version 3 is additive and retains existing accounts, sessions, tasks and references. SMTP recovery requires private server configuration; see the [recovery guide](https://github.com/sajadjanat/taskorbit/blob/main/docs/PASSWORD-RECOVERY.md). See the [workflow guide](https://github.com/sajadjanat/taskorbit/blob/main/docs/WORKFLOWS.md) for import limits and recurrence/history behavior.
 
-The release pipeline packages Windows x64, macOS Intel/Apple Silicon, Linux x64 DEB/AppImage, Android arm64 and the web/server archive. It also builds Linux amd64/arm64 server images at `ghcr.io/sajadjanat/taskorbit:v0.2.1`; `stable` advances only after all required publication checks pass. Desktop updater packages, signatures, `latest.json`, MCP bridge and checksums accompany a successful release.
+The release pipeline packages Windows x64, macOS Intel/Apple Silicon, Linux x64 DEB/AppImage, Android arm64 and the web/server archive. It also builds Linux amd64/arm64 server images at `ghcr.io/sajadjanat/taskorbit:v0.2.2`; `stable` advances only after all required publication checks pass. Desktop updater packages, signatures, `latest.json`, MCP bridge and checksums accompany a successful release.
 
 ## Verification limits
 

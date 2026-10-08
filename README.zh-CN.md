@@ -11,7 +11,7 @@
   <p>采用 React、shadcn/ui 和 Tauri 的轻量自托管项目管理应用。</p>
   <p>
     <a href="https://github.com/sajadjanat/taskorbit/actions/workflows/verify.yml"><img src="https://github.com/sajadjanat/taskorbit/actions/workflows/verify.yml/badge.svg" alt="Web and server checks" /></a>
-    <a href="https://github.com/sajadjanat/taskorbit/releases"><img src="https://img.shields.io/badge/version-0.2.1-b88645" alt="Version 0.2.1" /></a>
+    <a href="https://github.com/sajadjanat/taskorbit/releases"><img src="https://img.shields.io/badge/version-0.2.2-b88645" alt="Version 0.2.2" /></a>
     <img src="https://img.shields.io/badge/Tauri-2-24c8db?logo=tauri&amp;logoColor=white" alt="Tauri 2" />
     <img src="https://img.shields.io/badge/UI-shadcn%2Fui-18181b?logo=shadcnui&amp;logoColor=white" alt="shadcn/ui" />
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-b88645" alt="MIT license" /></a>
@@ -22,6 +22,12 @@
 ![TaskOrbit 中文任务看板](docs/images/zh-CN/board-dark.png)
 
 _截图来自实际应用，使用临时示例项目和虚构账户，不包含个人数据。应用界面支持简体中文、英语、波斯语和阿拉伯语，截图均为中文。_
+
+### 0.2.2 移动布局
+
+底部导航、全宽状态列、可折叠筛选和底部弹出表单让小屏幕更易使用。任务和团队列表转换为卡片，并保留明暗玻璃主题及语言方向支持。
+
+<p align="center"><img src="docs/images/zh-CN/mobile-light.png" alt="移动端浅色看板" width="280" /> <img src="docs/images/zh-CN/mobile-dark.png" alt="移动端深色看板" width="280" /></p>
 
 ## 为什么选择 TaskOrbit？
 
@@ -79,13 +85,13 @@ _截图来自实际应用，使用临时示例项目和虚构账户，不包含�
 
 ## 下载
 
-[**TaskOrbit 0.2.1 → GitHub Releases**](https://github.com/sajadjanat/taskorbit/releases/tag/v0.2.1)
+[**TaskOrbit 0.2.2 → GitHub Releases**](https://github.com/sajadjanat/taskorbit/releases/tag/v0.2.2)
 
 | 平台                | 安装包或访问方式              | 更新方式                 |
 | ------------------- | ----------------------------- | ------------------------ |
-| Windows x64         | TaskOrbit_0.2.1_x64-setup.exe | 应用内签名更新           |
-| macOS Apple Silicon | TaskOrbit_0.2.1_aarch64.dmg   | 应用内签名更新           |
-| macOS Intel         | TaskOrbit_0.2.1_x64.dmg       | 应用内签名更新           |
+| Windows x64         | TaskOrbit_0.2.2_x64-setup.exe | 应用内签名更新           |
+| macOS Apple Silicon | TaskOrbit_0.2.2_aarch64.dmg   | 应用内签名更新           |
+| macOS Intel         | TaskOrbit_0.2.2_x64.dmg       | 应用内签名更新           |
 | Linux x64           | DEB / AppImage                | 应用内签名更新           |
 | Android arm64       | taskorbit-android-arm64.apk   | 签名 APK；需用户批准安装 |
 | Web / iPhone / iPad | 浏览器 / 添加到主屏幕         | 服务器升级后重新加载     |
@@ -117,7 +123,7 @@ docker compose up -d --build
 docker compose -f compose.image.yaml up -d
 ```
 
-镜像 `ghcr.io/sajadjanat/taskorbit:v0.2.1` 支持 Linux amd64 和 arm64。SQLite、账户及附件保存在 `taskorbit-data` 卷中。`docker compose down -v` 会删除此卷及其数据。
+镜像 `ghcr.io/sajadjanat/taskorbit:v0.2.2` 支持 Linux amd64 和 arm64。SQLite、账户及附件保存在 `taskorbit-data` 卷中。`docker compose down -v` 会删除此卷及其数据。
 
 ## 公共 HTTPS 服务器：两个容器
 
@@ -137,7 +143,7 @@ docker compose -f compose.yaml -f compose.https.yaml up -d --build
 
 ## 更新
 
-实例管理员可在管理面板检查新版本。拉取镜像后运行 `docker compose -f compose.image.yaml -f compose.updates.yaml up -d`，即可启用带数据库备份和失败自动回滚的一键服务器升级。这会增加一个更新容器：共两个容器，使用 Caddy 时共三个。0.1.3 起桌面客户端在本地连接页提供签名更新，可通过 **Connection → Server connection and updates…** 菜单返回。Android 下载新的签名 APK，并需要用户批准安装。服务器升级后，网页和 iPhone PWA 提示重新加载。更早的客户端需先手动安装一次 0.2.1。参阅 [更新指南](docs/UPDATES.md)。
+实例管理员可在管理面板检查新版本。拉取镜像后运行 `docker compose -f compose.image.yaml -f compose.updates.yaml up -d`，即可启用带数据库备份和失败自动回滚的一键服务器升级。这会增加一个更新容器：共两个容器，使用 Caddy 时共三个。0.1.3 起桌面客户端在本地连接页提供签名更新，可通过 **Connection → Server connection and updates…** 菜单返回。Android 下载新的签名 APK，并需要用户批准安装。服务器升级后，网页和 iPhone PWA 提示重新加载。更早的客户端需先手动安装一次 0.2.2。参阅 [更新指南](docs/UPDATES.md)。
 
 ## 安装到设备
 
@@ -184,7 +190,7 @@ Compose 将资源限制为 512 MB 内存和一个 CPU；这些是上限，不是
 
 ## 发布与范围
 
-标签 `v0.2.1` 会触发验证、原生打包、多架构镜像及发布草稿。所有平台构建成功后才发布。参阅 [发布说明](docs/RELEASE-NOTES.md)、[验证记录](docs/VERIFICATION.md) 和 [路线图](docs/ROADMAP.md) 了解限制与后续工作。
+标签 `v0.2.2` 会触发验证、原生打包、多架构镜像及发布草稿。所有平台构建成功后才发布。参阅 [发布说明](docs/RELEASE-NOTES.md)、[验证记录](docs/VERIFICATION.md) 和 [路线图](docs/ROADMAP.md) 了解限制与后续工作。
 
 技术栈：React、TypeScript、Vite、Tailwind、真正的 shadcn/ui 源组件、Express、Node 内置 SQLite API 和 Tauri 2。Vazirmatn 字体采用 OFL 许可证。品牌采用受阳光照亮的水星、石色/炭色背景和金色强调；[品牌详情](assets/brand/WORDMARK.md)。
 

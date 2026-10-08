@@ -123,6 +123,8 @@ test("two independent clients receive changes immediately without reloading or l
     await expect(receiver.getByRole("dialog")).not.toBeVisible({
       timeout: 4000,
     });
+    // List view keeps tasks in every status visible after a remote status move.
+    await receiver.getByRole("button", { name: "List", exact: true }).click();
     await receiver
       .getByRole("button", { name: /Edited after module deletion/ })
       .click();

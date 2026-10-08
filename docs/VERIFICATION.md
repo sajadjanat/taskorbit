@@ -1,5 +1,13 @@
 # Preview verification
 
+## 2026-10-08 mobile workspace — 0.2.2
+
+- All 53 API/MCP/update/workflow tests passed with temporary databases. TypeScript and the 0.2.2 production build passed; locked Rust metadata resolves TaskOrbit 0.2.2.
+- All 22 combined browser scenarios passed in desktop Chrome and iPhone WebKit emulation. The mobile regression covers widths of 320, 390 and 430 pixels: page overflow, full-width cards, touch-sized navigation, collapsible RTL filters, status selection, mobile list rows, Team forms, drawer focus and Escape restoration. Dark boards and the mobile user form passed WCAG axe checks.
+- Existing live-collaboration and recurring-task tests now use List to inspect tasks across statuses, since the mobile board intentionally shows only the selected column. Closed drawers are excluded from keyboard interaction. Desktop behavior remains covered by the browser suite.
+- Documentation captures include four desktop and two mobile views per locale, generated from fictional disposable workspaces. The updated preview at localhost:4322 also uses fictional data and a temporary database. No production data or deployed instance was modified.
+- Native/container publication is gated separately by release CI. Physical-device installation, Windows/macOS OS signing and macOS notarization retain the limitations in the release notes.
+
 ## 2026-10-08 team accounts, RTL selectors and glass themes — 0.2.1
 
 - All 53 API/MCP/update/workflow tests passed with temporary databases. Added coverage for workspace-admin account creation, member/viewer/outsider rejection, privileged token rejection, strict validation, case-normalized duplicate email rejection, ordinary instance privileges, successful login with the selected workspace role, and account rollback when membership insertion fails.

@@ -47,7 +47,7 @@ test("setup, project, sprint, work item, comment, language and persistence", asy
     .fill(testInfo.project.name === "chromium" ? "WEB" : "IOS");
   await dialog.getByRole("button", { name: "Save", exact: true }).click();
   await expect(dialog).not.toBeVisible();
-  if (mobile)
+  if (mobile && (await page.locator(".mobile-backdrop").isVisible()))
     await page.locator(".mobile-backdrop").click({
       position: { x: (page.viewportSize()?.width || 390) - 12, y: 12 },
     });
@@ -127,7 +127,7 @@ test("setup, project, sprint, work item, comment, language and persistence", asy
     await expect(page.locator("html")).toHaveAttribute("dir", direction);
     await expect(
       page
-        .locator(".main-nav")
+        .locator(mobile ? ".mobile-bottom-nav" : ".main-nav")
         .getByRole("button", { name: new RegExp(`^${taskLabel}`) }),
     ).toBeVisible();
   }

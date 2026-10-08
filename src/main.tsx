@@ -8,6 +8,7 @@ import "@fontsource/vazirmatn/700.css";
 import "./index.css";
 import "./components/workflow-tools.css";
 import "./components/glass.css";
+import "./components/mobile.css";
 if (
   "serviceWorker" in navigator &&
   import.meta.env.PROD &&

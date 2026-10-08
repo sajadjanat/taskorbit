@@ -46,3 +46,11 @@ The empty-project illustration is an AI-generated transparent Mercury sphere wit
 - Forms expose busy state and disable duplicate submission. Field hints and errors are associated with inputs; status/error messages use live-region semantics.
 - Keyboard focus remains visible. Theme transitions respect reduced motion. Controls retain contrast in both themes.
 - Connection updates are a compact disclosure below the form. Update availability remains visible, while detail and actions can expand without dominating the entry page.
+
+## Mobile layout — 0.2.2
+
+- Up to 760 px: fixed four-item bottom navigation, safe-area padding, 44 px navigation/action targets and an accessible project drawer.
+- Board: full-width selected column, horizontally scrollable status tabs with counts, roving keyboard focus and locale-aware arrows.
+- Controls: full-row search, compact view switch and bulk action, optional two-column filters with active count.
+- Lists: task and member rows become cards; task metadata retains labels and email addresses can wrap.
+- Forms: scrollable bottom sheets with 16 px inputs, single-column fields and touch-sized actions. Preserve contrast and glass theme tokens in both appearances.

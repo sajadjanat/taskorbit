@@ -202,7 +202,13 @@ try {
         .getByRole("heading", { name: data.attachments, exact: true })
         .waitFor();
       await capture("task-detail-light");
-      console.log(`Captured ${locale}: four actual localized UI previews`);
+      await page.keyboard.press("Escape");
+      await page.setViewportSize({ width: 390, height: 844 });
+      await page.getByRole("tabpanel").locator(".task-card").first().waitFor();
+      await capture("mobile-light");
+      await page.getByRole("button", { name: data.dark, exact: true }).click();
+      await capture("mobile-dark");
+      console.log(`Captured ${locale}: four desktop and two mobile UI previews`);
     } finally {
       await context?.close();
       await new Promise((r) => server.close(r));

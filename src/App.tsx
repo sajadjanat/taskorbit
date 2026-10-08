@@ -251,6 +251,14 @@ function AppContent({
       : matchMedia("(prefers-color-scheme: dark)").matches;
   });
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [compact, setCompact] = useState(
+    () => matchMedia("(max-width: 760px)").matches,
+  );
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [mobileStatus, setMobileStatus] = useState("todo");
+  const sidebarRef = useRef<HTMLElement>(null);
+  const sidebarCloseRef = useRef<HTMLButtonElement>(null);
+  const drawerOpenerRef = useRef<HTMLElement | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
   const [pendingTask, setPendingTask] = useState("");
   const [pendingResource, setPendingResource] = useState("");
@@ -354,6 +362,30 @@ function AppContent({
       workspace?.role === "admin" ||
       workspace?.role === "member";
   const writable = canWrite && !project?.archived;
+  useEffect(() => {
+    const query = matchMedia("(max-width: 760px)");
+    const update = () => {
+      setCompact(query.matches);
+      if (!query.matches) setMobile(false);
+    };
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
+  useEffect(() => {
+    if (filters.status) setMobileStatus(filters.status);
+  }, [filters.status]);
+  useEffect(() => {
+    if (!compact || !mobile) return;
+    const previous =
+      drawerOpenerRef.current || (document.activeElement as HTMLElement | null);
+    const overflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    sidebarCloseRef.current?.focus();
+    return () => {
+      document.body.style.overflow = overflow;
+      previous?.focus();
+    };
+  }, [compact, mobile]);
   useEffect(() => {
     document.documentElement.lang = locale;
     document.documentElement.dir = localeDirection(locale);
@@ -782,6 +814,7 @@ function AppContent({
     isNew = true,
   ) => {
     setError("");
+    setMobile(false);
     setEditor({ kind, data, isNew });
   };
   async function saveEditor(e: FormEvent) {
@@ -1351,15 +1384,56 @@ function AppContent({
 
   return (
     <div className="app-shell">
-      {mobile && (
+      {compact && mobile && (
         <button
           className="mobile-backdrop"
           aria-label={t("close")}
           onClick={() => setMobile(false)}
         />
       )}
-      <aside className={`sidebar ${mobile ? "is-open" : ""}`}>
-        <Logo />
+      <aside
+        ref={sidebarRef}
+        className={`sidebar ${mobile ? "is-open" : ""}`}
+        inert={compact && !mobile}
+        role={compact && mobile ? "dialog" : undefined}
+        aria-modal={compact && mobile ? true : undefined}
+        aria-label={t("projects")}
+        onKeyDown={(event) => {
+          if (!compact || !mobile || event.defaultPrevented) return;
+          if (event.key === "Escape") {
+            event.preventDefault();
+            setMobile(false);
+          }
+          if (event.key === "Tab") {
+            const items = Array.from(
+              sidebarRef.current?.querySelectorAll<HTMLElement>(
+                'button:not(:disabled), a[href], input, [tabindex="0"]',
+              ) || [],
+            ).filter((el) => el.getClientRects().length);
+            const target = event.shiftKey ? items.at(-1) : items[0];
+            if (
+              (event.shiftKey && document.activeElement === items[0]) ||
+              (!event.shiftKey && document.activeElement === items.at(-1))
+            ) {
+              event.preventDefault();
+              target?.focus();
+            }
+          }
+        }}
+      >
+        <div className="sidebar-brand">
+          <Logo />
+          <Button
+            ref={sidebarCloseRef}
+            className="sidebar-close"
+            variant="ghost"
+            size="icon"
+            aria-label={t("close")}
+            onClick={() => setMobile(false)}
+          >
+            <X size={20} />
+          </Button>
+        </div>
         <div className="workspace-switch">
           <Picker
             value={wid}
@@ -1471,6 +1545,18 @@ function AppContent({
           </>
         )}
         <div className="sidebar-bottom">
+          <Button
+            className="sidebar-refresh"
+            variant="ghost"
+            disabled={busy}
+            onClick={() => {
+              setMobile(false);
+              void refresh();
+            }}
+          >
+            <RefreshCw size={16} />
+            {t("refresh")}
+          </Button>
           <nav className="main-nav">
             {(
               [
@@ -1513,14 +1599,18 @@ function AppContent({
           </div>
         </div>
       </aside>
-      <main className="main">
+      <main className="main" inert={compact && mobile}>
         <header className="topbar">
           <Button
             className="mobile-toggle"
             variant="ghost"
             size="icon"
             aria-label={t("projects")}
-            onClick={() => setMobile(!mobile)}
+            aria-expanded={mobile}
+            onClick={(event) => {
+              drawerOpenerRef.current = event.currentTarget;
+              setMobile(!mobile);
+            }}
           >
             <Menu size={18} />
           </Button>
@@ -1550,6 +1640,7 @@ function AppContent({
             {languageControl}
             {themeControl}
             <Button
+              className="desktop-refresh"
               variant="ghost"
               size="icon"
               disabled={busy}
@@ -1563,7 +1654,7 @@ function AppContent({
         <div className="content">
           <WebUpdateNotice locale={locale} />
           {errorBanner}
-          <div className="page-header">
+          <div className={`page-header section-${section}`}>
             <div>
               <h1>
                 {t(section)}
@@ -1930,7 +2021,35 @@ function AppContent({
                       ))}
                     </div>
                   </div>
-                  <div className="filter-bar">
+                  <div className="mobile-filter-toggle">
+                    <Button
+                      variant={filtersOpen ? "secondary" : "outline"}
+                      aria-expanded={filtersOpen}
+                      aria-controls="task-filters"
+                      onClick={() => setFiltersOpen(!filtersOpen)}
+                    >
+                      <Filter size={16} />
+                      {t("filters")}
+                      {Object.entries(filters).filter(
+                        ([key, value]) => key !== "q" && value,
+                      ).length > 0 && (
+                        <Badge variant="secondary">
+                          {
+                            Object.entries(filters).filter(
+                              ([key, value]) => key !== "q" && value,
+                            ).length
+                          }
+                        </Badge>
+                      )}
+                    </Button>
+                    <span>
+                      {filtered.length} {t("tasks")}
+                    </span>
+                  </div>
+                  <div
+                    id="task-filters"
+                    className={`filter-bar ${filtersOpen ? "is-expanded" : ""}`}
+                  >
                     <Filter size={15} />
                     <Picker
                       value={filters.status}
@@ -1992,61 +2111,118 @@ function AppContent({
                       ) : undefined,
                     )
                   ) : mode === "board" ? (
-                    <div className="board">
-                      {statuses.map((s) => (
-                        <section
-                          key={s}
-                          className="board-column"
-                          onDragOver={(e) => {
-                            if (writable) e.preventDefault();
-                          }}
-                          onDrop={(e) => {
-                            e.preventDefault();
-                            const item = tasks.find(
-                              (x) =>
-                                x.id ===
-                                e.dataTransfer.getData("text/taskorbit"),
-                            );
-                            if (item) moveTask(item, s);
-                          }}
-                        >
-                          <div className="column-header">
-                            <span className={`row-dot dot-${s}`} />
-                            <h2>{t(s)}</h2>
+                    <>
+                      <div
+                        className="mobile-status-tabs"
+                        role="tablist"
+                        aria-label={t("status")}
+                      >
+                        {statuses.map((status, index) => (
+                          <button
+                            key={status}
+                            id={`board-tab-${status}`}
+                            role="tab"
+                            aria-selected={mobileStatus === status}
+                            aria-controls={`board-column-${status}`}
+                            tabIndex={mobileStatus === status ? 0 : -1}
+                            onClick={() => setMobileStatus(status)}
+                            onKeyDown={(event) => {
+                              let next: number | undefined;
+                              const rtl = localeDirection(locale) === "rtl";
+                              if (event.key === "Home") next = 0;
+                              if (event.key === "End")
+                                next = statuses.length - 1;
+                              if (event.key === "ArrowRight")
+                                next =
+                                  (index + (rtl ? -1 : 1) + statuses.length) %
+                                  statuses.length;
+                              if (event.key === "ArrowLeft")
+                                next =
+                                  (index + (rtl ? 1 : -1) + statuses.length) %
+                                  statuses.length;
+                              if (next !== undefined) {
+                                event.preventDefault();
+                                setMobileStatus(statuses[next]);
+                                document
+                                  .getElementById(`board-tab-${statuses[next]}`)
+                                  ?.focus();
+                              }
+                            }}
+                          >
+                            <span className={`row-dot dot-${status}`} />
+                            {t(status)}
                             <span>
-                              {filtered.filter((x) => x.status === s).length}
+                              {
+                                filtered.filter(
+                                  (task) => task.status === status,
+                                ).length
+                              }
                             </span>
-                            {writable && (
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                aria-label={t("newTask") + " " + t(s)}
-                                onClick={() => newTask({ status: s })}
-                              >
-                                <Plus size={15} />
-                              </Button>
-                            )}
-                          </div>
-                          <div className="column-items">
-                            {filtered
-                              .filter((x) => x.status === s)
-                              .map(taskCard)}
-                            {writable && (
-                              <Button
-                                variant="ghost"
-                                className="add-card"
-                                onClick={() => newTask({ status: s })}
-                              >
-                                <Plus size={15} />
-                                {t("newTask")}
-                              </Button>
-                            )}
-                          </div>
-                        </section>
-                      ))}
-                    </div>
+                          </button>
+                        ))}
+                      </div>
+                      <div className="board">
+                        {statuses.map((s) => (
+                          <section
+                            key={s}
+                            id={`board-column-${s}`}
+                            className={`board-column ${mobileStatus === s ? "mobile-current" : ""}`}
+                            role={compact ? "tabpanel" : undefined}
+                            aria-labelledby={
+                              compact ? `board-tab-${s}` : undefined
+                            }
+                            tabIndex={compact ? 0 : undefined}
+                            onDragOver={(e) => {
+                              if (writable) e.preventDefault();
+                            }}
+                            onDrop={(e) => {
+                              e.preventDefault();
+                              const item = tasks.find(
+                                (x) =>
+                                  x.id ===
+                                  e.dataTransfer.getData("text/taskorbit"),
+                              );
+                              if (item) moveTask(item, s);
+                            }}
+                          >
+                            <div className="column-header">
+                              <span className={`row-dot dot-${s}`} />
+                              <h2>{t(s)}</h2>
+                              <span>
+                                {filtered.filter((x) => x.status === s).length}
+                              </span>
+                              {writable && (
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  aria-label={t("newTask") + " " + t(s)}
+                                  onClick={() => newTask({ status: s })}
+                                >
+                                  <Plus size={15} />
+                                </Button>
+                              )}
+                            </div>
+                            <div className="column-items">
+                              {filtered
+                                .filter((x) => x.status === s)
+                                .map(taskCard)}
+                              {writable && (
+                                <Button
+                                  variant="ghost"
+                                  className="add-card"
+                                  onClick={() => newTask({ status: s })}
+                                >
+                                  <Plus size={15} />
+                                  {t("newTask")}
+                                </Button>
+                              )}
+                            </div>
+                          </section>
+                        ))}
+                      </div>
+                    </>
                   ) : mode === "list" ? (
-                    <div className="table-wrap">
+                    <div className="table-wrap task-table">
                       <table>
                         <thead>
                           <tr>
@@ -2062,7 +2238,7 @@ function AppContent({
                           {filtered.map((task) => (
                             <tr key={task.id}>
                               <td>{issueTag(task)}</td>
-                              <td>
+                              <td className="task-title-cell">
                                 <button
                                   className="title-link"
                                   onClick={() => setDetail(task)}
@@ -2070,19 +2246,23 @@ function AppContent({
                                   {task.title}
                                 </button>
                               </td>
-                              <td>{statusBadge(task.status)}</td>
-                              <td>
+                              <td data-label={t("status")}>
+                                {statusBadge(task.status)}
+                              </td>
+                              <td data-label={t("priority")}>
                                 <span
                                   className={`priority priority-${task.priority}`}
                                 >
                                   {t(task.priority)}
                                 </span>
                               </td>
-                              <td>
+                              <td data-label={t("assignee_id")}>
                                 {members.find((m) => m.id === task.assignee_id)
                                   ?.name || "–"}
                               </td>
-                              <td>{formatDate(task.due_date)}</td>
+                              <td data-label={t("due_date")}>
+                                {formatDate(task.due_date)}
+                              </td>
                             </tr>
                           ))}
                         </tbody>
@@ -2328,7 +2508,7 @@ function AppContent({
               {section === "members" && (
                 <>
                   <p className="muted mb-5">{t("teamAccountsHint")}</p>
-                  <div className="table-wrap">
+                  <div className="table-wrap members-table">
                     <table>
                       <thead>
                         <tr>
@@ -2349,7 +2529,9 @@ function AppContent({
                                 {m.name}
                               </span>
                             </td>
-                            <td dir="ltr">{m.email}</td>
+                            <td className="member-email">
+                              <span dir="ltr">{m.email}</span>
+                            </td>
                             <td>
                               {t(
                                 m.role === "admin"
@@ -2555,6 +2737,42 @@ function AppContent({
           </a>
         </footer>
       </main>
+      <nav
+        className="mobile-bottom-nav"
+        aria-label={t("mobileNavigation")}
+        inert={compact && mobile}
+      >
+        {(
+          [
+            ["overview", LayoutDashboard],
+            ["tasks", CheckCheck],
+            ["members", Users],
+          ] as const
+        ).map(([target, Icon]) => (
+          <button
+            key={target}
+            aria-current={section === target ? "page" : undefined}
+            onClick={() => {
+              setSection(target);
+              setMobile(false);
+            }}
+          >
+            <Icon size={20} />
+            <span>{t(target)}</span>
+          </button>
+        ))}
+        <button
+          aria-label={t("moreNavigation")}
+          aria-expanded={mobile}
+          onClick={(event) => {
+            drawerOpenerRef.current = event.currentTarget;
+            setMobile(true);
+          }}
+        >
+          <Menu size={20} />
+          <span>{t("moreNavigation")}</span>
+        </button>
+      </nav>
       <GlobalSearch
         open={searchOpen}
         setOpen={setSearchOpen}

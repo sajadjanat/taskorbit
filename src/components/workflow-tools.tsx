@@ -433,6 +433,9 @@ export function BulkActions({
         variant="outline"
         size="sm"
         disabled={!tasks.length}
+        className="bulk-trigger"
+        aria-label={t("bulkActions")}
+        title={t("bulkActions")}
         onClick={() => {
           setCandidates(tasks.slice(0, 100));
           setSelected(new Set());
@@ -441,7 +444,7 @@ export function BulkActions({
         }}
       >
         <ListChecks size={16} />
-        {t("bulkActions")}
+        <span>{t("bulkActions")}</span>
       </Button>
       <Dialog
         open={open}

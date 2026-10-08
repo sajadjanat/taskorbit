@@ -115,6 +115,8 @@ test("team account creation, Persian filter direction and glass themes", async (
     .click();
   await page.getByRole("menuitem", { name: "فارسی", exact: true }).click();
   await nav(page, /کارها/);
+  if ((page.viewportSize()?.width || 1280) <= 760)
+    await page.getByRole("button", { name: "فیلترها", exact: true }).click();
   const status = page.locator(".filter-bar").getByRole("combobox").first();
   await expect(status).toHaveAttribute("dir", "rtl");
   await expect(status).toHaveCSS("text-align", "start");
@@ -227,6 +229,7 @@ test("global keyboard search opens a task; recurring completion and bulk editing
       position: { x: (page.viewportSize()?.width || 390) - 12, y: 12 },
     });
   await nav(page, /Work items/);
+  await page.getByRole("button", { name: "List", exact: true }).click();
   await expect(
     page.getByRole("button", { name: new RegExp(taskTitle) }),
   ).toHaveCount(2);

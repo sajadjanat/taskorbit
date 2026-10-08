@@ -1,6 +1,6 @@
 {
   "name": "@taskorbit/mcp",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "type": "module",
   "description": "Connect MCP agents to your self-hosted TaskOrbit server",
   "license": "MIT",

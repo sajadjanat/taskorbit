@@ -43,6 +43,7 @@ export const samples = {
     overview: "Overview",
     tasks: "Work items",
     light: "Light",
+    dark: "Dark",
     attachments: "Attachments",
   },
   fa: {
@@ -87,6 +88,7 @@ export const samples = {
     overview: "نمای کلی",
     tasks: "کارها",
     light: "روشن",
+    dark: "تیره",
     attachments: "پیوست‌ها",
   },
   ar: {
@@ -131,6 +133,7 @@ export const samples = {
     overview: "نظرة عامة",
     tasks: "المهام",
     light: "فاتح",
+    dark: "داكن",
     attachments: "المرفقات",
   },
   "zh-CN": {
@@ -175,6 +178,7 @@ export const samples = {
     overview: "概览",
     tasks: "任务",
     light: "浅色",
+    dark: "深色",
     attachments: "附件",
   },
 };
