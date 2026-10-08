@@ -96,7 +96,16 @@ test("setup, project, sprint, work item, comment, language and persistence", asy
   await expect(dialog.getByRole("link", { name: /brief.txt/ })).toBeVisible();
   await page.keyboard.press("Escape");
   await page.reload();
-  await nav(/Work items/);
+  // Both browser projects share the fixture database; equal creation timestamps
+  // can make either project the default after reload. Select this fixture by name.
+  if (mobile) await page.locator(".mobile-toggle").click();
+  await page
+    .locator(".project-nav")
+    .getByRole("button", {
+      name: "Launch " + testInfo.project.name,
+      exact: true,
+    })
+    .click();
   await expect(
     page.getByRole("button", { name: /Design the onboarding flow/ }),
   ).toBeVisible();
