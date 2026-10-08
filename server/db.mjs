@@ -24,7 +24,31 @@ export function openDatabase(file) {
     CREATE INDEX IF NOT EXISTS session_expiry ON sessions(expires);
     CREATE UNIQUE INDEX IF NOT EXISTS one_active_sprint ON sprints(project_id) WHERE status='active';
     CREATE INDEX IF NOT EXISTS api_token_user ON api_tokens(user_id);
-    PRAGMA user_version=2;`);
+    CREATE TABLE IF NOT EXISTS password_resets(token_hash TEXT PRIMARY KEY,user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,expires INTEGER NOT NULL);
+    CREATE TABLE IF NOT EXISTS notifications(id TEXT PRIMARY KEY,user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,task_id TEXT REFERENCES tasks(id) ON DELETE CASCADE,kind TEXT NOT NULL,actor_id TEXT REFERENCES users(id),read INTEGER NOT NULL DEFAULT 0,dedupe_key TEXT UNIQUE,created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
+    CREATE INDEX IF NOT EXISTS notification_user ON notifications(user_id,read,created_at);
+    CREATE TABLE IF NOT EXISTS sprint_history(sprint_id TEXT NOT NULL REFERENCES sprints(id) ON DELETE CASCADE,day TEXT NOT NULL,scope_points INTEGER NOT NULL,remaining_points INTEGER NOT NULL,completed_items INTEGER NOT NULL,PRIMARY KEY(sprint_id,day));`);
+  // Additive, idempotent migrations retain all existing work and user accounts.
+  for (const [table, column, definition] of [
+    ["tasks", "recurrence", "TEXT NOT NULL DEFAULT 'none'"],
+    [
+      "tasks",
+      "recurrence_source_id",
+      "TEXT REFERENCES tasks(id) ON DELETE SET NULL",
+    ],
+    ["sprints", "capacity", "INTEGER NOT NULL DEFAULT 0"],
+  ]) {
+    if (
+      !db
+        .prepare(`PRAGMA table_info(${table})`)
+        .all()
+        .some((c) => c.name === column)
+    )
+      db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
+  }
+  db.exec(
+    "CREATE UNIQUE INDEX IF NOT EXISTS task_recurrence_source ON tasks(recurrence_source_id) WHERE recurrence_source_id IS NOT NULL; PRAGMA user_version=3;",
+  );
   return db;
 }
 export function transaction(db, fn) {

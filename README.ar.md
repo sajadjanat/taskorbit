@@ -11,7 +11,7 @@
   <p>إدارة مشاريع خفيفة وذاتية الاستضافة باستخدام React وshadcn/ui وTauri.</p>
   <p>
     <a href="https://github.com/sajadjanat/taskorbit/actions/workflows/verify.yml"><img src="https://github.com/sajadjanat/taskorbit/actions/workflows/verify.yml/badge.svg" alt="Web and server checks" /></a>
-    <a href="https://github.com/sajadjanat/taskorbit/releases"><img src="https://img.shields.io/badge/version-0.1.10-b88645" alt="Version 0.1.10" /></a>
+    <a href="https://github.com/sajadjanat/taskorbit/releases"><img src="https://img.shields.io/badge/version-0.2.0-b88645" alt="Version 0.2.0" /></a>
     <img src="https://img.shields.io/badge/Tauri-2-24c8db?logo=tauri&amp;logoColor=white" alt="Tauri 2" />
     <img src="https://img.shields.io/badge/UI-shadcn%2Fui-18181b?logo=shadcnui&amp;logoColor=white" alt="shadcn/ui" />
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-b88645" alt="MIT license" /></a>
@@ -58,6 +58,9 @@ _صور فعلية للتطبيق ببيانات تجريبية وحسابات �
 | **العملاء الأصليون**      | عملاء Tauri لأنظمة Windows وmacOS وLinux وAndroid مع عنوان خادم ذاتي الاستضافة قابل للتحديد.                                     |
 | **خادم خفيف**             | حاوية خادم واحدة ووحدة تخزين SQLite دائمة، دون Redis أو طابور رسائل أو خدمة قاعدة بيانات منفصلة.                                 |
 | **تحديث التطبيق والخادم** | تحديث سطح مكتب موقّع، فحص APK، إعادة تحميل الويب/PWA، وترقية خادم اختيارية بنقرة واحدة مع نسخ احتياطي واستعادة.                  |
+| **سير عمل الفريق**        | بحث شامل Ctrl/⌘ K، إشعارات التكليف والنقاش والمواعيد، مهام متكررة، تعديل جماعي، قوالب وتقارير سعة الدورات.                       |
+| **نقل المشروع**           | تصدير واستيراد JSON واستيراد CSV مع معاينة والتحقق من المراجع وحفظ ذري. [الدليل](docs/WORKFLOWS.md).                             |
+| **استعادة كلمة المرور**   | روابط بريدية عبر SMTP اختياري ومساعدة من المسؤول عند عدم ضبط البريد. [الإعداد](docs/PASSWORD-RECOVERY.md).                       |
 
 الواجهة وREADME متاحان بالعربية والإنجليزية والفارسية والصينية المبسطة. تعرض كل نسخة صوراً فعلية بلغتها.
 
@@ -76,13 +79,13 @@ _صور فعلية للتطبيق ببيانات تجريبية وحسابات �
 
 ## التنزيل
 
-[**TaskOrbit 0.1.10 → GitHub Releases**](https://github.com/sajadjanat/taskorbit/releases/tag/v0.1.10)
+[**TaskOrbit 0.2.0 → GitHub Releases**](https://github.com/sajadjanat/taskorbit/releases/tag/v0.2.0)
 
 | المنصة              | الحزمة أو الوصول                      | طريقة التحديث                       |
 | ------------------- | ------------------------------------- | ----------------------------------- |
-| Windows x64         | TaskOrbit_0.1.10_x64-setup.exe        | تحديث موقّع داخل التطبيق            |
-| macOS Apple Silicon | TaskOrbit_0.1.10_aarch64.dmg          | تحديث موقّع داخل التطبيق            |
-| macOS Intel         | TaskOrbit_0.1.10_x64.dmg              | تحديث موقّع داخل التطبيق            |
+| Windows x64         | TaskOrbit_0.2.0_x64-setup.exe         | تحديث موقّع داخل التطبيق            |
+| macOS Apple Silicon | TaskOrbit_0.2.0_aarch64.dmg           | تحديث موقّع داخل التطبيق            |
+| macOS Intel         | TaskOrbit_0.2.0_x64.dmg               | تحديث موقّع داخل التطبيق            |
 | Linux x64           | DEB / AppImage                        | تحديث موقّع داخل التطبيق            |
 | Android arm64       | taskorbit-android-arm64.apk           | APK موقّع؛ التثبيت بموافقة المستخدم |
 | Web / iPhone / iPad | المتصفح / الإضافة إلى الشاشة الرئيسية | إعادة التحميل بعد تحديث الخادم      |
@@ -114,7 +117,7 @@ docker compose up -d --build
 docker compose -f compose.image.yaml up -d
 ```
 
-الصورة `ghcr.io/sajadjanat/taskorbit:v0.1.10` متاحة لـ Linux amd64 وarm64. تحفظ الحسابات والمرفقات وSQLite في `taskorbit-data`. الأمر `docker compose down -v` يحذف وحدة التخزين والبيانات.
+الصورة `ghcr.io/sajadjanat/taskorbit:v0.2.0` متاحة لـ Linux amd64 وarm64. تحفظ الحسابات والمرفقات وSQLite في `taskorbit-data`. الأمر `docker compose down -v` يحذف وحدة التخزين والبيانات.
 
 ## خادم عام مع HTTPS: حاويتان
 
@@ -134,7 +137,7 @@ docker compose -f compose.yaml -f compose.https.yaml up -d --build
 
 ## التحديثات
 
-يمكن للمشرف العام التحقق من الإصدارات في لوحة الإدارة. لتفعيل تحديث الخادم بنقرة واحدة مع نسخة احتياطية واستعادة تلقائية عند الفشل، اسحب الصور ثم شغّل `docker compose -f compose.image.yaml -f compose.updates.yaml up -d`. تضاف حاوية تحديث: حاويتان إجمالاً أو ثلاث مع Caddy. يتضمن سطح المكتب منذ 0.1.3 تحديثات موقعة عبر شاشة الاتصال وقائمة **Connection → Server connection and updates…**. يتيح Android تنزيل APK الموقّع ويتطلب موافقة المستخدم للتثبيت. يقدم الويب وPWA على iPhone إعادة التحميل بعد تحديث الخادم. الإصدارات الأقدم تحتاج تثبيت 0.1.10 يدويًا مرة واحدة. راجع [دليل التحديث](docs/UPDATES.md).
+يمكن للمشرف العام التحقق من الإصدارات في لوحة الإدارة. لتفعيل تحديث الخادم بنقرة واحدة مع نسخة احتياطية واستعادة تلقائية عند الفشل، اسحب الصور ثم شغّل `docker compose -f compose.image.yaml -f compose.updates.yaml up -d`. تضاف حاوية تحديث: حاويتان إجمالاً أو ثلاث مع Caddy. يتضمن سطح المكتب منذ 0.1.3 تحديثات موقعة عبر شاشة الاتصال وقائمة **Connection → Server connection and updates…**. يتيح Android تنزيل APK الموقّع ويتطلب موافقة المستخدم للتثبيت. يقدم الويب وPWA على iPhone إعادة التحميل بعد تحديث الخادم. الإصدارات الأقدم تحتاج تثبيت 0.2.0 يدويًا مرة واحدة. راجع [دليل التحديث](docs/UPDATES.md).
 
 ## التثبيت على الأجهزة
 
@@ -181,7 +184,7 @@ npm run test:e2e
 
 ## الإصدار والنطاق
 
-يشغّل الوسم `v0.1.10` الاختبارات وبناء الحزم الأصلية والصورة متعددة المعماريات ومسودة إصدار. ينشر الإصدار بعد نجاح جميع المنصات. راجع [ملاحظات الإصدار](docs/RELEASE-NOTES.md) و[نتائج التحقق](docs/VERIFICATION.md) و[خارطة الطريق](docs/ROADMAP.md).
+يشغّل الوسم `v0.2.0` الاختبارات وبناء الحزم الأصلية والصورة متعددة المعماريات ومسودة إصدار. ينشر الإصدار بعد نجاح جميع المنصات. راجع [ملاحظات الإصدار](docs/RELEASE-NOTES.md) و[نتائج التحقق](docs/VERIFICATION.md) و[خارطة الطريق](docs/ROADMAP.md).
 
 التقنيات: React وTypeScript وVite وTailwind ومكونات shadcn/ui الفعلية وExpress وSQLite المدمجة في Node وTauri 2. الخط Vazirmatn بترخيص OFL. تعتمد الهوية على عطارد وإضاءة شمسية دافئة وألوان حجرية/فحمية وذهبية؛ [تفاصيل الهوية](assets/brand/WORDMARK.md).
 

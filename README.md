@@ -11,7 +11,7 @@
   <p>Lightweight self-hosted project management, built with React, shadcn/ui and Tauri.</p>
   <p>
     <a href="https://github.com/sajadjanat/taskorbit/actions/workflows/verify.yml"><img src="https://github.com/sajadjanat/taskorbit/actions/workflows/verify.yml/badge.svg" alt="Web and server checks" /></a>
-    <a href="https://github.com/sajadjanat/taskorbit/releases"><img src="https://img.shields.io/badge/version-0.1.10-b88645" alt="Version 0.1.10" /></a>
+    <a href="https://github.com/sajadjanat/taskorbit/releases"><img src="https://img.shields.io/badge/version-0.2.0-b88645" alt="Version 0.2.0" /></a>
     <img src="https://img.shields.io/badge/Tauri-2-24c8db?logo=tauri&amp;logoColor=white" alt="Tauri 2" />
     <img src="https://img.shields.io/badge/UI-shadcn%2Fui-18181b?logo=shadcnui&amp;logoColor=white" alt="shadcn/ui" />
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-b88645" alt="MIT license" /></a>
@@ -43,21 +43,24 @@ For **TaskOrbit**, we chose Mercury: the smallest planet in our solar system, wi
 
 ## Features
 
-| Features                   | What it does                                                                                                                         |
-| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| **Projects & workspaces**  | Multiple workspaces and projects, project identifiers, colors and archiving.                                                         |
-| **Sprints**                | Sprints with goals, dates, planned/active/completed states and progress.                                                             |
-| **Work views**             | Kanban with drag-and-drop, searchable list and due-date timeline.                                                                    |
-| **Task details**           | Task descriptions, priorities, assignees, sprint/module assignment, estimates, due dates and labels.                                 |
-| **Task relationships**     | Subtasks, related items and blocking dependencies with cycle prevention.                                                             |
-| **Collaboration**          | Live updates across connected clients, comments, activity history and attachments up to 10 MB each (20 per task).                    |
-| **Project knowledge**      | Modules, plain-text project documents and shared saved filters.                                                                      |
-| **Team administration**    | Instance administrator, user creation/deactivation/password reset, workspace administrator/member/viewer roles.                      |
-| **Language & appearance**  | English, Persian, Arabic and Simplified Chinese, RTL and LTR, local fonts and light/dark appearance.                                 |
-| **Web & iPhone PWA**       | Web app and iPhone/iPad PWA with an offline connection screen. Editing requires connectivity.                                        |
-| **Native clients**         | Tauri clients for Windows, macOS, Linux and Android, with a user-supplied self-hosted server URL.                                    |
-| **Small server footprint** | One server container and a persistent SQLite volume. No Redis, message queue or separate database service.                           |
-| **App & server updates**   | Signed desktop updates, Android APK checks, web/PWA reload notices, and optional one-click server upgrades with backup and rollback. |
+| Features                   | What it does                                                                                                                                                  |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Projects & workspaces**  | Multiple workspaces and projects, project identifiers, colors and archiving.                                                                                  |
+| **Sprints**                | Sprints with goals, dates, planned/active/completed states and progress.                                                                                      |
+| **Work views**             | Kanban with drag-and-drop, searchable list and due-date timeline.                                                                                             |
+| **Task details**           | Task descriptions, priorities, assignees, sprint/module assignment, estimates, due dates and labels.                                                          |
+| **Task relationships**     | Subtasks, related items and blocking dependencies with cycle prevention.                                                                                      |
+| **Collaboration**          | Live updates across connected clients, comments, activity history and attachments up to 10 MB each (20 per task).                                             |
+| **Project knowledge**      | Modules, plain-text project documents and shared saved filters.                                                                                               |
+| **Team administration**    | Instance administrator, user creation/deactivation/password reset, workspace administrator/member/viewer roles.                                               |
+| **Language & appearance**  | English, Persian, Arabic and Simplified Chinese, RTL and LTR, local fonts and light/dark appearance.                                                          |
+| **Web & iPhone PWA**       | Web app and iPhone/iPad PWA with an offline connection screen. Editing requires connectivity.                                                                 |
+| **Native clients**         | Tauri clients for Windows, macOS, Linux and Android, with a user-supplied self-hosted server URL.                                                             |
+| **Small server footprint** | One server container and a persistent SQLite volume. No Redis, message queue or separate database service.                                                    |
+| **App & server updates**   | Signed desktop updates, Android APK checks, web/PWA reload notices, and optional one-click server upgrades with backup and rollback.                          |
+| **Team workflows**         | Global search (Ctrl/⌘ K), assignment/comment/deadline inbox, recurring tasks, bulk editing, localized project templates and sprint capacity/workload reports. |
+| **Project transfer**       | JSON project export/import and CSV task import with preview, reference validation and atomic rollback. [Workflow guide](docs/WORKFLOWS.md).                   |
+| **Password recovery**      | Optional SMTP email reset links; clear administrator assistance when email is not configured. [Setup](docs/PASSWORD-RECOVERY.md).                             |
 
 The interface and README are available in English, Persian, Arabic and Simplified Chinese. Each README shows actual previews in its own language.
 
@@ -76,16 +79,16 @@ The interface and README are available in English, Persian, Arabic and Simplifie
 
 ## Download
 
-[**TaskOrbit 0.1.10 → GitHub Releases**](https://github.com/sajadjanat/taskorbit/releases/tag/v0.1.10)
+[**TaskOrbit 0.2.0 → GitHub Releases**](https://github.com/sajadjanat/taskorbit/releases/tag/v0.2.0)
 
-| Platform            | Package / access               | Update method                          |
-| ------------------- | ------------------------------ | -------------------------------------- |
-| Windows x64         | TaskOrbit_0.1.10_x64-setup.exe | Signed in-app updater                  |
-| macOS Apple Silicon | TaskOrbit_0.1.10_aarch64.dmg   | Signed in-app updater                  |
-| macOS Intel         | TaskOrbit_0.1.10_x64.dmg       | Signed in-app updater                  |
-| Linux x64           | DEB / AppImage                 | Signed in-app updater                  |
-| Android arm64       | taskorbit-android-arm64.apk    | Signed APK; user-approved installation |
-| Web / iPhone / iPad | Browser / Add to Home Screen   | Reload after server upgrade            |
+| Platform            | Package / access              | Update method                          |
+| ------------------- | ----------------------------- | -------------------------------------- |
+| Windows x64         | TaskOrbit_0.2.0_x64-setup.exe | Signed in-app updater                  |
+| macOS Apple Silicon | TaskOrbit_0.2.0_aarch64.dmg   | Signed in-app updater                  |
+| macOS Intel         | TaskOrbit_0.2.0_x64.dmg       | Signed in-app updater                  |
+| Linux x64           | DEB / AppImage                | Signed in-app updater                  |
+| Android arm64       | taskorbit-android-arm64.apk   | Signed APK; user-approved installation |
+| Web / iPhone / iPad | Browser / Add to Home Screen  | Reload after server upgrade            |
 
 <a id="quick-start"></a>
 
@@ -114,7 +117,7 @@ To use the published multi-architecture image instead of building from source:
 docker compose -f compose.image.yaml up -d
 ```
 
-The public image is `ghcr.io/sajadjanat/taskorbit:v0.1.10` for Linux amd64 and arm64. For HTTPS with this image, combine `compose.image.yaml` with `compose.https.yaml` and set the same `TASKORBIT_DOMAIN` described below.
+The public image is `ghcr.io/sajadjanat/taskorbit:v0.2.0` for Linux amd64 and arm64. For HTTPS with this image, combine `compose.image.yaml` with `compose.https.yaml` and set the same `TASKORBIT_DOMAIN` described below.
 
 SQLite, attachments and account data persist in `taskorbit-data`. Do not use `docker compose down -v` unless you intend to delete them.
 
@@ -183,7 +186,7 @@ The Compose resource settings cap the application at 512 MB and one CPU; these a
 
 ## Release and scope
 
-Tag `v0.1.10` triggers verification, native packaging, a multi-architecture server image and a draft release. Publication occurs only after all platform jobs succeed. See [release notes](docs/RELEASE-NOTES.md) and [roadmap](docs/ROADMAP.md) for implemented and remaining features.
+Tag `v0.2.0` triggers verification, native packaging, a multi-architecture server image and a draft release. Publication occurs only after all platform jobs succeed. See [release notes](docs/RELEASE-NOTES.md) and [roadmap](docs/ROADMAP.md) for implemented and remaining features.
 
 Stack: React, TypeScript, Vite, Tailwind, genuine shadcn/ui source components, Express, Node's SQLite API and Tauri 2. Font: Vazirmatn (OFL). The Mercury wordmark and app icon use warm solar lighting, with stone/charcoal surfaces and gold accents throughout both UI themes. Brand artwork was generated from the owner's GitOrbit reference; see [brand details](assets/brand/WORDMARK.md).
 

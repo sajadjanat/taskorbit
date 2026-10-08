@@ -35,6 +35,7 @@ const taskFields = {
   labels: z.array(z.string().min(1).max(40)).max(20).optional(),
   due_date: date.nullable().optional(),
   estimate: z.number().int().min(0).max(1000).optional(),
+  recurrence: z.enum(["none", "daily", "weekly", "monthly"]).optional(),
 };
 const projectFields = {
   name,
@@ -45,6 +46,8 @@ const projectFields = {
     .regex(/^#[A-Fa-f0-9]{6}$/)
     .optional(),
   archived: z.boolean().optional(),
+  template: z.enum(["blank", "software", "campaign", "operations"]).optional(),
+  locale: z.enum(["en", "fa", "ar", "zh-CN"]).optional(),
 };
 const sprintFields = {
   name,
@@ -52,6 +55,7 @@ const sprintFields = {
   start_date: date,
   end_date: date,
   status: z.enum(["planned", "active", "completed"]).optional(),
+  capacity: z.number().int().min(0).max(100000).optional(),
 };
 const filterFields = {
   q: z.string().max(200).optional(),

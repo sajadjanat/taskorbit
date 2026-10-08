@@ -211,7 +211,9 @@ test("SDK writes use normal task version conflicts, comments, sprint/module/page
       name: "Sprint",
       start_date: "2026-10-06",
       end_date: "2026-10-20",
+      capacity: 12,
     });
+    assert.equal(sprint.capacity, 12);
     const module = await call(c, "create_module", {
       project_id: p.id,
       name: "Module",
@@ -221,7 +223,10 @@ test("SDK writes use normal task version conflicts, comments, sprint/module/page
       title: "Agent work",
       sprint_id: sprint.id,
       module_id: module.id,
+      due_date: "2026-10-15",
+      recurrence: "weekly",
     });
+    assert.equal(t.recurrence, "weekly");
     const updated = await call(c, "update_task", {
       task_id: t.id,
       version: t.version,

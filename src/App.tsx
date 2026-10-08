@@ -10,6 +10,17 @@ import { isTauri, invoke } from "@tauri-apps/api/core";
 import { version as appVersion } from "../package.json";
 import { Updates, WebUpdateNotice } from "./components/updates";
 import { EntryShell } from "./components/entry-shell";
+import { PasswordRecovery } from "./components/password-recovery";
+import {
+  GlobalSearch,
+  Inbox,
+  BulkActions,
+  SprintReportButton,
+  ProjectTransfer,
+  RecurrenceBadge,
+  type SearchResult,
+} from "./components/workflow-tools";
+import { workflowMessages } from "./lib/workflow-i18n";
 import { McpIntegrations } from "./components/mcp-integrations";
 import { useRealtime, type LiveChange } from "./lib/realtime";
 import {
@@ -163,6 +174,7 @@ const blankTask = {
   labels: [],
   due_date: null,
   estimate: 0,
+  recurrence: "none",
 };
 function Picker({
   value,
@@ -221,8 +233,20 @@ export default function App() {
     () => localStorage.getItem("taskorbit.theme") === "dark",
   );
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [pendingTask, setPendingTask] = useState("");
+  const [pendingResource, setPendingResource] = useState("");
+  const [resetToken] = useState(
+    () => new URLSearchParams(location.search).get("reset") || "",
+  );
+  const [recovery, setRecovery] = useState(() =>
+    resetToken ? "reset" : "none",
+  );
   const t = useCallback(
-    (key: string) => messages[locale][key as MessageKey] || key,
+    (key: string): string =>
+      messages[locale][key as MessageKey] ||
+      workflowMessages[locale][key] ||
+      key,
     [locale],
   );
   const [user, setUser] = useState<User | null>(null),
@@ -330,7 +354,12 @@ export default function App() {
       if (e.status === 401 && user) {
         setUser(null);
         setError(t("sessionExpired"));
-      } else
+      } else if (e.message === "Invalid email or password")
+        setError(t("invalidCredentials"));
+      else if (e.message === "Origin not allowed") setError(t("originError"));
+      else if (e.message === "Recurring tasks need a due date")
+        setError(t("recurrenceHint"));
+      else
         setError(
           e.status === 0
             ? t("networkError")
@@ -464,6 +493,7 @@ export default function App() {
     setFilters(blankFilters);
   }, [pid, user?.id, loadProject]);
   async function refreshLive(changes: LiveChange[] | null) {
+    setLiveRevision((v) => v + 1);
     const access =
       !changes ||
       changes.some(
@@ -540,13 +570,6 @@ export default function App() {
         );
         if (selection.current.detailId === id) setComments(updated);
       }
-      if (
-        access ||
-        relevant.some((change) =>
-          ["attachments", "links", "tasks"].includes(change.resource || ""),
-        )
-      )
-        setLiveRevision((old) => old + 1);
     }
   }
   useRealtime(!!user && !connection, refreshLive, async () => {
@@ -577,13 +600,19 @@ export default function App() {
   }, [detail?.id]);
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+      if (
+        user &&
+        !editor &&
+        !detail &&
+        (e.metaKey || e.ctrlKey) &&
+        e.key.toLowerCase() === "k"
+      ) {
         e.preventDefault();
-        setSection("tasks");
-        setTimeout(() => searchRef.current?.focus(), 0);
+        setSearchOpen((v) => !v);
       }
       if (
         e.key === "n" &&
+        !document.querySelector('[role="dialog"]') &&
         !(
           e.target instanceof HTMLInputElement ||
           e.target instanceof HTMLTextAreaElement
@@ -598,7 +627,47 @@ export default function App() {
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [editor, detail, writable, pid]);
+  }, [editor, detail, writable, pid, user?.id]);
+  useEffect(() => {
+    if (!pendingTask) return;
+    const found = tasks.find(
+      (item) => item.id === pendingTask && item.project_id === pid,
+    );
+    if (found) {
+      setDetail(found);
+      setPendingTask("");
+    }
+  }, [tasks, pendingTask, pid]);
+  useEffect(() => {
+    if (!pendingResource) return;
+    const node = document.getElementById(`resource-${pendingResource}`);
+    if (node) {
+      node.scrollIntoView({ block: "center" });
+      node.focus({ preventScroll: true });
+      setPendingResource("");
+    }
+  }, [pendingResource, pages, sprints, section]);
+  function navigateResult(result: SearchResult) {
+    setError("");
+    setDetail(null);
+    setEditor(null);
+    setWid(result.workspace_id);
+    setPid(result.project_id);
+    setMobile(false);
+    setSection(
+      result.kind === "sprint"
+        ? "sprints"
+        : result.kind === "page"
+          ? "pages"
+          : result.kind === "project"
+            ? "overview"
+            : "tasks",
+    );
+    setPendingTask(result.kind === "task" ? result.id : "");
+    setPendingResource(
+      ["page", "sprint"].includes(result.kind) ? result.id : "",
+    );
+  }
   async function refresh() {
     setBusy(true);
     try {
@@ -634,6 +703,9 @@ export default function App() {
       setAuthForm((form) => ({ ...form, password: "" }));
       setPasswordVisible(false);
       setUser(null);
+      setSearchOpen(false);
+      setPendingTask("");
+      setPendingResource("");
       setDetail(null);
       setEditor(null);
       setTasks([]);
@@ -720,10 +792,12 @@ export default function App() {
       }
       if (kind === "project") {
         url = isNew ? `/workspaces/${wid}/projects` : `/projects/${data.id}`;
-        body = { ...data, archived: !!data.archived };
+        body = { ...data, archived: !!data.archived, locale };
       }
-      if (kind === "sprint")
+      if (kind === "sprint") {
         url = isNew ? `/projects/${pid}/sprints` : `/sprints/${data.id}`;
+        body = { ...data, capacity: Number(data.capacity || 0) };
+      }
       if (kind === "module" || kind === "page" || kind === "view") {
         const resource =
           kind === "module" ? "modules" : kind === "page" ? "pages" : "views";
@@ -832,12 +906,25 @@ export default function App() {
       start_date: today(),
       end_date: new Date(Date.now() + 14 * 86400000).toISOString().slice(0, 10),
       status: "planned",
+      capacity: 0,
     });
   const empty = (title: string, hint?: string, action?: ReactNode) => (
     <div className="empty">
-      <Orbit size={38} />
+      {[t("projectHint"), t("noTasks")].includes(title) ? (
+        <img
+          className="empty-orbit"
+          src="/onboarding-orbit.webp"
+          alt=""
+          width={144}
+          height={144}
+        />
+      ) : (
+        <Orbit size={38} />
+      )}
       <h3>{title}</h3>
-      {hint && <p>{hint}</p>}
+      {(hint || title === t("projectHint")) && (
+        <p>{hint || t("gettingStartedHint")}</p>
+      )}
       {action}
     </div>
   );
@@ -879,6 +966,7 @@ export default function App() {
         </div>
       )}
       <div className="task-meta">
+        <RecurrenceBadge task={task} locale={locale} />
         <span className={`priority priority-${task.priority}`}>
           <span /> {t(task.priority)}
         </span>
@@ -1067,6 +1155,26 @@ export default function App() {
         )}
       </EntryShell>
     );
+  if (recovery !== "none")
+    return (
+      <PasswordRecovery
+        locale={locale}
+        token={recovery === "reset" ? resetToken : ""}
+        brand={<Logo />}
+        controls={entryControls}
+        onBack={() => {
+          setRecovery("none");
+          setError("");
+          setAuthForm((f) => ({ ...f, password: "" }));
+          if (resetToken) {
+            setUser(null);
+            const url = new URL(location.href);
+            url.searchParams.delete("reset");
+            history.replaceState(null, "", url);
+          }
+        }}
+      />
+    );
   if (!user)
     return (
       <EntryShell
@@ -1190,6 +1298,19 @@ export default function App() {
             )}
           </Button>
         </form>
+        {!setup && (
+          <Button
+            className="forgot-password"
+            variant="ghost"
+            type="button"
+            onClick={() => {
+              setError("");
+              setRecovery("request");
+            }}
+          >
+            {t("forgotPassword")}
+          </Button>
+        )}
       </EntryShell>
     );
 
@@ -1376,6 +1497,21 @@ export default function App() {
             <strong>{t(section)}</strong>
           </div>
           <div className="topbar-actions">
+            <Button
+              variant="ghost"
+              className="workspace-search"
+              aria-label={t("globalSearch")}
+              onClick={() => setSearchOpen(true)}
+            >
+              <Search size={17} />
+              <span className="search-label">{t("searchEverything")}</span>
+              <kbd dir="ltr">Ctrl K</kbd>
+            </Button>
+            <Inbox
+              locale={locale}
+              revision={liveRevision}
+              onSelect={navigateResult}
+            />
             {languageControl}
             {themeControl}
             <Button
@@ -1417,6 +1553,15 @@ export default function App() {
               </p>
             </div>
             <div className="header-actions">
+              {pid && ["overview", "tasks", "settings"].includes(section) && (
+                <ProjectTransfer
+                  projectId={pid}
+                  projectName={project?.name || ""}
+                  canImport={canManage && writable}
+                  locale={locale}
+                  after={loadProject}
+                />
+              )}
               {!!project?.archived && (
                 <Badge variant="secondary">{t("archived")}</Badge>
               )}
@@ -1499,6 +1644,24 @@ export default function App() {
             <>
               {section === "overview" && (
                 <>
+                  {tasks.length === 0 && writable && (
+                    <div className="first-step">
+                      <img
+                        src="/onboarding-orbit.webp"
+                        alt=""
+                        width={88}
+                        height={88}
+                      />
+                      <div>
+                        <h2>{t("gettingStartedTitle")}</h2>
+                        <p>{t("noTasksHint")}</p>
+                      </div>
+                      <Button onClick={() => newTask()}>
+                        <Plus size={16} />
+                        {t("newTask")}
+                      </Button>
+                    </div>
+                  )}
                   <div className="overview-stats">
                     {[
                       [t("total"), tasks.length, CheckCheck],
@@ -1685,8 +1848,17 @@ export default function App() {
                           setFilters({ ...filters, q: e.target.value })
                         }
                       />
-                      <kbd>⌘ K</kbd>
                     </div>
+                    {writable && (
+                      <BulkActions
+                        projectId={pid}
+                        tasks={filtered}
+                        members={members}
+                        sprints={sprints}
+                        locale={locale}
+                        after={loadProject}
+                      />
+                    )}
                     <div className="view-switch">
                       {(
                         [
@@ -1919,7 +2091,7 @@ export default function App() {
                     const items = tasks.filter((x) => x.sprint_id === s.id),
                       done = items.filter((x) => x.status === "done").length;
                     return (
-                      <Card key={s.id}>
+                      <Card key={s.id} id={`resource-${s.id}`} tabIndex={-1}>
                         <CardContent className="resource-card">
                           <div className="resource-heading">
                             {statusBadge(s.status)}
@@ -1951,6 +2123,15 @@ export default function App() {
                             <span>
                               {done} / {items.length} {t("tasks")}
                             </span>
+                            <SprintReportButton
+                              sprint={s}
+                              locale={locale}
+                              revision={
+                                liveRevision +
+                                tasks.length +
+                                tasks.reduce((sum, v) => sum + v.version, 0)
+                              }
+                            />
                             <Button
                               variant="ghost"
                               size="sm"
@@ -2033,7 +2214,12 @@ export default function App() {
               {section === "pages" && (
                 <div className="pages-list">
                   {pages.map((p) => (
-                    <section key={p.id} className="panel document">
+                    <section
+                      key={p.id}
+                      id={`resource-${p.id}`}
+                      tabIndex={-1}
+                      className="panel document"
+                    >
                       <div className="panel-heading">
                         <h2>
                           <BookOpen size={18} />
@@ -2295,6 +2481,12 @@ export default function App() {
           </a>
         </footer>
       </main>
+      <GlobalSearch
+        open={searchOpen}
+        setOpen={setSearchOpen}
+        locale={locale}
+        onSelect={navigateResult}
+      />
       <Dialog
         open={!!editor}
         onOpenChange={(v) => {
@@ -2355,7 +2547,14 @@ export default function App() {
                       </Label>
                       {field.options ? (
                         <Picker
-                          value={String(value || "")}
+                          value={String(
+                            value ||
+                              (field.key === "template"
+                                ? "blank"
+                                : field.key === "recurrence"
+                                  ? "none"
+                                  : ""),
+                          )}
                           onChange={(v) => set(v)}
                           options={field.options}
                           label={t(field.key)}
@@ -2390,7 +2589,13 @@ export default function App() {
                           }
                           required={field.required}
                           min={field.type === "number" ? 0 : undefined}
-                          max={field.type === "number" ? 1000 : undefined}
+                          max={
+                            field.type === "number"
+                              ? field.key === "capacity"
+                                ? 100000
+                                : 1000
+                              : undefined
+                          }
                           minLength={
                             field.type === "password" && field.required
                               ? 12
@@ -2423,6 +2628,16 @@ export default function App() {
                   );
                 })}
               </div>
+              {editor.kind === "task" && (
+                <p className="workflow-note template-hint">
+                  {t("recurrenceHint")}
+                </p>
+              )}
+              {editor.kind === "project" && editor.isNew && (
+                <p className="workflow-note template-hint">
+                  {t("templateHint")}
+                </p>
+              )}
               <div className="dialog-actions">
                 <Button
                   type="button"
@@ -2668,6 +2883,11 @@ export default function App() {
     if (e.kind === "project") {
       add("identifier", { required: true });
       add("color", { type: "color" });
+      if (e.isNew)
+        add("template", {
+          options: optionList(["blank", "software", "campaign", "operations"]),
+          wide: true,
+        });
     }
     if (e.kind === "sprint") {
       add("goal", { type: "textarea", wide: true });
@@ -2676,6 +2896,7 @@ export default function App() {
       add("status", {
         options: optionList(["planned", "active", "completed"]),
       });
+      add("capacity", { type: "number" });
     }
     if (e.kind === "task") {
       add("status", { options: optionList(statuses) });
@@ -2704,6 +2925,9 @@ export default function App() {
         nullable: true,
       });
       add("due_date", { type: "date" });
+      add("recurrence", {
+        options: optionList(["none", "daily", "weekly", "monthly"]),
+      });
       add("estimate", { type: "number" });
       add("labels", { wide: true });
     }

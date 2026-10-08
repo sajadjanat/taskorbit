@@ -35,6 +35,10 @@ The distinctive visual is the approved transparent Mercury artwork. Supporting l
 
 ## Interaction rules
 
+Version 0.2.0 adds a search command dialog, inbox, import review, bulk selection and sprint reports using the same palette, typography and spacing. Dialog text and close controls follow locale direction; mobile dialogs scroll within the viewport. Cards use the existing quiet border token rather than a foreground-colored outline.
+
+The empty-project illustration is an AI-generated transparent Mercury sphere with three fine solar-gold orbits, based on the approved `public/icon-512.png` brand reference. Source: `assets/brand/onboarding-orbit.png`; optimized transparent 512 px WebP: `public/onboarding-orbit.webp`. Prompt: quiet rocky Mercury, sunlight from the upper-left, thin elliptical paths and restrained gold markers, no text, UI, logos or people. It is decorative, has an empty alternative text, and accompanies a real next-step action. It is not used for task status or data.
+
 - A new or invalid locale preference starts in English. Valid saved language choices are respected; Persian and Arabic use RTL, while URL/email fields remain LTR.
 - Inputs have appropriate types, autocomplete and persistent labels. Passwords can be shown or hidden without clearing their value.
 - Forms expose busy state and disable duplicate submission. Field hints and errors are associated with inputs; status/error messages use live-region semantics.

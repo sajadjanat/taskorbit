@@ -6,6 +6,7 @@ import "@fontsource/vazirmatn/500.css";
 import "@fontsource/vazirmatn/600.css";
 import "@fontsource/vazirmatn/700.css";
 import "./index.css";
+import "./components/workflow-tools.css";
 if (
   "serviceWorker" in navigator &&
   import.meta.env.PROD &&

@@ -557,6 +557,6 @@ test("opening database again preserves projects and work items", () => {
     reopened.prepare("SELECT title FROM tasks WHERE id=?").get(task.id).title,
     "Test task",
   );
-  assert.equal(reopened.prepare("PRAGMA user_version").get().user_version, 2);
+  assert.equal(reopened.prepare("PRAGMA user_version").get().user_version, 3);
   reopened.close();
 });

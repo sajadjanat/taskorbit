@@ -72,7 +72,7 @@ bearer_token_env_var = "TASKORBIT_TOKEN"
       "command": "npx",
       "args": [
         "-y",
-        "--package=https://github.com/sajadjanat/taskorbit/releases/download/v0.1.10/taskorbit-mcp-0.1.10.tgz",
+        "--package=https://github.com/sajadjanat/taskorbit/releases/download/v0.2.0/taskorbit-mcp-0.2.0.tgz",
         "taskorbit-mcp"
       ],
       "env": {

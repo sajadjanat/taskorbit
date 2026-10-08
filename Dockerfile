@@ -12,6 +12,7 @@ COPY package*.json .npmrc ./
 RUN npm ci --omit=dev --no-audit --no-fund && npm cache clean --force && mkdir /data && chown node:node /data
 COPY --from=build /app/dist ./dist
 COPY server ./server
+COPY shared ./shared
 COPY mcp ./mcp
 USER node
 VOLUME ["/data"]

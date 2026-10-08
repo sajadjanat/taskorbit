@@ -14,6 +14,8 @@ import { readFileSync } from "node:fs";
 import { openDatabase, transaction } from "./db.mjs";
 import { createRealtime } from "./realtime.mjs";
 import { mountMcp } from "./mcp.mjs";
+import { mountPasswordRecovery, passwordMailer } from "./password-recovery.mjs";
+import { mountWorkflows, templateIds } from "./workflows.mjs";
 import {
   VERSION,
   releaseChecker,
@@ -47,6 +49,8 @@ const projectSchema = z.object({
     .regex(/^#[a-fA-F0-9]{6}$/)
     .default("#7d4b0b"),
   archived: z.boolean().default(false),
+  template: z.enum(templateIds).default("blank"),
+  locale: z.enum(["en", "fa", "ar", "zh-CN"]).default("en"),
 });
 const sprintSchema = z
   .object({
@@ -55,6 +59,7 @@ const sprintSchema = z
     start_date: date,
     end_date: date,
     status: z.enum(["planned", "active", "completed"]).default("planned"),
+    capacity: z.number().int().min(0).max(100000).default(0),
   })
   .refine((v) => v.end_date >= v.start_date, {
     message: "End date precedes start date",
@@ -75,6 +80,7 @@ const taskSchema = z.object({
   labels: z.array(z.string().trim().min(1).max(40)).max(20).default([]),
   due_date: date.nullable().default(null),
   estimate: z.number().int().min(0).max(1000).default(0),
+  recurrence: z.enum(["none", "daily", "weekly", "monthly"]).default("none"),
 });
 const hash = (v) => createHash("sha256").update(v).digest("hex");
 export function hashPassword(value) {
@@ -100,6 +106,7 @@ export function createApp({
   checkRelease = releaseChecker(),
   upgradeAgent = updateAgentClient(),
   maintenancePath = process.env.UPDATE_STATE_PATH,
+  sendPasswordReset = passwordMailer(),
 } = {}) {
   const db = openDatabase(database),
     app = express();
@@ -120,6 +127,7 @@ export function createApp({
     }),
   );
   const json = express.json({ limit: "256kb" });
+  app.use(/^\/api\/projects\/[^/]+\/import$/, express.json({ limit: "2mb" }));
   app.use((req, res, next) =>
     req.path === "/mcp" || req.path === "/mcp/" ? next() : json(req, res, next),
   );
@@ -246,11 +254,9 @@ export function createApp({
   }
   function sessionOnly(req, res, next) {
     if (!req.session)
-      return res
-        .status(403)
-        .json({
-          error: "Use the signed-in application to manage account credentials",
-        });
+      return res.status(403).json({
+        error: "Use the signed-in application to manage account credentials",
+      });
     next();
   }
   function admin(req, res, next) {
@@ -291,6 +297,8 @@ export function createApp({
   }
   const decode = (t) => ({ ...t, labels: JSON.parse(t.labels) });
   function taskRefs(p, v, tid) {
+    if (v.recurrence && v.recurrence !== "none" && !v.due_date)
+      fail(400, "Recurring tasks need a due date");
     if (
       v.assignee_id &&
       !db
@@ -367,10 +375,29 @@ export function createApp({
     if (!verify(v.password, u.password)) fail(401, "Invalid email or password");
     res.json(session(req, res, u));
   });
+  mountPasswordRecovery(app, {
+    db,
+    origin,
+    limiter: authLimit,
+    mailer: sendPasswordReset,
+    hashPassword,
+    fail,
+  });
   app.use("/api", auth);
   const realtime = createRealtime(db);
   app.get("/api/events", sessionOnly, realtime.connect);
   app.use("/api", realtime.track);
+  const workflows = mountWorkflows(app, {
+    db,
+    workspace,
+    project,
+    task,
+    audit,
+    taskSchema,
+    taskRefs,
+    decode,
+    fail,
+  });
   app.get("/api/me", (req, res) => res.json(publicUser(req.user)));
   app.get("/api/me/token-info", (req, res) =>
     res.json({
@@ -456,6 +483,9 @@ export function createApp({
       );
       db.prepare("DELETE FROM sessions WHERE user_id=?").run(req.user.id);
       db.prepare("DELETE FROM api_tokens WHERE user_id=?").run(req.user.id);
+      db.prepare("DELETE FROM password_resets WHERE user_id=?").run(
+        req.user.id,
+      );
     });
     res.clearCookie("taskorbit_session", { path: "/" }).json({ ok: true });
   });
@@ -564,6 +594,7 @@ export function createApp({
       if (v.password || v.active === false) {
         db.prepare("DELETE FROM sessions WHERE user_id=?").run(u.id);
         db.prepare("DELETE FROM api_tokens WHERE user_id=?").run(u.id);
+        db.prepare("DELETE FROM password_resets WHERE user_id=?").run(u.id);
       }
     });
     res.json(
@@ -674,9 +705,17 @@ export function createApp({
     workspace(req, req.params.wid, true, true);
     const v = projectSchema.parse(req.body),
       pid = randomUUID();
-    db.prepare(
-      "INSERT INTO projects(id,workspace_id,name,identifier,description,color) VALUES(?,?,?,?,?,?)",
-    ).run(pid, req.params.wid, v.name, v.identifier, v.description, v.color);
+    transaction(db, () => {
+      db.prepare(
+        "INSERT INTO projects(id,workspace_id,name,identifier,description,color) VALUES(?,?,?,?,?,?)",
+      ).run(pid, req.params.wid, v.name, v.identifier, v.description, v.color);
+      workflows.seedTemplate(
+        req,
+        db.prepare("SELECT * FROM projects WHERE id=?").get(pid),
+        v.template,
+        v.locale,
+      );
+    });
     res
       .status(201)
       .json(db.prepare("SELECT * FROM projects WHERE id=?").get(pid));
@@ -714,7 +753,9 @@ export function createApp({
     project(req, req.params.pid, true);
     const v = sprintSchema.parse(req.body),
       sid = randomUUID();
-    db.prepare("INSERT INTO sprints VALUES(?,?,?,?,?,?,?)").run(
+    db.prepare(
+      "INSERT INTO sprints(id,project_id,name,goal,start_date,end_date,status,capacity) VALUES(?,?,?,?,?,?,?,?)",
+    ).run(
       sid,
       req.params.pid,
       v.name,
@@ -722,6 +763,7 @@ export function createApp({
       v.start_date,
       v.end_date,
       v.status,
+      v.capacity,
     );
     res.status(201).json({ id: sid, project_id: req.params.pid, ...v });
   });
@@ -733,8 +775,9 @@ export function createApp({
     project(req, s.project_id, true);
     const v = sprintSchema.parse(req.body);
     db.prepare(
-      "UPDATE sprints SET name=?,goal=?,start_date=?,end_date=?,status=? WHERE id=?",
-    ).run(v.name, v.goal, v.start_date, v.end_date, v.status, s.id);
+      "UPDATE sprints SET name=?,goal=?,start_date=?,end_date=?,status=?,capacity=? WHERE id=?",
+    ).run(v.name, v.goal, v.start_date, v.end_date, v.status, v.capacity, s.id);
+    workflows.snapshot(s.id, s.status !== "completed");
     res.json({ ...s, ...v });
   });
   app.get("/api/projects/:pid/tasks", (req, res) => {
@@ -751,39 +794,10 @@ export function createApp({
   );
   app.post("/api/projects/:pid/tasks", (req, res) => {
     const p = project(req, req.params.pid, true),
-      v = taskSchema.parse(req.body),
-      tid = randomUUID();
-    taskRefs(p, v, tid);
-    transaction(db, () => {
-      const n = db
-        .prepare(
-          "UPDATE projects SET sequence=sequence+1 WHERE id=? RETURNING sequence",
-        )
-        .get(p.id).sequence;
-      db.prepare(
-        "INSERT INTO tasks(id,project_id,number,title,description,status,priority,assignee_id,sprint_id,module_id,parent_id,labels,due_date,estimate,created_by) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-      ).run(
-        tid,
-        p.id,
-        n,
-        v.title,
-        v.description,
-        v.status,
-        v.priority,
-        v.assignee_id,
-        v.sprint_id,
-        v.module_id,
-        v.parent_id,
-        JSON.stringify(v.labels),
-        v.due_date,
-        v.estimate,
-        req.user.id,
-      );
-      audit(req, p.id, tid, "created", { title: v.title, status: v.status });
-    });
+      v = taskSchema.parse(req.body);
     res
       .status(201)
-      .json(decode(db.prepare("SELECT * FROM tasks WHERE id=?").get(tid)));
+      .json(transaction(db, () => workflows.insertTask(req, p, v)));
   });
   app.put("/api/tasks/:tid", (req, res) => {
     const t = task(req, req.params.tid, true),
@@ -795,7 +809,7 @@ export function createApp({
     transaction(db, () => {
       const result = db
         .prepare(
-          "UPDATE tasks SET title=?,description=?,status=?,priority=?,assignee_id=?,sprint_id=?,module_id=?,parent_id=?,labels=?,due_date=?,estimate=?,version=version+1,updated_at=CURRENT_TIMESTAMP WHERE id=? AND version=?",
+          "UPDATE tasks SET title=?,description=?,status=?,priority=?,assignee_id=?,sprint_id=?,module_id=?,parent_id=?,labels=?,due_date=?,estimate=?,recurrence=?,version=version+1,updated_at=CURRENT_TIMESTAMP WHERE id=? AND version=?",
         )
         .run(
           v.title,
@@ -809,6 +823,7 @@ export function createApp({
           JSON.stringify(v.labels),
           v.due_date,
           v.estimate,
+          v.recurrence,
           t.id,
           v.version,
         );
@@ -818,6 +833,11 @@ export function createApp({
         to: v.status,
         title: v.title,
       });
+      workflows.afterTaskChange(
+        req,
+        t,
+        db.prepare("SELECT * FROM tasks WHERE id=?").get(t.id),
+      );
     });
     res.json(decode(db.prepare("SELECT * FROM tasks WHERE id=?").get(t.id)));
   });
@@ -827,6 +847,7 @@ export function createApp({
     transaction(db, () => {
       audit(req, t.project_id, t.id, "deleted", { title: t.title });
       db.prepare("DELETE FROM tasks WHERE id=?").run(t.id);
+      workflows.snapshot(t.sprint_id);
     });
     res.json({ ok: true });
   });
@@ -851,6 +872,7 @@ export function createApp({
         "INSERT INTO comments(id,task_id,user_id,body) VALUES(?,?,?,?)",
       ).run(cid, t.id, req.user.id, v.body);
       audit(req, t.project_id, t.id, "commented", {});
+      workflows.afterComment(req, t);
     });
     res.status(201).json({ id: cid, ...v });
   });

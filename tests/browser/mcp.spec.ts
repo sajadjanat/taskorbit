@@ -1,4 +1,8 @@
 import { test, expect } from "@playwright/test";
+import { readFileSync } from "node:fs";
+const version = JSON.parse(
+  readFileSync(new URL("../../package.json", import.meta.url), "utf8"),
+).version;
 test("MCP settings create a token once, generate agent configs and revoke access", async ({
   page,
   request,
@@ -60,7 +64,9 @@ test("MCP settings create a token once, generate agent configs and revoke access
     .getByLabel("Agent / connection method")
     .selectOption("stdio-windows");
   await expect(panel.locator("pre")).toContainText('"command": "cmd"');
-  await expect(panel.locator("pre")).toContainText("taskorbit-mcp-0.1.10.tgz");
+  await expect(panel.locator("pre")).toContainText(
+    `taskorbit-mcp-${version}.tgz`,
+  );
   await expect(
     panel.getByRole("link", { name: /Full setup guide/ }),
   ).toHaveAttribute("href", /docs\/MCP\.md$/);

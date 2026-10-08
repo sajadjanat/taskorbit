@@ -1,6 +1,6 @@
 {
   "name": "taskorbit",
-  "version": "0.1.10",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -28,6 +28,7 @@
     "express-rate-limit": "^8.1.0",
     "helmet": "^8.1.0",
     "lucide-react": "^0.468.0",
+    "nodemailer": "^10.0.16",
     "radix-ui": "^1.6.7",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
@@ -51,5 +52,8 @@
   },
   "engines": {
     "node": ">=22.18.0"
+  },
+  "overrides": {
+    "shell-quote": "^1.12.0"
   }
 }

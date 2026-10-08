@@ -59,10 +59,12 @@ export type Task = {
   labels: string[];
   due_date: string | null;
   estimate: number;
+  recurrence: "none" | "daily" | "weekly" | "monthly";
   version: number;
   created_at: string;
 };
 export type Sprint = {
+  capacity: number;
   id: string;
   name: string;
   goal: string;

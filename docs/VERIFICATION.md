@@ -1,5 +1,14 @@
 # Preview verification
 
+## 2026-10-08 team workflows and release candidate 0.2.0
+
+- 52 API/MCP/upgrade/workflow tests passed with temporary SQLite databases. A populated schema-2 fixture was upgraded and reopened twice, preserving accounts, sessions, labels, discussions and sprint references, with a clean foreign-key check.
+- New regression coverage includes search isolation and revoked access, calendar-safe recurrence and duplicate prevention, all-or-nothing bulk version conflicts, notification ownership/deduplication, localized templates, JSON reference remapping, malformed multilingual CSV rollback, capacity/workload history, hashed/expiring/replay-safe reset links, session/token revocation and delayed/failed delivery.
+- TypeScript checking and the 0.2.0 production build passed. UI vendor code is split from application code; neither generated JavaScript bundle exceeds the previous 500 kB warning threshold. `npm audit` reported zero vulnerabilities after correcting the development shell-quote dependency.
+- The final combined 0.2.0 browser run passed all 18 scenarios across desktop Chromium and iPhone WebKit emulation. Tests cover the new dialogs with axe WCAG checks, keyboard navigation, recurrence, bulk changes, file preview/download, reports and Persian RTL without page overflow. The MCP package assertion reads the release version dynamically; global-search fixtures use distinct titles across browser projects. Browser emulation does not verify physical iPhone installation. CI publication is recorded separately when complete.
+- Four documentation previews per language were recaptured from disposable fictional projects for English, Persian, Arabic and Simplified Chinese. The transparent empty-state illustration is AI-generated from the existing brand reference; its optimized WebP is about 53 kB.
+- Local Docker/native packaging is not available in this Windows session; release CI remains responsible for those gates. No production instance or user database was modified. SMTP was exercised through a test mailer; an external provider and actual delivery remain unconfigured and unverified.
+
 ## 2026-10-06 connection and live collaboration fixes
 
 - The installed Windows client reproduced the reported issues: startup stayed on the connection form despite a saved server, and invoking the real native menu navigated to `about:blank`. The corrected local Windows executable automatically opened the saved server, passed three real native menu/return cycles, kept history-based settings reachable and rejected native commands from the remote server. WebView2 used an isolated temporary profile and anonymous requests; production work data was not changed. Local executable linking used an `rlib`-only build workaround for the GNU linker's DLL export limit; release packaging retains the normal crate types.
